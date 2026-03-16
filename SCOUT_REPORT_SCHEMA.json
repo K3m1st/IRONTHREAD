@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "operation": "",
+    "target_ip": "",
+    "target_hostname": "",
+    "date": "",
+    "agent": "SCOUT v1.0",
+    "status": "COMPLETE | PARTIAL"
+  },
+  "target_profile": {
+    "ip": "",
+    "hostname": "",
+    "os_detected": "",
+    "os_confidence": "HIGH | MEDIUM | LOW",
+    "open_port_count": 0,
+    "attack_surface_categories": []
+  },
+  "ports": [
+    {
+      "port": 0,
+      "protocol": "tcp | udp",
+      "service": "",
+      "version": "",
+      "confidence": "HIGH | MEDIUM | LOW",
+      "notes": ""
+    }
+  ],
+  "web": {
+    "present": false,
+    "ports": [],
+    "technology_stack": [],
+    "directories": [
+      {
+        "path": "",
+        "status_code": 0,
+        "notes": "",
+        "confidence": "HIGH | MEDIUM | LOW"
+      }
+    ],
+    "login_pages": [],
+    "notable_headers": [],
+    "notes": ""
+  },
+  "file_sharing": {
+    "present": false,
+    "smb": {
+      "present": false,
+      "anonymous_access": "YES | NO | NOT_TESTED",
+      "shares": [],
+      "domain": "",
+      "notes": ""
+    },
+    "ftp": {
+      "present": false,
+      "anonymous_access": "YES | NO | NOT_TESTED",
+      "notes": ""
+    },
+    "nfs": {
+      "present": false,
+      "mounts": [],
+      "notes": ""
+    }
+  },
+  "remote_access": {
+    "present": false,
+    "ssh": {
+      "present": false,
+      "port": 22,
+      "version": "",
+      "auth_methods": [],
+      "notes": ""
+    },
+    "rdp": {
+      "present": false,
+      "port": 3389,
+      "notes": ""
+    },
+    "winrm": {
+      "present": false,
+      "port": 5985,
+      "notes": ""
+    }
+  },
+  "dns": {
+    "present": false,
+    "zone_transfer_attempted": false,
+    "zone_transfer_success": false,
+    "hostnames": [],
+    "subdomains": [],
+    "notes": ""
+  },
+  "databases": [
+    {
+      "service": "",
+      "port": 0,
+      "version": "",
+      "anonymous_access": "YES | NO | NOT_TESTED",
+      "notes": ""
+    }
+  ],
+  "other_services": [
+    {
+      "port": 0,
+      "service": "",
+      "notes": "",
+      "confidence": "HIGH | MEDIUM | LOW"
+    }
+  ],
+  "anomalies": [
+    {
+      "id": "ANOMALY-001",
+      "description": "",
+      "detected_via": "",
+      "recommended_followup": ""
+    }
+  ],
+  "gaps": [
+    {
+      "id": "GAP-001",
+      "description": "",
+      "reason": "",
+      "suggested_approach": ""
+    }
+  ],
+  "planner_recommendations": [
+    {
+      "priority": 1,
+      "action": "",
+      "rationale": "",
+      "target": ""
+    }
+  ],
+  "tools_executed": [
+    {
+      "tool": "",
+      "command": "",
+      "output_file": ""
+    }
+  ],
+  "raw_output_directory": ""
+}
