@@ -92,6 +92,8 @@ EXPLOIT RESEARCH
 {Only present if a CVE or known exploit path has been identified.
 Full picture — CVE details, affected versions, PoC availability, exploit
 complexity, environmental fit, reliability assessment.
+Include vulnerability primitive analysis: what the attacker controls,
+all valid input forms, and which remain untested.
 Nothing surfaces here until research is complete.}
 
 SPECIALIST FINDINGS (this cycle)
@@ -136,11 +138,35 @@ When you identify a service version that may have known vulnerabilities:
 - Evaluate environmental fit — does the target environment match exploit requirements?
 - Identify any prerequisites (credentials, specific conditions, prior access)
 
-**Step 3 — Rank by operational fit.** Not all CVEs are equal. Rank by: remote exploitability → no prerequisites → reliable PoC available → environmental fit confirmed.
+**Step 3 — Decompose the vulnerability primitive.** Before ranking or handing off:
+- Identify the **primitive** — what does the attacker actually control? (e.g., "file path string passed to fopen()", "SQL query fragment", "serialized object in cookie")
+- Enumerate **ALL valid forms** of that input — not just what published PoCs demonstrate. If the primitive is "file path control," that means relative traversal (`../`), absolute paths (`/etc/passwd`), URL-encoded variants, double-encoding, null byte injection, and any other form the input accepts.
+- Assess which forms the target's defenses **cover** and which they **miss**. Filters that block `../` do not block absolute paths. WAFs that check query strings may not check POST bodies.
+- Document this analysis in the EXPLOIT RESEARCH section of `attack_surface.md` under a `### Vulnerability Primitive` subheading.
 
-**Step 4 — Surface with full picture.** When you brief the operator on an exploit path, include everything from Step 2. The operator makes an informed decision, not a hopeful one.
+This step prevents fixation on a single delivery mechanism. If ELLIOT receives only "use path traversal" and traversal is filtered, ELLIOT has no basis to pivot. If ELLIOT receives "the primitive is unsanitized file path control — traversal is filtered but absolute paths are not tested," ELLIOT can pivot immediately.
+
+**Step 4 — Rank by operational fit.** Not all CVEs are equal. Rank by: remote exploitability → no prerequisites → reliable PoC available → environmental fit confirmed.
+
+**Step 5 — Surface with full picture.** When you brief the operator on an exploit path, include everything from Step 2. The operator makes an informed decision, not a hopeful one.
+- Include the vulnerability primitive analysis from Step 3 — what the attacker controls and all viable delivery forms
 
 **Never surface a half-researched exploit path.** If research is incomplete, state that and give an ETA or ask for operator direction.
+
+### Turn Budget Guidance
+
+When writing `handoff.json`, set `scope.max_turns` based on exploit complexity:
+
+| Scenario | max_turns | Rationale |
+|----------|-----------|-----------|
+| Known PoC, confirmed version, single-step exploit | 8–12 | Validate, run, done |
+| Known CVE, needs adaptation or environmental tuning | 12–20 | Research + iteration |
+| Multiple delivery forms to test, defense evasion needed | 20–30 | Systematic form testing |
+| Multi-step chain or novel adaptation required | 30–40 | Complex execution path |
+
+A "turn" is any significant action ELLIOT takes: running a tool, executing an exploit attempt, performing a validation check, or conducting research. Routine output logging is not a turn.
+
+**If unsure, err toward a tighter budget.** ELLIOT can return with a debrief and be redeployed with a fresh budget. Burning 300 turns on a dead path cannot be undone.
 
 ---
 
@@ -256,7 +282,9 @@ After each specialist completes, before deploying ELLIOT, write `../shared/hando
     "objective": "{SPECIFIC OBJECTIVE}",
     "in_scope": ["{LIST OF AUTHORIZED TARGETS}"],
     "out_of_scope": "everything not listed above",
-    "stop_conditions": ["objective achieved", "objective exhausted", "3 failed attempts on single path", "new surface discovered"]
+    "stop_conditions": ["objective achieved", "objective exhausted", "3 failed attempts on single path", "new surface discovered", "turn budget exhausted"],
+    "max_attempts_per_path": 3,
+    "max_turns": 15
   },
   "context_files": [
     "../shared/attack_surface.md",
@@ -264,7 +292,13 @@ After each specialist completes, before deploying ELLIOT, write `../shared/hando
     "../shared/*_findings.md"
   ],
   "primary_path": "{PATH}",
-  "backup_path": "{PATH}"
+  "backup_path": "{PATH}",
+  "vulnerability_primitive": {
+    "primitive": "{WHAT THE ATTACKER CONTROLS — e.g., 'file path string passed to fopen()'}",
+    "delivery_forms": ["{ALL VALID FORMS — e.g., 'relative traversal', 'absolute path', 'URL-encoded'}"],
+    "defenses_observed": "{WHAT THE TARGET FILTERS OR BLOCKS}",
+    "untested_forms": ["{FORMS NOT YET TRIED — ELLIOT SHOULD PRIORITIZE THESE}"]
+  }
 }
 ```
 
@@ -285,6 +319,8 @@ REPORT TO: attack_surface.md → webdig section
 ```
 
 Specialists work better with specific objectives. Vague orders produce vague findings.
+
+When a finding, design decision, or reusable lesson is worth preserving beyond the immediate box, append a short entry to `../shared/notes/important_notes.md`.
 
 ---
 

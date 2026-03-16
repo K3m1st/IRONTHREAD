@@ -166,7 +166,9 @@ The handoff must include:
 - `scope.in_scope` — explicit list of authorized targets/services
 - `scope.out_of_scope` — "everything not listed above"
 - `scope.stop_conditions` — when ELLIOT must stop and return
+- `scope.max_turns` — total turn budget for this deployment (see Turn Budget Guidance in `PLANNER_SYSTEM_PROMPT.md`)
 - `primary_path` and `backup_path` — ranked attack paths
+- `vulnerability_primitive` — what the attacker controls, all delivery forms, observed defenses, and untested forms
 - `context_files` — which shared/ files ELLIOT should read
 
 After writing:

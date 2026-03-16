@@ -12,7 +12,8 @@
     "scope",
     "context_files",
     "primary_path",
-    "backup_path"
+    "backup_path",
+    "vulnerability_primitive"
   ],
   "properties": {
     "operation": {
@@ -39,7 +40,8 @@
         "in_scope",
         "out_of_scope",
         "stop_conditions",
-        "max_attempts_per_path"
+        "max_attempts_per_path",
+        "max_turns"
       ],
       "properties": {
         "objective": {
@@ -70,6 +72,12 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 5
+        },
+        "max_turns": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 40,
+          "description": "Total turn budget for this deployment. Planner sets based on CVE complexity. ELLIOT hard-stops when exhausted."
         }
       }
     },
@@ -88,6 +96,37 @@
     "backup_path": {
       "type": "string",
       "minLength": 1
+    },
+    "vulnerability_primitive": {
+      "type": "object",
+      "required": ["primitive", "delivery_forms"],
+      "properties": {
+        "primitive": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the attacker controls — the underlying input that enables the vulnerability"
+        },
+        "delivery_forms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "ALL valid forms of the controlled input, not just what PoCs show"
+        },
+        "defenses_observed": {
+          "type": "string",
+          "description": "What filtering or defenses the target applies to this input"
+        },
+        "untested_forms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Delivery forms not yet attempted — ELLIOT should prioritize these"
+        }
+      }
     },
     "notes": {
       "type": "string"

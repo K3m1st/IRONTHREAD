@@ -116,9 +116,37 @@ Do not proceed. Do not pre-emptively act. Wait.
 [DECISION] {MOVE} confirmed. Deploying {SPECIALIST}.
 ```
 
-Issue deployment order with specific objective. When the confirmed move is ELLIOT deployment, **you must complete Step 6.5 before the operator launches ELLIOT**. For other specialists, operator proceeds directly:
+Issue deployment order with specific objective. When the confirmed move is WEBDIG deployment, **you must complete Step 6.25 before the operator launches WEBDIG**. When the confirmed move is ELLIOT deployment, **you must complete Step 6.5 before the operator launches ELLIOT**. For other specialists, operator proceeds directly:
 ```bash
 cd ../{specialist}
+claude
+```
+
+### Step 6.25 — Write deployment_webdig.json Before WEBDIG Deployment
+
+**This step is mandatory before any WEBDIG deployment.**
+
+When the confirmed move deploys WEBDIG, write `../shared/deployment_webdig.json` using the schema defined in `PLANNER_SYSTEM_PROMPT.md`.
+
+The deployment must include:
+- `authorized: true`
+- `target` — exact web target
+- `ports` — only the ports in scope
+- `objective` — one specific enumeration objective
+- `priority_paths` — first places WEBDIG should focus
+- `allowed_actions` — what WEBDIG may do in this phase
+- `disallowed_actions` — what WEBDIG may not do
+- `completion_criteria` — what counts as done
+- `return_conditions` — when WEBDIG must stop and hand back
+
+After writing:
+```
+[DEPLOY] deployment_webdig.json written. WEBDIG is authorized within defined scope.
+```
+
+Only then does the operator launch WEBDIG:
+```bash
+cd ../webdig
 claude
 ```
 
@@ -138,7 +166,9 @@ The handoff must include:
 - `scope.in_scope` — explicit list of authorized targets/services
 - `scope.out_of_scope` — "everything not listed above"
 - `scope.stop_conditions` — when ELLIOT must stop and return
+- `scope.max_turns` — total turn budget for this deployment (see Turn Budget Guidance in `PLANNER_SYSTEM_PROMPT.md`)
 - `primary_path` and `backup_path` — ranked attack paths
+- `vulnerability_primitive` — what the attacker controls, all delivery forms, observed defenses, and untested forms
 - `context_files` — which shared/ files ELLIOT should read
 
 After writing:
@@ -162,6 +192,7 @@ claude
 - Update attack_surface.md every evaluation cycle — never skip
 - Single recommendation per brief — one decision at a time
 - Specific deployment objectives — never open-ended orders
+- **Never deploy WEBDIG without writing deployment_webdig.json first**
 - Never self-authorize the next move — always wait for confirmation
 - **Never deploy ELLIOT without writing handoff.json first** — ELLIOT will hard-stop without it
 
