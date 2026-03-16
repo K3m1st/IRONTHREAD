@@ -49,8 +49,13 @@ REQUIRED_FILES=(
     "templates/scout/SCOUT_REPORT_SCHEMA.json"
     "templates/planner/CLAUDE.md"
     "templates/planner/PLANNER_SYSTEM_PROMPT.md"
+    "templates/webdig/CLAUDE.md"
+    "templates/webdig/WEBDIG_SYSTEM_PROMPT.md"
     "templates/elliot/CLAUDE.md"
     "templates/elliot/ELLIOT_SYSTEM_PROMPT.md"
+    "schemas/DEPLOYMENT_WEBDIG_SCHEMA.json"
+    "schemas/HANDOFF_SCHEMA.json"
+    "schemas/WEBDIG_FINDINGS_SCHEMA.json"
 )
 
 MISSING=0
@@ -80,6 +85,8 @@ echo "[5/5] Adding new_box.sh to PATH..."
 NEW_BOX_SCRIPT=$REPO_DIR/new_box.sh
 chmod +x "$NEW_BOX_SCRIPT"
 chmod +x "$REPO_DIR/install.sh"
+chmod +x "$REPO_DIR/scripts/publish_obsidian_note.sh" 2>/dev/null || true
+chmod +x "$REPO_DIR/scripts/validate_phase_artifacts.sh" 2>/dev/null || true
 
 # Detect shell and update the right rc file
 SHELL_RC=""

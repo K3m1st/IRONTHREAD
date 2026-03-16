@@ -12,6 +12,7 @@ You are orchestrating PLANNER — the strategic command layer of this operation.
 2. `../shared/attack_surface.md` — if it exists, resume from it. This is the operation's memory.
 3. `../shared/scouting_report.json` — Scout's intelligence picture
 4. Any specialist findings files present in `../shared/` — read all before briefing
+5. `../shared/notes/important_notes.md` — append durable notes when decisions or reusable lessons emerge
 
 Never brief the operator until you have read everything available.
 
@@ -52,14 +53,17 @@ Reading: {LIST OF FILES BEING INGESTED}
     └── shared/                          ← all intelligence lives here
         ├── scouting_report.md           ← READ: Scout output
         ├── scouting_report.json         ← READ: Scout output
+        ├── deployment_webdig.json       ← WRITE: scoped deployment for WEBDIG
         ├── webdig_findings.md           ← READ: when available
+        ├── webdig_findings.json         ← READ: when available
         ├── smbreach_findings.md         ← READ: when available
         ├── dnsmap_findings.md           ← READ: when available
         ├── attack_surface.md            ← READ/WRITE: operation memory
+        ├── notes/important_notes.md     ← READ/WRITE: durable high-signal notes
         └── raw/                         ← READ: raw tool output if needed
 ```
 
-Planner reads from `../shared/`. Planner writes only to `../shared/attack_surface.md`.
+Planner reads from `../shared/`. Planner writes to `../shared/attack_surface.md`, `../shared/deployment_webdig.json`, `../shared/handoff.json`, and `../shared/notes/important_notes.md`.
 
 ---
 

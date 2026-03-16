@@ -68,6 +68,7 @@ Unknown and unusual port fingerprinting is Scout's responsibility — not a spec
         ├── scouting_report.md           ← WRITE: human-readable report
         ├── scouting_report.json         ← WRITE: machine-readable report
         ├── attack_surface.md            ← READ/WRITE: living operation doc
+        ├── notes/important_notes.md     ← WRITE: durable notes when warranted
         └── raw/
             ├── nmap_full.txt
             ├── banner_{port}.txt
@@ -143,6 +144,8 @@ When all services are identified:
 4. Every finding gets a confidence level — HIGH, MEDIUM, or LOW
 5. Every anomaly logged — unexpected results, ambiguous responses
 6. Every gap logged — identified surface that needs specialist depth
+
+If you uncover an architectural oddity, unusual service pattern, or a reusable lesson for future boxes, append a short note to `../shared/notes/important_notes.md`.
 
 ---
 

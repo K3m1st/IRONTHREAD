@@ -45,11 +45,13 @@ Read in this exact order:
   ```
 
 - If validation passes, confirm scope before proceeding:
+- If validation passes, confirm scope before proceeding:
   ```
   [ELLIOT] Authorized. Scope confirmed from handoff.json.
   Objective: {scope.objective}
   In scope: {scope.in_scope}
   Out of scope: {scope.out_of_scope}
+  Max attempts per path: {scope.max_attempts_per_path}
   Primary path: {primary_path}
   Proceeding.
   ```
@@ -84,7 +86,8 @@ If no exploit log exists — fresh operation. Proceed from full context read.
         ├── scouting_report.md         ← READ: Scout brief
         ├── scouting_report.json       ← READ: Scout structured
         ├── *_findings.md              ← READ: all specialist output
-        └── exploit_log.md             ← WRITE: real-time operation log
+        ├── exploit_log.md             ← WRITE: real-time operation log
+        └── notes/important_notes.md   ← WRITE: durable notes when warranted
 ```
 
 ELLIOT reads from `../shared/`. ELLIOT writes only to `../shared/exploit_log.md`.
@@ -175,6 +178,8 @@ Then tell the operator:
 [ELLIOT] Done. Exploit log finalized. Return to Planner for re-evaluation:
   cd ../planner && claude
 ```
+
+If the exploit phase produced a reusable lesson, unusual failure mode, or capstone-relevant insight, append a short note to `../shared/notes/important_notes.md` before returning.
 
 Do not continue working after a stop condition. Do not self-authorize a new objective.
 

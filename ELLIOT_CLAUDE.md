@@ -50,6 +50,7 @@ Read in this exact order:
   Objective: {scope.objective}
   In scope: {scope.in_scope}
   Out of scope: {scope.out_of_scope}
+  Max attempts per path: {scope.max_attempts_per_path}
   Primary path: {primary_path}
   Proceeding.
   ```

@@ -5,7 +5,9 @@
 
 ## Overview
 
-Two commands. That's it.
+The repo is centered on a staged agent workflow, with a web-first path as the current primary thread:
+
+`SCOUT -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT`
 
 ```bash
 # One time only — first time setup
@@ -28,13 +30,20 @@ When you clone this repo, it should look like this:
     ├── new_box.sh              ← run every new box
     ├── templates/
     │   ├── scout/
-    │   │   ├── CLAUDE.md
-    │   │   ├── SCOUT_SYSTEM_PROMPT.md
-    │   │   ├── SCOUT_REPORT_TEMPLATE.md
-    │   │   └── SCOUT_REPORT_SCHEMA.json
-    │   └── planner/
-    │       ├── CLAUDE.md
-    │       └── PLANNER_SYSTEM_PROMPT.md
+    │   ├── planner/
+    │   ├── webdig/
+    │   └── elliot/
+    ├── docs/
+    │   ├── PHASE_1_5.md
+    │   ├── OBSIDIAN_WORKFLOW.md
+    │   └── WEB_FIRST_CONTROL_STRATEGY.md
+    ├── schemas/
+    │   ├── DEPLOYMENT_WEBDIG_SCHEMA.json
+    │   ├── HANDOFF_SCHEMA.json
+    │   └── WEBDIG_FINDINGS_SCHEMA.json
+    └── scripts/
+        ├── publish_obsidian_note.sh
+        └── validate_phase_artifacts.sh
 ```
 
 ---
@@ -68,7 +77,8 @@ new_box.sh Monitored 10.10.10.10
 
 **What it does:**
 - Creates `~/Desktop/HTB/boxes/Monitored/`
-- Builds full directory tree with scout/, planner/, shared/raw/
+- Builds full directory tree with scout/, planner/, webdig/, elliot/, shared/raw/, and shared/notes/
+- Copies shared schemas into `shared/schemas/` for box-local validation and contract reference
 - Copies all agent files from templates into the right places
 - Writes target IP into shared/target.txt
 - Prints exactly what to do next
@@ -87,6 +97,9 @@ claude
 # Step 2 — Run Planner
 cd ~/Desktop/HTB/boxes/Monitored/planner
 claude
+
+# Then follow the web-first thread
+# Planner -> webdig -> Planner -> elliot
 ```
 
 That's the entire workflow.
@@ -111,17 +124,21 @@ cd ../planner && claude
     └── PLANNER writes shared/attack_surface.md
     └── PLANNER delivers operational brief → you confirm next move
             ↓
-cd ../specialist && claude  (PLANNER tells you which one)
-    └── SPECIALIST reads shared/scouting_report.json for context
-    └── SPECIALIST enumerates assigned surface
-    └── SPECIALIST writes findings to shared/
+cd ../webdig && claude
+    └── WEBDIG reads shared/scouting_report.json for context
+    └── WEBDIG enumerates assigned web surface
+    └── WEBDIG writes findings to shared/
             ↓
 cd ../planner && claude     (re-evaluate after specialist returns)
     └── PLANNER reads new findings
     └── PLANNER updates attack_surface.md
+    └── PLANNER writes handoff.json for scoped exploitation
     └── PLANNER delivers updated brief → you confirm next move
             ↓
-[repeat until exploitation phase]
+cd ../elliot && claude
+    └── ELLIOT validates handoff.json
+    └── ELLIOT executes only within scope
+    └── ELLIOT returns to Planner on stop condition
 ```
 
 ---
@@ -158,13 +175,30 @@ After running `new_box.sh`, every box looks like this:
     │   ├── CLAUDE.md                    ← Planner orchestration
     │   └── PLANNER_SYSTEM_PROMPT.md     ← Planner identity
     │
+    ├── webdig/
+    │   ├── CLAUDE.md                    ← Web specialist orchestration
+    │   └── WEBDIG_SYSTEM_PROMPT.md      ← Web specialist identity
+    │
+    ├── elliot/
+    │   ├── CLAUDE.md                    ← Exploit specialist orchestration
+    │   └── ELLIOT_SYSTEM_PROMPT.md      ← Exploit specialist identity
+    │
     └── shared/                          ← all output lives here
         ├── target.txt                   ← box name + IP
         ├── operation.md                 ← operation status board
         ├── scouting_report.md           ← Scout output (human)
         ├── scouting_report.json         ← Scout output (machine)
         ├── attack_surface.md            ← Planner living doc
+        ├── deployment_webdig.json       ← Planner authorization for WEBDIG
         ├── webdig_findings.md           ← WEBDIG output
+        ├── webdig_findings.json         ← WEBDIG structured output
+        ├── handoff.json                 ← Planner authorization for ELLIOT
+        ├── schemas/
+        │   ├── DEPLOYMENT_WEBDIG_SCHEMA.json
+        │   ├── HANDOFF_SCHEMA.json
+        │   └── WEBDIG_FINDINGS_SCHEMA.json
+        ├── notes/
+        │   └── important_notes.md       ← high-signal durable notes
         ├── smbreach_findings.md         ← SMBREACH output
         ├── dnsmap_findings.md           ← DNSMAP output
         └── raw/                         ← all raw tool output
@@ -176,11 +210,12 @@ After running `new_box.sh`, every box looks like this:
 
 ## Updating Agent Files
 
-When you improve an agent prompt, commit it to the repo:
+When you improve an agent prompt or control artifact, commit it to the repo:
 
 ```bash
 cd ~/Desktop/HTB/adversary-agents
 # edit templates/scout/SCOUT_SYSTEM_PROMPT.md
+# or docs/ / schemas/ for system controls
 git add .
 git commit -m "sharpen Scout identification boundary"
 git push
@@ -197,6 +232,19 @@ Existing boxes keep their original files — they are snapshots, not symlinks.
 - Claude Code: `npm install -g @anthropic-ai/claude-code`
 - Anthropic API key set in environment: `export ANTHROPIC_API_KEY=your_key`
 - Standard Kali tools: nmap, whatweb, gobuster, ffuf, smbclient, enum4linux, dig, dnsenum
+
+---
+
+## Notes And Research
+
+- Web-first hardening plan: [docs/PHASE_1_5.md](/Users/kenn3/Desktop/IRONTHREAD/docs/PHASE_1_5.md)
+- Control model: [docs/WEB_FIRST_CONTROL_STRATEGY.md](/Users/kenn3/Desktop/IRONTHREAD/docs/WEB_FIRST_CONTROL_STRATEGY.md)
+- Obsidian note flow: [docs/OBSIDIAN_WORKFLOW.md](/Users/kenn3/Desktop/IRONTHREAD/docs/OBSIDIAN_WORKFLOW.md)
+- Session sync plan: [docs/SESSION_SYNC_PLAN.md](/Users/kenn3/Desktop/IRONTHREAD/docs/SESSION_SYNC_PLAN.md)
+- Kali migration note: [docs/KALI_V1_TO_V2_MIGRATION.md](/Users/kenn3/Desktop/IRONTHREAD/docs/KALI_V1_TO_V2_MIGRATION.md)
+- Claude sync brief: [docs/CLAUDE_SYNC_BRIEF.md](/Users/kenn3/Desktop/IRONTHREAD/docs/CLAUDE_SYNC_BRIEF.md)
+- Structured contracts: `schemas/`
+- Validation helper: `scripts/validate_phase_artifacts.sh`
 
 ---
 

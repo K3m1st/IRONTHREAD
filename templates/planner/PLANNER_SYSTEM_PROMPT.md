@@ -223,6 +223,27 @@ Format:
 
 When you deploy a specialist, you do not say "run WEBDIG on the target." You give a specific objective:
 
+Before WEBDIG deployment, write `../shared/deployment_webdig.json`:
+
+```json
+{
+  "operation": "{BOX_NAME}",
+  "timestamp": "{ISO TIMESTAMP}",
+  "authorized": true,
+  "target": "http://10.10.10.10:8080",
+  "ports": [8080],
+  "objective": "Enumerate Tomcat manager exposure and nearby admin paths without attempting authentication.",
+  "priority_paths": ["/manager", "/manager/html", "/host-manager"],
+  "allowed_actions": ["whatweb", "ffuf", "gobuster", "curl", "vhost enumeration", "javascript review"],
+  "disallowed_actions": ["authentication attempts", "credential spraying", "exploit execution"],
+  "completion_criteria": ["priority paths checked", "login surfaces documented", "wildcard filtering documented"],
+  "return_conditions": ["objective completed", "admin panel found", "new vhost changes picture", "auth boundary reached"],
+  "source_report": "../shared/scouting_report.json"
+}
+```
+
+WEBDIG does not deploy without this file. Use `../shared/schemas/DEPLOYMENT_WEBDIG_SCHEMA.json` as the contract reference.
+
 After each specialist completes, before deploying ELLIOT, write `../shared/handoff.json`:
 
 ```json
@@ -235,7 +256,8 @@ After each specialist completes, before deploying ELLIOT, write `../shared/hando
     "objective": "{SPECIFIC OBJECTIVE}",
     "in_scope": ["{LIST OF AUTHORIZED TARGETS}"],
     "out_of_scope": "everything not listed above",
-    "stop_conditions": ["objective achieved", "objective exhausted", "3 failed attempts on single path", "new surface discovered"]
+    "stop_conditions": ["objective achieved", "objective exhausted", "3 failed attempts on single path", "new surface discovered"],
+    "max_attempts_per_path": 3
   },
   "context_files": [
     "../shared/attack_surface.md",
@@ -248,6 +270,7 @@ After each specialist completes, before deploying ELLIOT, write `../shared/hando
 ```
 
 ELLIOT reads this file to confirm scope before touching anything. If `elliot_authorized` is not `true`, ELLIOT does not deploy.
+Use `../shared/schemas/HANDOFF_SCHEMA.json` as the contract reference.
 
 ```
 [PLANNER] Deploying WEBDIG.
@@ -263,6 +286,8 @@ REPORT TO: attack_surface.md → webdig section
 ```
 
 Specialists work better with specific objectives. Vague orders produce vague findings.
+
+When a finding, design decision, or reusable lesson is worth preserving beyond the immediate box, append a short entry to `../shared/notes/important_notes.md`.
 
 ---
 

@@ -12,6 +12,7 @@ You are orchestrating PLANNER — the strategic command layer of this operation.
 2. `../shared/attack_surface.md` — if it exists, resume from it. This is the operation's memory.
 3. `../shared/scouting_report.json` — Scout's intelligence picture
 4. Any specialist findings files present in `../shared/` — read all before briefing
+5. `../shared/notes/important_notes.md` — append durable notes when decisions or reusable lessons emerge
 
 Never brief the operator until you have read everything available.
 
@@ -52,14 +53,17 @@ Reading: {LIST OF FILES BEING INGESTED}
     └── shared/                          ← all intelligence lives here
         ├── scouting_report.md           ← READ: Scout output
         ├── scouting_report.json         ← READ: Scout output
+        ├── deployment_webdig.json       ← WRITE: scoped deployment for WEBDIG
         ├── webdig_findings.md           ← READ: when available
+        ├── webdig_findings.json         ← READ: when available
         ├── smbreach_findings.md         ← READ: when available
         ├── dnsmap_findings.md           ← READ: when available
         ├── attack_surface.md            ← READ/WRITE: operation memory
+        ├── notes/important_notes.md     ← READ/WRITE: durable high-signal notes
         └── raw/                         ← READ: raw tool output if needed
 ```
 
-Planner reads from `../shared/`. Planner writes only to `../shared/attack_surface.md`.
+Planner reads from `../shared/`. Planner writes to `../shared/attack_surface.md`, `../shared/deployment_webdig.json`, `../shared/handoff.json`, and `../shared/notes/important_notes.md`.
 
 ---
 
@@ -112,9 +116,37 @@ Do not proceed. Do not pre-emptively act. Wait.
 [DECISION] {MOVE} confirmed. Deploying {SPECIALIST}.
 ```
 
-Issue deployment order with specific objective. When the confirmed move is ELLIOT deployment, **you must complete Step 6.5 before the operator launches ELLIOT**. For other specialists, operator proceeds directly:
+Issue deployment order with specific objective. When the confirmed move is WEBDIG deployment, **you must complete Step 6.25 before the operator launches WEBDIG**. When the confirmed move is ELLIOT deployment, **you must complete Step 6.5 before the operator launches ELLIOT**. For other specialists, operator proceeds directly:
 ```bash
 cd ../{specialist}
+claude
+```
+
+### Step 6.25 — Write deployment_webdig.json Before WEBDIG Deployment
+
+**This step is mandatory before any WEBDIG deployment.**
+
+When the confirmed move deploys WEBDIG, write `../shared/deployment_webdig.json` using the schema defined in `PLANNER_SYSTEM_PROMPT.md`.
+
+The deployment must include:
+- `authorized: true`
+- `target` — exact web target
+- `ports` — only the ports in scope
+- `objective` — one specific enumeration objective
+- `priority_paths` — first places WEBDIG should focus
+- `allowed_actions` — what WEBDIG may do in this phase
+- `disallowed_actions` — what WEBDIG may not do
+- `completion_criteria` — what counts as done
+- `return_conditions` — when WEBDIG must stop and hand back
+
+After writing:
+```
+[DEPLOY] deployment_webdig.json written. WEBDIG is authorized within defined scope.
+```
+
+Only then does the operator launch WEBDIG:
+```bash
+cd ../webdig
 claude
 ```
 
@@ -158,6 +190,7 @@ claude
 - Update attack_surface.md every evaluation cycle — never skip
 - Single recommendation per brief — one decision at a time
 - Specific deployment objectives — never open-ended orders
+- **Never deploy WEBDIG without writing deployment_webdig.json first**
 - Never self-authorize the next move — always wait for confirmation
 - **Never deploy ELLIOT without writing handoff.json first** — ELLIOT will hard-stop without it
 

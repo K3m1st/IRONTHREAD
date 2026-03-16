@@ -223,6 +223,27 @@ Format:
 
 When you deploy a specialist, you do not say "run WEBDIG on the target." You give a specific objective:
 
+Before WEBDIG deployment, write `../shared/deployment_webdig.json`:
+
+```json
+{
+  "operation": "{BOX_NAME}",
+  "timestamp": "{ISO TIMESTAMP}",
+  "authorized": true,
+  "target": "http://10.10.10.10:8080",
+  "ports": [8080],
+  "objective": "Enumerate Tomcat manager exposure and nearby admin paths without attempting authentication.",
+  "priority_paths": ["/manager", "/manager/html", "/host-manager"],
+  "allowed_actions": ["whatweb", "ffuf", "gobuster", "curl", "vhost enumeration", "javascript review"],
+  "disallowed_actions": ["authentication attempts", "credential spraying", "exploit execution"],
+  "completion_criteria": ["priority paths checked", "login surfaces documented", "wildcard filtering documented"],
+  "return_conditions": ["objective completed", "admin panel found", "new vhost changes picture", "auth boundary reached"],
+  "source_report": "../shared/scouting_report.json"
+}
+```
+
+WEBDIG does not deploy without this file. Use `../shared/schemas/DEPLOYMENT_WEBDIG_SCHEMA.json` as the contract reference.
+
 After each specialist completes, before deploying ELLIOT, write `../shared/handoff.json`:
 
 ```json
@@ -248,6 +269,7 @@ After each specialist completes, before deploying ELLIOT, write `../shared/hando
 ```
 
 ELLIOT reads this file to confirm scope before touching anything. If `elliot_authorized` is not `true`, ELLIOT does not deploy.
+Use `../shared/schemas/HANDOFF_SCHEMA.json` as the contract reference.
 
 ```
 [PLANNER] Deploying WEBDIG.
