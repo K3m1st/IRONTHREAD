@@ -22,7 +22,10 @@ flowchart LR
     K --> L["shared/handoff.json"]
     L --> M["ELLIOT"]
     M --> N["shared/exploit_log.md"]
-    N --> K
+    N --> O["shared/deployment_noire.json"]
+    O --> P["NOIRE"]
+    P --> Q["shared/noire_findings.md/json"]
+    Q --> K
 ```
 
 ---
@@ -55,6 +58,7 @@ flowchart TD
     A --> D["webdig/"]
     A --> E["elliot/"]
     A --> F["shared/"]
+    A --> G["noire/"]
 
     B --> B1["CLAUDE.md"]
     B --> B2["SCOUT_SYSTEM_PROMPT.md"]
@@ -70,6 +74,9 @@ flowchart TD
     E --> E1["CLAUDE.md"]
     E --> E2["ELLIOT_SYSTEM_PROMPT.md"]
 
+    G --> G1["CLAUDE.md"]
+    G --> G2["NOIRE_SYSTEM_PROMPT.md"]
+
     F --> F1["target.txt"]
     F --> F2["operation.md"]
     F --> F3["attack_surface.md"]
@@ -80,9 +87,12 @@ flowchart TD
     F --> F8["webdig_findings.json"]
     F --> F9["handoff.json"]
     F --> F10["exploit_log.md"]
-    F --> F11["notes/important_notes.md"]
-    F --> F12["schemas/"]
-    F --> F13["raw/"]
+    F --> F11["deployment_noire.json"]
+    F --> F12["noire_findings.md"]
+    F --> F13["noire_findings.json"]
+    F --> F14["notes/important_notes.md"]
+    F --> F15["schemas/"]
+    F --> F16["raw/"]
 ```
 
 ---
@@ -106,6 +116,10 @@ flowchart LR
     D["ELLIOT"] --> D1["Validate handoff.json"]
     D --> D2["Exploit only in scope"]
     D --> D3["Return to Planner on stop condition"]
+
+    E["NOIRE"] --> E1["Confirm current foothold"]
+    E --> E2["Investigate local escalation surface"]
+    E --> E3["Return ranked leads to Planner"]
 ```
 
 ---
@@ -119,6 +133,7 @@ sequenceDiagram
     participant P as PLANNER
     participant W as WEBDIG
     participant E as ELLIOT
+    participant N as NOIRE
     participant X as shared/
 
     O->>S: Start recon
@@ -147,7 +162,16 @@ sequenceDiagram
     E->>X: Validate handoff.json
     E->>X: Write exploit_log.md
     E->>X: Append important notes if needed
-    E->>O: Return to Planner on stop condition
+    E->>O: Return foothold and recommend NOIRE when needed
+
+    O->>P: Re-evaluate foothold
+    P->>X: Write deployment_noire.json
+    P->>O: Deploy NOIRE
+
+    O->>N: Start post-access investigation
+    N->>X: Read deployment_noire.json
+    N->>X: Write noire_findings.md/json
+    N->>O: Return to Planner
 ```
 
 ---
@@ -163,9 +187,12 @@ flowchart LR
     F["deployment_webdig.json"] --> C
     G["webdig_findings.json"] --> B
     H["handoff.json"] --> E
-    I["important_notes.md"] --> B
-    I --> C
-    I --> E
+    I["deployment_noire.json"] --> J["NOIRE"]
+    K["noire_findings.json"] --> B
+    L["important_notes.md"] --> B
+    L --> C
+    L --> E
+    L --> J
 ```
 
 ---
@@ -181,8 +208,9 @@ flowchart TD
     B["After"] --> B1["deployment_webdig.json required"]
     B --> B2["webdig_findings.json required"]
     B --> B3["handoff.json schema-backed"]
-    B --> B4["important_notes.md added"]
-    B --> B5["validation scripts added"]
+    B --> B4["NOIRE added after foothold"]
+    B --> B5["important_notes.md added"]
+    B --> B6["validation scripts added"]
 ```
 
 ---
@@ -207,5 +235,6 @@ The current infrastructure is a file-backed multi-agent workflow.
 - `PLANNER` decides and authorizes.
 - `WEBDIG` enumerates web scope under a bounded deployment contract.
 - `ELLIOT` exploits only after scoped authorization.
+- `NOIRE` investigates the host after foothold and returns ranked local leads.
 - `shared/` is the system bus.
 - `schemas/` and validation scripts are the first step away from prompt-only control.

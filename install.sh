@@ -53,8 +53,12 @@ REQUIRED_FILES=(
     "templates/webdig/WEBDIG_SYSTEM_PROMPT.md"
     "templates/elliot/CLAUDE.md"
     "templates/elliot/ELLIOT_SYSTEM_PROMPT.md"
+    "templates/noire/CLAUDE.md"
+    "templates/noire/NOIRE_SYSTEM_PROMPT.md"
     "schemas/DEPLOYMENT_WEBDIG_SCHEMA.json"
+    "schemas/DEPLOYMENT_NOIRE_SCHEMA.json"
     "schemas/HANDOFF_SCHEMA.json"
+    "schemas/NOIRE_FINDINGS_SCHEMA.json"
     "schemas/WEBDIG_FINDINGS_SCHEMA.json"
 )
 

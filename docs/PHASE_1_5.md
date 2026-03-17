@@ -11,7 +11,7 @@ It is not full MCP yet.
 
 It is the stage where the web-first execution thread becomes operationally disciplined:
 
-`SCOUT -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT`
+`SCOUT -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT -> NOIRE -> PLANNER -> ELLIOT`
 
 The point is to reduce operator burden and model drift before investing in a heavier coordination layer.
 
@@ -38,6 +38,8 @@ The point is to reduce operator burden and model drift before investing in a hea
 - `deployment_webdig.json`
 - `webdig_findings.json`
 - `handoff.json`
+- `deployment_noire.json`
+- `noire_findings.json`
 
 ### 3. Validation mindset
 - schemas for handoff artifacts
@@ -71,3 +73,4 @@ Phase 1.5 is complete when:
 - ELLIOT authorization is schema-backed
 - important notes can be captured and exported without extra manual work
 - a validator can check WEBDIG and ELLIOT artifacts before phase transitions
+- NOIRE exists as the post-access investigation layer between foothold and privesc

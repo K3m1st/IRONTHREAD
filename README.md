@@ -7,7 +7,7 @@
 
 The repo is centered on a staged agent workflow, with a web-first path as the current primary thread:
 
-`SCOUT -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT`
+`SCOUT -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT -> NOIRE -> PLANNER -> ELLIOT`
 
 ```bash
 # One time only — first time setup
@@ -32,14 +32,17 @@ When you clone this repo, it should look like this:
     │   ├── scout/
     │   ├── planner/
     │   ├── webdig/
-    │   └── elliot/
+    │   ├── elliot/
+    │   └── noire/
     ├── docs/
     │   ├── PHASE_1_5.md
     │   ├── OBSIDIAN_WORKFLOW.md
     │   └── WEB_FIRST_CONTROL_STRATEGY.md
     ├── schemas/
     │   ├── DEPLOYMENT_WEBDIG_SCHEMA.json
+    │   ├── DEPLOYMENT_NOIRE_SCHEMA.json
     │   ├── HANDOFF_SCHEMA.json
+    │   ├── NOIRE_FINDINGS_SCHEMA.json
     │   └── WEBDIG_FINDINGS_SCHEMA.json
     └── scripts/
         ├── publish_obsidian_note.sh
@@ -77,7 +80,7 @@ new_box.sh Monitored 10.10.10.10
 
 **What it does:**
 - Creates `~/Desktop/HTB/boxes/Monitored/`
-- Builds full directory tree with scout/, planner/, webdig/, elliot/, shared/raw/, and shared/notes/
+- Builds full directory tree with scout/, planner/, webdig/, elliot/, noire/, shared/raw/, and shared/notes/
 - Copies shared schemas into `shared/schemas/` for box-local validation and contract reference
 - Copies all agent files from templates into the right places
 - Writes target IP into shared/target.txt
@@ -98,8 +101,8 @@ claude
 cd ~/Desktop/HTB/boxes/Monitored/planner
 claude
 
-# Then follow the web-first thread
-# Planner -> webdig -> Planner -> elliot
+# Then follow the current primary thread
+# Planner -> webdig -> Planner -> elliot -> noire -> Planner -> elliot
 ```
 
 That's the entire workflow.
@@ -137,8 +140,19 @@ cd ../planner && claude     (re-evaluate after specialist returns)
             ↓
 cd ../elliot && claude
     └── ELLIOT validates handoff.json
-    └── ELLIOT executes only within scope
-    └── ELLIOT returns to Planner on stop condition
+    └── ELLIOT gains initial access when path is viable
+    └── ELLIOT returns to Planner or recommends NOIRE after foothold
+            ↓
+cd ../noire && claude
+    └── NOIRE investigates the host from current foothold
+    └── NOIRE writes ranked local escalation leads
+    └── NOIRE returns to Planner
+            ↓
+cd ../planner && claude
+    └── PLANNER scopes next move from NOIRE findings
+            ↓
+cd ../elliot && claude
+    └── ELLIOT executes scoped privilege escalation as needed
 ```
 
 ---
@@ -183,6 +197,10 @@ After running `new_box.sh`, every box looks like this:
     │   ├── CLAUDE.md                    ← Exploit specialist orchestration
     │   └── ELLIOT_SYSTEM_PROMPT.md      ← Exploit specialist identity
     │
+    ├── noire/
+    │   ├── CLAUDE.md                    ← Post-access investigation orchestration
+    │   └── NOIRE_SYSTEM_PROMPT.md       ← Post-access investigation identity
+    │
     └── shared/                          ← all output lives here
         ├── target.txt                   ← box name + IP
         ├── operation.md                 ← operation status board
@@ -190,12 +208,17 @@ After running `new_box.sh`, every box looks like this:
         ├── scouting_report.json         ← Scout output (machine)
         ├── attack_surface.md            ← Planner living doc
         ├── deployment_webdig.json       ← Planner authorization for WEBDIG
+        ├── deployment_noire.json        ← Planner authorization for NOIRE
         ├── webdig_findings.md           ← WEBDIG output
         ├── webdig_findings.json         ← WEBDIG structured output
+        ├── noire_findings.md            ← NOIRE output
+        ├── noire_findings.json          ← NOIRE structured output
         ├── handoff.json                 ← Planner authorization for ELLIOT
         ├── schemas/
         │   ├── DEPLOYMENT_WEBDIG_SCHEMA.json
+        │   ├── DEPLOYMENT_NOIRE_SCHEMA.json
         │   ├── HANDOFF_SCHEMA.json
+        │   ├── NOIRE_FINDINGS_SCHEMA.json
         │   └── WEBDIG_FINDINGS_SCHEMA.json
         ├── notes/
         │   └── important_notes.md       ← high-signal durable notes

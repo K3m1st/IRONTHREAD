@@ -168,7 +168,9 @@ Next: {WHAT COMES AFTER THIS}
 Briefing operator before proceeding.
 ```
 
-Wait for operator acknowledgment before moving to post-exploitation.
+If the objective was initial access and you landed as a low-privilege user such as `www-data`, `apache`, `nginx`, or another constrained account, your default recommendation is NOIRE deployment for post-access investigation before privilege escalation.
+
+Wait for operator acknowledgment before moving further.
 
 ### Step 6 — Stop and Return to Planner
 

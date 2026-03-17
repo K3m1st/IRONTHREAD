@@ -61,6 +61,33 @@ validate_elliot() {
     echo "[+] ELLIOT handoff validated."
 }
 
+validate_noire() {
+    local deploy_json="$SHARED_DIR/deployment_noire.json"
+    local findings_json="$SHARED_DIR/noire_findings.json"
+
+    [ -f "$deploy_json" ] || { echo "[!] Missing: $deploy_json"; exit 1; }
+    [ -f "$findings_json" ] || { echo "[!] Missing: $findings_json"; exit 1; }
+
+    jq -e '
+        .authorized == true and
+        (.objective | type == "string" and length > 0) and
+        (.current_access.user | type == "string" and length > 0) and
+        (.in_scope | type == "array" and length > 0) and
+        (.allowed_actions | type == "array" and length > 0) and
+        (.disallowed_actions | type == "array" and length > 0)
+    ' "$deploy_json" > /dev/null
+
+    jq -e '
+        (.objective.statement | type == "string" and length > 0) and
+        (.current_access.user | type == "string" and length > 0) and
+        (.privesc_leads | type == "array") and
+        (.planner_flags | type == "array") and
+        (.tools_executed | type == "array")
+    ' "$findings_json" > /dev/null
+
+    echo "[+] NOIRE artifacts validated."
+}
+
 case "$PHASE" in
     webdig)
         validate_webdig
@@ -68,9 +95,12 @@ case "$PHASE" in
     elliot)
         validate_elliot
         ;;
+    noire)
+        validate_noire
+        ;;
     *)
         echo "[!] Unknown phase: $PHASE"
-        echo "    Supported: webdig, elliot"
+        echo "    Supported: webdig, noire, elliot"
         exit 1
         ;;
 esac

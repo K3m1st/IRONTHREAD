@@ -270,6 +270,30 @@ Before WEBDIG deployment, write `../shared/deployment_webdig.json`:
 
 WEBDIG does not deploy without this file. Use `../shared/schemas/DEPLOYMENT_WEBDIG_SCHEMA.json` as the contract reference.
 
+Before NOIRE deployment, write `../shared/deployment_noire.json`:
+
+```json
+{
+  "operation": "{BOX_NAME}",
+  "timestamp": "{ISO TIMESTAMP}",
+  "authorized": true,
+  "objective": "Enumerate local privilege escalation and credential opportunities from the current www-data foothold without attempting escalation.",
+  "current_access": {
+    "user": "www-data",
+    "privilege_level": "low-privilege shell",
+    "access_vector": "reverse shell via web exploit"
+  },
+  "in_scope": ["local system enumeration", "service inspection", "sudo rights", "credentials and configs", "writable paths"],
+  "out_of_scope": "privilege escalation execution, persistence, destructive modification, lateral movement",
+  "allowed_actions": ["local enumeration", "service and process inspection", "config review", "credential artifact discovery", "targeted web research"],
+  "disallowed_actions": ["privilege escalation execution", "persistence", "destructive actions", "lateral movement"],
+  "completion_criteria": ["current access confirmed", "high-value findings ranked", "privesc leads documented", "credentials and misconfigurations documented"],
+  "return_conditions": ["objective completed", "shell context lost", "scope boundary reached", "findings sufficient for Planner decision"]
+}
+```
+
+NOIRE does not deploy without this file. Use `../shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json` as the contract reference.
+
 After each specialist completes, before deploying ELLIOT, write `../shared/handoff.json`:
 
 ```json
@@ -319,6 +343,8 @@ REPORT TO: attack_surface.md → webdig section
 ```
 
 Specialists work better with specific objectives. Vague orders produce vague findings.
+
+NOIRE is the default next move after ELLIOT gains a low-privilege foothold, unless the objective already explicitly scoped direct privilege escalation and Planner has sufficient evidence to skip investigation.
 
 When a finding, design decision, or reusable lesson is worth preserving beyond the immediate box, append a short entry to `../shared/notes/important_notes.md`.
 

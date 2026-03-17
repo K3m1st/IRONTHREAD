@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ironthread.local/schemas/deployment-noire.schema.json",
+  "title": "Planner to Noire Deployment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operation",
+    "timestamp",
+    "authorized",
+    "objective",
+    "current_access",
+    "in_scope",
+    "out_of_scope",
+    "allowed_actions",
+    "disallowed_actions",
+    "completion_criteria",
+    "return_conditions"
+  ],
+  "properties": {
+    "operation": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "authorized": { "type": "boolean", "const": true },
+    "objective": { "type": "string", "minLength": 1 },
+    "current_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user", "privilege_level", "access_vector"],
+      "properties": {
+        "user": { "type": "string", "minLength": 1 },
+        "privilege_level": { "type": "string", "minLength": 1 },
+        "access_vector": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+    "in_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "out_of_scope": { "type": "string", "minLength": 1 },
+    "allowed_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "disallowed_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "completion_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "return_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": { "type": "string" }
+  }
+}

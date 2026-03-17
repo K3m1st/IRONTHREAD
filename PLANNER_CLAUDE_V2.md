@@ -56,6 +56,9 @@ Reading: {LIST OF FILES BEING INGESTED}
         ├── deployment_webdig.json       ← WRITE: scoped deployment for WEBDIG
         ├── webdig_findings.md           ← READ: when available
         ├── webdig_findings.json         ← READ: when available
+        ├── deployment_noire.json        ← WRITE: scoped deployment for NOIRE
+        ├── noire_findings.md            ← READ: when available
+        ├── noire_findings.json          ← READ: when available
         ├── smbreach_findings.md         ← READ: when available
         ├── dnsmap_findings.md           ← READ: when available
         ├── attack_surface.md            ← READ/WRITE: operation memory
@@ -63,7 +66,7 @@ Reading: {LIST OF FILES BEING INGESTED}
         └── raw/                         ← READ: raw tool output if needed
 ```
 
-Planner reads from `../shared/`. Planner writes to `../shared/attack_surface.md`, `../shared/deployment_webdig.json`, `../shared/handoff.json`, and `../shared/notes/important_notes.md`.
+Planner reads from `../shared/`. Planner writes to `../shared/attack_surface.md`, `../shared/deployment_webdig.json`, `../shared/deployment_noire.json`, `../shared/handoff.json`, and `../shared/notes/important_notes.md`.
 
 ---
 
@@ -116,7 +119,7 @@ Do not proceed. Do not pre-emptively act. Wait.
 [DECISION] {MOVE} confirmed. Deploying {SPECIALIST}.
 ```
 
-Issue deployment order with specific objective. When the confirmed move is WEBDIG deployment, **you must complete Step 6.25 before the operator launches WEBDIG**. When the confirmed move is ELLIOT deployment, **you must complete Step 6.5 before the operator launches ELLIOT**. For other specialists, operator proceeds directly:
+Issue deployment order with specific objective. When the confirmed move is WEBDIG deployment, **you must complete Step 6.25 before the operator launches WEBDIG**. When the confirmed move is NOIRE deployment, **you must complete Step 6.4 before the operator launches NOIRE**. When the confirmed move is ELLIOT deployment, **you must complete Step 6.5 before the operator launches ELLIOT**. For other specialists, operator proceeds directly:
 ```bash
 cd ../{specialist}
 claude
@@ -147,6 +150,23 @@ After writing:
 Only then does the operator launch WEBDIG:
 ```bash
 cd ../webdig
+claude
+```
+
+### Step 6.4 — Write deployment_noire.json Before NOIRE Deployment
+
+**This step is mandatory before any NOIRE deployment.**
+
+When the confirmed move deploys NOIRE, write `../shared/deployment_noire.json` using the schema defined in `PLANNER_SYSTEM_PROMPT.md`.
+
+After writing:
+```
+[DEPLOY] deployment_noire.json written. NOIRE is authorized within defined scope.
+```
+
+Only then does the operator launch NOIRE:
+```bash
+cd ../noire
 claude
 ```
 
@@ -193,6 +213,7 @@ claude
 - Single recommendation per brief — one decision at a time
 - Specific deployment objectives — never open-ended orders
 - **Never deploy WEBDIG without writing deployment_webdig.json first**
+- **Never deploy NOIRE without writing deployment_noire.json first**
 - Never self-authorize the next move — always wait for confirmation
 - **Never deploy ELLIOT without writing handoff.json first** — ELLIOT will hard-stop without it
 
