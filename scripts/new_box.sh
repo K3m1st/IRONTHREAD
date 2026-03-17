@@ -16,7 +16,8 @@ if [ -z "$BOX_NAME" ] || [ -z "$TARGET_IP" ]; then
     exit 1
 fi
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BOXES_DIR=~/Desktop/HTB/boxes
 BOX_DIR=$BOXES_DIR/$BOX_NAME
 TEMPLATES_DIR=$REPO_DIR/templates

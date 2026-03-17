@@ -6,7 +6,8 @@
 
 set -e
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 HTB_BASE=~/Desktop/HTB
 BOXES_DIR=$HTB_BASE/boxes
 TEMPLATES_DIR=$REPO_DIR/templates
@@ -86,11 +87,11 @@ echo "  [✓] Boxes directory: $BOXES_DIR"
 # ── Step 5 — Add new_box.sh to PATH ──────────────────────────
 echo "[5/5] Adding new_box.sh to PATH..."
 
-NEW_BOX_SCRIPT=$REPO_DIR/new_box.sh
+NEW_BOX_SCRIPT=$REPO_DIR/scripts/new_box.sh
 chmod +x "$NEW_BOX_SCRIPT"
-chmod +x "$REPO_DIR/install.sh"
-chmod +x "$REPO_DIR/scripts/publish_obsidian_note.sh" 2>/dev/null || true
-chmod +x "$REPO_DIR/scripts/validate_phase_artifacts.sh" 2>/dev/null || true
+chmod +x "$SCRIPT_DIR/install.sh"
+chmod +x "$SCRIPT_DIR/publish_obsidian_note.sh" 2>/dev/null || true
+chmod +x "$SCRIPT_DIR/validate_phase_artifacts.sh" 2>/dev/null || true
 
 # Detect shell and update the right rc file
 SHELL_RC=""
