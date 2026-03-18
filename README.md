@@ -45,6 +45,12 @@ IRONTHREAD/
 │   ├── install.sh           ← run once
 │   ├── new_box.sh           ← run every new box
 │   └── validate_phase_artifacts.sh
+├── .claude/commands/         ← operator skills
+│   ├── newbox.md            ← /newbox — create new box
+│   ├── status.md            ← /status — operational picture
+│   ├── findings.md          ← /findings — consolidated findings
+│   ├── checkpoint.md        ← /checkpoint — save state for session rehydration
+│   └── writeup.md           ← /writeup — public writeup + internal debrief
 ├── docs/                    ← architecture docs
 │   ├── PHASE_1_5.md
 │   ├── INFRA_WIREFRAME.md
@@ -167,9 +173,15 @@ All noire tools execute on the target via SSH (`execution_context` parameter).
 
 ## Session Resume
 
-Both agents check `../shared/` at startup and resume from the last session. Nothing is lost.
+Both agents check `../shared/` at startup and resume from the last session. Oracle reads `checkpoint.md` first (if it exists) for fast rehydration, then `attack_surface.md` for full history.
+
+Before ending an Oracle session, run `/checkpoint` to save a clean state snapshot. This makes the next session resume instant instead of re-parsing the full attack surface history.
 
 ```bash
+# Inside Oracle session, before ending:
+/checkpoint
+
+# Next session:
 cd ~/Desktop/HTB/boxes/BOXNAME/oracle && claude
 cd ~/Desktop/HTB/boxes/BOXNAME/elliot && claude
 ```
@@ -192,6 +204,7 @@ cd ~/Desktop/HTB/boxes/BOXNAME/elliot && claude
     └── shared/
         ├── target.txt
         ├── operation.md
+        ├── checkpoint.md              ← clean state snapshot for session rehydration
         ├── scouting_report.md / .json
         ├── attack_surface.md
         ├── webdig_findings.md / .json
@@ -225,6 +238,20 @@ Changes apply to all future boxes via `new_box.sh`. Existing boxes keep their or
 - Anthropic API key: `export ANTHROPIC_API_KEY=your_key`
 - Python 3 with mcp[cli]: `pip3 install mcp[cli]`
 - Standard tools: nmap, whatweb, gobuster, ffuf, smbclient, dig, curl
+
+---
+
+## Operator Skills
+
+Slash commands available inside any Claude Code session in the repo:
+
+| Skill | What it does |
+|-------|-------------|
+| `/newbox` | Create a new box operation (wraps `new_box.sh`) |
+| `/status` | Read shared/ state, present operational picture |
+| `/findings` | Consolidated summary of all findings across phases |
+| `/checkpoint` | Save clean state snapshot to `checkpoint.md` for session rehydration |
+| `/writeup` | Post-engagement: produce public writeup + internal debrief |
 
 ---
 
