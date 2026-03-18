@@ -46,7 +46,7 @@ Reading: {LIST OF FILES BEING INGESTED}
 ## DIRECTORY STRUCTURE
 
 ```
-~/Desktop/HTB/boxes/{BOX_NAME}/
+boxes/{BOX_NAME}/
     ├── oracle/
     │   ├── CLAUDE.md                    ← this file
     │   └── ORACLE_SYSTEM_PROMPT.md      ← identity, reasoning frameworks, protocols

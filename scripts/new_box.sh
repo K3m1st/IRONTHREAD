@@ -18,7 +18,7 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-BOXES_DIR=~/Desktop/HTB/boxes
+BOXES_DIR=$REPO_DIR/boxes
 BOX_DIR=$BOXES_DIR/$BOX_NAME
 TEMPLATES_DIR=$REPO_DIR/templates
 

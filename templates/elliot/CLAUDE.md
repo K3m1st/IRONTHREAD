@@ -78,7 +78,7 @@ If no exploit log exists — fresh operation. Proceed from full context read.
 ## DIRECTORY STRUCTURE
 
 ```
-~/Desktop/HTB/boxes/{BOX_NAME}/
+boxes/{BOX_NAME}/
     ├── elliot/
     │   ├── CLAUDE.md                  ← this file
     │   └── ELLIOT_SYSTEM_PROMPT.md    ← identity and principles

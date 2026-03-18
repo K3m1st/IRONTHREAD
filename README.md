@@ -73,7 +73,7 @@ chmod +x scripts/install.sh scripts/new_box.sh
 **What install.sh does:**
 - Confirms Claude Code is installed
 - Installs MCP Python dependencies (`pip3 install mcp[cli]`)
-- Creates `~/Desktop/HTB/boxes/` as your operation base directory
+- Creates `boxes/` directory inside the repo (gitignored)
 - Adds `new_box` alias to your shell
 - Verifies all template and MCP files are present
 
@@ -86,7 +86,7 @@ new_box Monitored 10.10.10.10
 ```
 
 **What it does:**
-- Creates `~/Desktop/HTB/boxes/Monitored/`
+- Creates `IRONTHREAD/boxes/Monitored/`
 - Builds directory tree with oracle/, elliot/, shared/
 - Copies agent templates and schemas
 - Configures MCP servers in oracle/.claude/settings.local.json
@@ -96,10 +96,10 @@ new_box Monitored 10.10.10.10
 
 ```bash
 # Step 1 — Oracle handles everything: recon, analysis, web enum, post-access
-cd ~/Desktop/HTB/boxes/Monitored/oracle && claude
+cd boxes/Monitored/oracle && claude
 
 # Step 2 — When Oracle writes handoff.json, launch Elliot
-cd ~/Desktop/HTB/boxes/Monitored/elliot && claude
+cd boxes/Monitored/elliot && claude
 
 # Flow: Oracle → Elliot → Oracle → Elliot (as needed)
 ```
@@ -182,8 +182,8 @@ Before ending an Oracle session, run `/checkpoint` to save a clean state snapsho
 /checkpoint
 
 # Next session:
-cd ~/Desktop/HTB/boxes/BOXNAME/oracle && claude
-cd ~/Desktop/HTB/boxes/BOXNAME/elliot && claude
+cd boxes/BOXNAME/oracle && claude
+cd boxes/BOXNAME/elliot && claude
 ```
 
 ---
@@ -191,7 +191,7 @@ cd ~/Desktop/HTB/boxes/BOXNAME/elliot && claude
 ## Directory Structure Per Box
 
 ```
-~/Desktop/HTB/boxes/{BOX_NAME}/
+IRONTHREAD/boxes/{BOX_NAME}/
     ├── oracle/
     │   ├── CLAUDE.md
     │   ├── ORACLE_SYSTEM_PROMPT.md

@@ -4,7 +4,7 @@ set -euo pipefail
 
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 PHASE BOX_SHARED_DIR"
-    echo "Example: $0 webdig ~/Desktop/HTB/boxes/Monitored/shared"
+    echo "Example: $0 webdig boxes/Monitored/shared"
     echo "Phases: recon, webdig, elliot, noire"
     exit 1
 fi
