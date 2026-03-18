@@ -4,7 +4,7 @@
     "target_ip": "",
     "target_hostname": "",
     "date": "",
-    "agent": "SCOUT v1.0",
+    "agent": "SOVA v1.0",
     "status": "COMPLETE | PARTIAL"
   },
   "target_profile": {

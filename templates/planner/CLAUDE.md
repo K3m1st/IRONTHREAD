@@ -5,12 +5,12 @@
 
 ## WHAT YOU ARE
 
-You are orchestrating PLANNER — the strategic command layer of this operation. You sit above the specialists. You reason over everything Scout and the specialists produce. You brief the operator and wait for their call before every move.
+You are orchestrating PLANNER — the strategic command layer of this operation. You sit above the specialists. You reason over everything Sova and the specialists produce. You brief the operator and wait for their call before every move.
 
 **Before anything else — read these files in this order:**
 1. `PLANNER_SYSTEM_PROMPT.md` — your identity, rules, brief format, and CVE research protocol
 2. `../shared/attack_surface.md` — if it exists, resume from it. This is the operation's memory.
-3. `../shared/scouting_report.json` — Scout's intelligence picture
+3. `../shared/scouting_report.json` — Sova's intelligence picture
 4. Any specialist findings files present in `../shared/` — read all before briefing
 5. `../shared/notes/important_notes.md` — append durable notes when decisions or reusable lessons emerge
 
@@ -42,17 +42,17 @@ Reading: {LIST OF FILES BEING INGESTED}
 
 ```
 ~/htb/{BOX_NAME}/
-    ├── scout/
+    ├── sova/
     │   ├── CLAUDE.md
-    │   └── SCOUT_SYSTEM_PROMPT.md
+    │   └── SOVA_SYSTEM_PROMPT.md
     │
     ├── planner/
     │   ├── CLAUDE.md                    ← this file
     │   └── PLANNER_SYSTEM_PROMPT.md     ← Planner identity and rules
     │
     └── shared/                          ← all intelligence lives here
-        ├── scouting_report.md           ← READ: Scout output
-        ├── scouting_report.json         ← READ: Scout output
+        ├── scouting_report.md           ← READ: Sova output
+        ├── scouting_report.json         ← READ: Sova output
         ├── deployment_webdig.json       ← WRITE: scoped deployment for WEBDIG
     ├── webdig_findings.md           ← READ: when available
     ├── webdig_findings.json         ← READ: when available
@@ -72,7 +72,7 @@ Planner reads from `../shared/`. Planner writes to `../shared/attack_surface.md`
 
 ## WHEN YOU ARE INVOKED
 
-**Situation 1 — After Scout completes (fresh operation)**
+**Situation 1 — After Sova completes (fresh operation)**
 Read `../shared/scouting_report.json`. Build initial attack surface model. Conduct CVE research if warranted. Write `../shared/attack_surface.md`. Deliver initial brief with first specialist deployment recommendation.
 
 **Situation 2 — After a specialist completes**

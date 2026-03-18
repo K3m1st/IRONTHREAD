@@ -7,7 +7,7 @@
 
 ```mermaid
 flowchart LR
-    A["Operator"] --> B["SCOUT"]
+    A["Operator"] --> B["SOVA"]
     B --> C["shared/scouting_report.md"]
     B --> D["shared/scouting_report.json"]
     D --> E["PLANNER"]
@@ -53,7 +53,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["boxes/{BOX_NAME}/"] --> B["scout/"]
+    A["boxes/{BOX_NAME}/"] --> B["sova/"]
     A --> C["planner/"]
     A --> D["webdig/"]
     A --> E["elliot/"]
@@ -61,9 +61,9 @@ flowchart TD
     A --> G["noire/"]
 
     B --> B1["CLAUDE.md"]
-    B --> B2["SCOUT_SYSTEM_PROMPT.md"]
-    B --> B3["SCOUT_REPORT_TEMPLATE.md"]
-    B --> B4["SCOUT_REPORT_SCHEMA.json"]
+    B --> B2["SOVA_SYSTEM_PROMPT.md"]
+    B --> B3["SOVA_REPORT_TEMPLATE.md"]
+    B --> B4["SOVA_REPORT_SCHEMA.json"]
 
     C --> C1["CLAUDE.md"]
     C --> C2["PLANNER_SYSTEM_PROMPT.md"]
@@ -101,7 +101,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A["SCOUT"] --> A1["Identify services"]
+    A["SOVA"] --> A1["Identify services"]
     A --> A2["Stop at identification boundary"]
     A --> A3["Write scouting report"]
 
@@ -129,7 +129,7 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     participant O as Operator
-    participant S as SCOUT
+    participant S as SOVA
     participant P as PLANNER
     participant W as WEBDIG
     participant E as ELLIOT
@@ -219,7 +219,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A["SCOUT / PLANNER / WEBDIG / ELLIOT"] --> B["shared/notes/important_notes.md"]
+    A["SOVA / PLANNER / WEBDIG / ELLIOT"] --> B["shared/notes/important_notes.md"]
     B --> C["scripts/publish_obsidian_note.sh"]
     C --> D["~/Desktop/AllSeeing/Agent Orchestration Idea"]
     D --> E["IRONTHREAD/Boxes or Architecture notes"]
@@ -231,7 +231,7 @@ flowchart LR
 
 The current infrastructure is a file-backed multi-agent workflow.
 
-- `SCOUT` discovers and identifies.
+- `SOVA` discovers and identifies.
 - `PLANNER` decides and authorizes.
 - `WEBDIG` enumerates web scope under a bounded deployment contract.
 - `ELLIOT` exploits only after scoped authorization.

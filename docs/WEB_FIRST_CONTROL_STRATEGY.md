@@ -1,5 +1,5 @@
 # Web-First Control Strategy
-> Hardening `SCOUT -> PLANNER -> WEBDIG -> ELLIOT` without overloading the model
+> Hardening `SOVA -> PLANNER -> WEBDIG -> ELLIOT` without overloading the model
 
 ---
 
@@ -27,7 +27,7 @@ That is how this becomes more valuable than "good prompting." It becomes a real 
 ## Why This Matters
 
 Right now, the strongest ideas in the repo are already pointing in the right direction:
-- `scouting_report.json` gives Scout a machine-readable handoff
+- `scouting_report.json` gives Sova a machine-readable handoff
 - `attack_surface.md` acts as persistent memory
 - `handoff.json` introduces scoped authorization for ELLIOT
 
@@ -35,8 +35,8 @@ Those are more valuable than prompt wording alone because they externalize state
 
 The next step is to make the web-first thread work as a controlled pipeline:
 
-1. `SCOUT` identifies web surface and stops at the identification boundary
-2. `PLANNER` converts Scout output into one concrete specialist objective
+1. `SOVA` identifies web surface and stops at the identification boundary
+2. `PLANNER` converts Sova output into one concrete specialist objective
 3. `WEBDIG` enumerates only within that objective and returns structured findings
 4. `PLANNER` re-ranks paths and writes a scoped exploit authorization
 5. `ELLIOT` executes only inside that authorization
@@ -88,7 +88,7 @@ Examples:
   becomes
   an allowed-actions list for the specialist phase plus evaluator checks on the output log
 
-- "Scout should stop at identification"
+- "Sova should stop at identification"
   becomes
   a report schema that captures identified web surface but does not contain deep enumeration fields
 
@@ -96,9 +96,9 @@ Examples:
 
 ## Web-First Target Architecture
 
-### Phase A: Scout Contract
+### Phase A: Sova Contract
 
-Scout should output a constrained, web-relevant surface summary that Planner can trust.
+Sova should output a constrained, web-relevant surface summary that Planner can trust.
 
 Minimum contract:
 - confirmed web ports
@@ -112,7 +112,7 @@ Minimum contract:
 - recommended specialist priority
 
 Important rule:
-Scout should not carry deep content discovery fields in its primary schema unless they were discovered incidentally during identification. The more room Scout has to look like WEBDIG, the easier it is for the model to drift.
+Sova should not carry deep content discovery fields in its primary schema unless they were discovered incidentally during identification. The more room Sova has to look like WEBDIG, the easier it is for the model to drift.
 
 ### Phase B: Planner Deployment Contract
 
@@ -228,7 +228,7 @@ Even lightweight validation increases obedience because the model learns that ma
 ### 5. Replay-based evals
 
 Save a few representative web-box scenarios and grade:
-- did Scout stop at the right boundary?
+- did Sova stop at the right boundary?
 - did Planner give one clear next move?
 - did WEBDIG stay within scope?
 - did Planner re-evaluate before exploitation?
@@ -269,7 +269,7 @@ Keep this intentionally narrow at first.
 
 ### Step 1
 Harden the web-only thread:
-- Scout
+- Sova
 - Planner
 - WEBDIG
 - Planner re-eval
@@ -316,7 +316,7 @@ That combination helps the model instead of burdening it.
 1. Add `deployment_webdig.json` as a required Planner artifact before any WEBDIG run.
 2. Add `webdig_findings.json` as a required WEBDIG artifact in parallel with markdown.
 3. Add a JSON schema for `handoff.json` instead of defining it only inline in prose.
-4. Narrow Scout's web fields so Scout cannot easily drift into WEBDIG territory.
+4. Narrow Sova's web fields so Sova cannot easily drift into WEBDIG territory.
 5. Add a simple validator script that checks whether phase artifacts are complete before allowing the next phase.
 
 ---

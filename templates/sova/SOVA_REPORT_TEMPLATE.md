@@ -2,7 +2,7 @@
 > Operation: {OPERATION_NAME}
 > Target: {TARGET_IP} / {TARGET_HOSTNAME}
 > Date: {DATE}
-> Agent: SCOUT v1.0
+> Agent: SOVA v1.0
 > Status: {COMPLETE | PARTIAL}
 
 ---
@@ -143,4 +143,4 @@
 All raw tool output saved to: `{OPERATION_DIR}/raw/`
 
 ---
-`[HANDOFF]` Scouting complete. Planner may proceed.
+`[HANDOFF]` Recon complete. Planner may proceed.

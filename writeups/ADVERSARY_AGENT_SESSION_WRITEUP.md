@@ -7,7 +7,7 @@
 
 ## Overview
 
-This session was a full design, build, and first live deployment of a multi-agent offensive security framework for HackTheBox. Starting from a concept ("I want to test agents on HTB boxes before OSAI+") and ending with Scout, Planner, WEBDIG, and ELLIOT running live on a real box. The architecture proved itself — and its gaps — in the same session.
+This session was a full design, build, and first live deployment of a multi-agent offensive security framework for HackTheBox. Starting from a concept ("I want to test agents on HTB boxes before OSAI+") and ending with Sova, Planner, WEBDIG, and ELLIOT running live on a real box. The architecture proved itself — and its gaps — in the same session.
 
 ---
 
@@ -17,7 +17,7 @@ This session was a full design, build, and first live deployment of a multi-agen
 
 | Agent | Role | Status |
 |-------|------|--------|
-| SCOUT | Initial recon — full port scan, service identification, fingerprinting | ✅ Complete v1 |
+| SOVA | Initial recon — full port scan, service identification, fingerprinting | ✅ Complete v1 |
 | PLANNER | Strategic command — ingests all intel, CVE research, briefs operator, deploys agents | ✅ Complete v2 |
 | WEBDIG | Web specialist — deep directory enum, vhost fuzzing, git dumping, tech fingerprinting | ✅ Complete v1 |
 | ELLIOT | Exploit specialist — scoped execution, validated exploitation, access milestone reporting | ✅ Complete v2 |
@@ -36,7 +36,7 @@ This session was a full design, build, and first live deployment of a multi-agen
 ### Directory Structure Per Box
 ```
 ~/Desktop/HTB/boxes/{BOX_NAME}/
-    ├── scout/        ← CLAUDE.md + SCOUT_SYSTEM_PROMPT.md
+    ├── sova/         ← CLAUDE.md + SOVA_SYSTEM_PROMPT.md
     ├── planner/      ← CLAUDE.md + PLANNER_SYSTEM_PROMPT.md
     ├── elliot/       ← CLAUDE.md + ELLIOT_SYSTEM_PROMPT.md
     └── shared/       ← all intelligence, all output, all agent handoffs
@@ -55,16 +55,16 @@ This session was a full design, build, and first live deployment of a multi-agen
 ## Key Architectural Decisions Made This Session
 
 ### 1. Identification vs Enumeration Boundary
-Scout's scope was a critical design debate. Resolution: Scout identifies, specialists enumerate. Scout touches every service once to confirm identity and exposure level — then stops. The line is drawn by service type in a boundary table in Scout's system prompt.
+Sova's scope was a critical design debate. Resolution: Sova identifies, specialists enumerate. Sova touches every service once to confirm identity and exposure level — then stops. The line is drawn by service type in a boundary table in Sova's system prompt.
 
 ### 2. Specialist Squad Model
-Moved away from one agent trying to do everything. Scout recommends which specialists to deploy based on what it finds. Each specialist has one domain and does it deeply.
+Moved away from one agent trying to do everything. Sova recommends which specialists to deploy based on what it finds. Each specialist has one domain and does it deeply.
 
 ### 3. Loose Leash on Reasoning
-Step 2 in Scout's CLAUDE.md deliberately has no hardcoded tool list. Scout reasons about what nmap surfaces and decides what to run next — documented, evidence-based decisions. This reduces variance while preserving adaptive intelligence.
+Step 2 in Sova's CLAUDE.md deliberately has no hardcoded tool list. Sova reasons about what nmap surfaces and decides what to run next — documented, evidence-based decisions. This reduces variance while preserving adaptive intelligence.
 
-### 4. Scout → Planner as Primary Focus
-Mid-session decision: de-prioritize specialist build-out, focus on Scout and Planner as the command layer. The specialists are infantry — Scout and Planner are the architecture that makes the operation coherent.
+### 4. Sova → Planner as Primary Focus
+Mid-session decision: de-prioritize specialist build-out, focus on Sova and Planner as the command layer. The specialists are infantry — Sova and Planner are the architecture that makes the operation coherent.
 
 ### 5. Planner as Strategic Advisor
 Planner never self-authorizes. It briefs, recommends a single move, and waits for operator confirmation. Executive summary first, full detail below. CVE research is complete before anything surfaces to the operator.
@@ -90,7 +90,7 @@ The mechanism that solves the operator-as-orchestrator problem. Planner writes a
 ## Live Operation: VariaType (HTB)
 
 ### What Worked
-- Scout produced a clean, complete scouting report on first run
+- Sova produced a clean, complete scouting report on first run
 - WEBDIG found the portal vhost, dumped the exposed .git, extracted credentials from git history, and mapped every post-auth endpoint — exceptional output
 - Planner built a high-quality attack surface document with ranked attack paths
 - The overall intelligence picture was more than sufficient for exploitation
@@ -151,7 +151,7 @@ handoff.json is a partial fix. The real fix is MCP.
 2. Define operation state schema in MCP
 3. Migrate handoff.json to MCP state
 4. Migrate attack_surface.md updates to MCP writes
-5. Test full Scout → Planner → Specialist → ELLIOT loop via MCP
+5. Test full Sova → Planner → Specialist → ELLIOT loop via MCP
 6. Decommission flat file handoffs once MCP is stable
 
 ---
@@ -159,7 +159,7 @@ handoff.json is a partial fix. The real fix is MCP.
 ### Phase 3 — Conductor Agent (post-MCP)
 **Goal:** Single agent manages the operation pipeline. Operator approves moves, doesn't manage sequencing.
 
-The Conductor reads MCP state, determines current operation phase, tells operator which agent to invoke next and with what context, and blocks invalid transitions. ELLIOT cannot deploy if Planner re-evaluation is pending. Specialists cannot deploy if Scout is not marked COMPLETE.
+The Conductor reads MCP state, determines current operation phase, tells operator which agent to invoke next and with what context, and blocks invalid transitions. ELLIOT cannot deploy if Planner re-evaluation is pending. Specialists cannot deploy if Sova is not marked COMPLETE.
 
 Operator workflow becomes:
 ```bash
@@ -208,11 +208,11 @@ cd ~/Desktop/HTB/boxes/BOXNAME/conductor && claude
     ├── install.sh
     ├── new_box.sh
     └── templates/
-        ├── scout/
+        ├── sova/
         │   ├── CLAUDE.md                  (v1)
-        │   ├── SCOUT_SYSTEM_PROMPT.md     (v1)
-        │   ├── SCOUT_REPORT_TEMPLATE.md   (v1)
-        │   └── SCOUT_REPORT_SCHEMA.json   (v1)
+        │   ├── SOVA_SYSTEM_PROMPT.md     (v1)
+        │   ├── SOVA_REPORT_TEMPLATE.md   (v1)
+        │   └── SOVA_REPORT_SCHEMA.json   (v1)
         ├── planner/
         │   ├── CLAUDE.md                  (v2)
         │   └── PLANNER_SYSTEM_PROMPT.md   (v2 — web search added)
@@ -230,7 +230,7 @@ When starting a new session, paste this as context:
 ```
 I am building a multi-agent offensive security framework for HackTheBox 
 called the Adversary Agent Architecture. The repo lives at 
-~/Desktop/HTB/adversary-agents/. Current agents: SCOUT (recon), 
+~/Desktop/HTB/adversary-agents/. Current agents: SOVA (recon), 
 PLANNER (strategy), WEBDIG (web specialist), ELLIOT (exploit specialist).
 
 Current phase: Phase 1 — tighten agent sequencing via handoff.json, 

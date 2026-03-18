@@ -11,7 +11,7 @@ It is not full MCP yet.
 
 It is the stage where the web-first execution thread becomes operationally disciplined:
 
-`SCOUT -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT -> NOIRE -> PLANNER -> ELLIOT`
+`SOVA -> PLANNER -> WEBDIG -> PLANNER -> ELLIOT -> NOIRE -> PLANNER -> ELLIOT`
 
 The point is to reduce operator burden and model drift before investing in a heavier coordination layer.
 
@@ -67,7 +67,7 @@ Once those are clear, MCP becomes a scaling step instead of a guessing step.
 ## Exit Criteria
 
 Phase 1.5 is complete when:
-- a new box scaffolds `scout`, `planner`, `webdig`, and `elliot`
+- a new box scaffolds `sova`, `planner`, `webdig`, and `elliot`
 - the README reflects the web-first workflow
 - Planner and WEBDIG have a defined structured handoff
 - ELLIOT authorization is schema-backed

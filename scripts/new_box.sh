@@ -32,7 +32,7 @@ echo ""
 echo "[*] Spinning up operation: $BOX_NAME ($TARGET_IP)"
 
 # ── Build directory tree ─────────────────────────────────────
-mkdir -p "$BOX_DIR/scout"
+mkdir -p "$BOX_DIR/sova"
 mkdir -p "$BOX_DIR/planner"
 mkdir -p "$BOX_DIR/webdig"
 mkdir -p "$BOX_DIR/elliot"
@@ -42,11 +42,11 @@ mkdir -p "$BOX_DIR/shared/schemas"
 mkdir -p "$BOX_DIR/shared/raw"
 
 # ── Deploy agent files ───────────────────────────────────────
-# Scout
-cp "$TEMPLATES_DIR/scout/CLAUDE.md"                "$BOX_DIR/scout/CLAUDE.md"
-cp "$TEMPLATES_DIR/scout/SCOUT_SYSTEM_PROMPT.md"   "$BOX_DIR/scout/SCOUT_SYSTEM_PROMPT.md"
-cp "$TEMPLATES_DIR/scout/SCOUT_REPORT_TEMPLATE.md" "$BOX_DIR/scout/SCOUT_REPORT_TEMPLATE.md"
-cp "$TEMPLATES_DIR/scout/SCOUT_REPORT_SCHEMA.json" "$BOX_DIR/scout/SCOUT_REPORT_SCHEMA.json"
+# Sova
+cp "$TEMPLATES_DIR/sova/CLAUDE.md"                "$BOX_DIR/sova/CLAUDE.md"
+cp "$TEMPLATES_DIR/sova/SOVA_SYSTEM_PROMPT.md"    "$BOX_DIR/sova/SOVA_SYSTEM_PROMPT.md"
+cp "$TEMPLATES_DIR/sova/SOVA_REPORT_TEMPLATE.md"  "$BOX_DIR/sova/SOVA_REPORT_TEMPLATE.md"
+cp "$TEMPLATES_DIR/sova/SOVA_REPORT_SCHEMA.json"  "$BOX_DIR/sova/SOVA_REPORT_SCHEMA.json"
 
 # Planner
 cp "$TEMPLATES_DIR/planner/CLAUDE.md"                  "$BOX_DIR/planner/CLAUDE.md"
@@ -86,7 +86,7 @@ cat > "$BOX_DIR/shared/operation.md" << EOF
 ## Agent Status
 | Agent | Status |
 |-------|--------|
-| SCOUT | PENDING |
+| SOVA | PENDING |
 | PLANNER | PENDING |
 | WEBDIG | PENDING |
 | ELLIOT | PENDING |
@@ -119,10 +119,10 @@ echo "  Target: $TARGET_IP"
 echo "  Location: $BOX_DIR"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "  Step 1 — Run Scout:"
-echo "    cd $BOX_DIR/scout && claude"
+echo "  Step 1 — Run Sova:"
+echo "    cd $BOX_DIR/sova && claude"
 echo ""
-echo "  Step 2 — After Scout completes, run Planner:"
+echo "  Step 2 — After Sova completes, run Planner:"
 echo "    cd $BOX_DIR/planner && claude"
 echo ""
 echo "  Current primary path:"

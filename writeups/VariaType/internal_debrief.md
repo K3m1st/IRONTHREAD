@@ -1,5 +1,5 @@
 # VariaType — Internal Debrief
-> For: Operator + AI Crew (Scout, Planner, WEBDIG, NOIRE, Elliot)
+> For: Operator + AI Crew (Sova, Planner, WEBDIG, NOIRE, Elliot)
 > Box: VariaType | Completed: 2026-03-17 | Sessions: 9 | Elliot turns: 13/40
 
 ---
@@ -8,7 +8,7 @@
 
 | Session | Agent | Duration | What Happened |
 |---------|-------|----------|---------------|
-| 1 | SCOUT | Quick | Port scan, service ID, attack surface mapped. 2 ports, Flask + nginx. |
+| 1 | SOVA | Quick | Port scan, service ID, attack surface mapped. 2 ports, Flask + nginx. |
 | 2 | WEBDIG | Quick | VHost discovery (portal.variatype.htb), .git dump, gitbot creds recovered, full endpoint map. |
 | 3 | ELLIOT (session 1) | Long | Massive enumeration — XXE, XInclude, SSRF, LFI, SQLi, PHP inclusion, nginx confusion, extension bypass. **All dead.** But mapped the entire font pipeline. |
 | 4 | PLANNER | Medium | CVE research. Identified CVE-2025-66034 as primary. Deprioritized regreSSHion. Researched Werkzeug debug, auth.php source. |
@@ -24,10 +24,10 @@
 
 ## What Every Agent Did Well
 
-### SCOUT
+### SOVA
 - Clean, structured output. Service inventory was accurate. Attack surface map was immediately actionable.
 - Correctly identified the `.designspace` XML upload as HIGH PRIORITY from the jump.
-- Knew to stop — didn't try to enumerate things outside scout scope.
+- Knew to stop — didn't try to enumerate things outside sova scope.
 
 ### WEBDIG
 - Found `portal.variatype.htb` via VHost fuzzing. This was the entire second half of the box.
@@ -190,7 +190,7 @@ Executing commands through a PHP webshell embedded in a font binary file is inhe
 | Metric | Value |
 |--------|-------|
 | Total sessions | 9 |
-| Agents deployed | 5 (Scout, WEBDIG, Planner, NOIRE, Elliot) |
+| Agents deployed | 5 (Sova, WEBDIG, Planner, NOIRE, Elliot) |
 | Elliot execution turns (all exploits) | 13/40 |
 | CVEs exploited | 3 |
 | Dead ends documented | 16+ |

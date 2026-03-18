@@ -21,8 +21,8 @@ Read in this exact order:
 1. `ELLIOT_SYSTEM_PROMPT.md` — your identity and operating principles
 2. `../shared/handoff.json` — **MANDATORY** — Planner's deployment authorization and scope
 3. `../shared/attack_surface.md` — Planner's full picture
-4. `../shared/scouting_report.json` — Scout's structured findings
-5. `../shared/scouting_report.md` — Scout's intelligence brief
+4. `../shared/scouting_report.json` — Sova's structured findings
+5. `../shared/scouting_report.md` — Sova's intelligence brief
 6. Any `../shared/*_findings.md` files present — specialist intelligence
 7. `../shared/target.txt` — target IP and box name
 8. `../shared/exploit_log.md` — if it exists, you are resuming a session
@@ -86,8 +86,8 @@ If no exploit log exists — fresh operation. Proceed from full context read.
     └── shared/
         ├── target.txt                 ← READ: IP and box name
         ├── attack_surface.md          ← READ: Planner's picture
-        ├── scouting_report.md         ← READ: Scout brief
-        ├── scouting_report.json       ← READ: Scout structured
+        ├── scouting_report.md         ← READ: Sova brief
+        ├── scouting_report.json       ← READ: Sova structured
         ├── *_findings.md              ← READ: all specialist output
         ├── exploit_log.md             ← WRITE: real-time operation log
         └── notes/important_notes.md   ← WRITE: durable notes when warranted
