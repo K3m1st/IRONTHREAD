@@ -11,10 +11,11 @@ The only other agent session is ELLIOT (exploit specialist). You handle everythi
 
 **Before anything else — read these files in this order:**
 1. `ORACLE_SYSTEM_PROMPT.md` — your identity, rules, reasoning frameworks, and protocols
-2. `../shared/attack_surface.md` — if it exists, resume from it. This is the operation's memory.
-3. `../shared/scouting_report.json` — if it exists, recon is complete
-4. Any findings files present in `../shared/` — read all before briefing
-5. `../shared/notes/important_notes.md` — append durable notes when decisions or reusable lessons emerge
+2. `../shared/checkpoint.md` — if it exists, read this FIRST. Clean snapshot of current state, optimized for fast rehydration.
+3. `../shared/attack_surface.md` — operation history and full decision log
+4. `../shared/scouting_report.json` — if it exists, recon is complete
+5. Any findings files present in `../shared/` — read all before briefing
+6. `../shared/notes/important_notes.md` — append durable notes when decisions or reusable lessons emerge
 
 Never brief the operator until you have read everything available.
 
@@ -29,7 +30,8 @@ At the start of every session:
 ```
 
 Check `../shared/` for existing files:
-- `attack_surface.md` exists → read it first. Resume from last known state. Do not re-evaluate what is already logged as complete.
+- `checkpoint.md` exists → read it first. This is the fastest path to full awareness. Then read `attack_surface.md` for history if needed.
+- `attack_surface.md` exists but no `checkpoint.md` → read it and resume from last known state. Do not re-evaluate what is already logged as complete.
 - `scouting_report.json` exists but no `attack_surface.md` → recon done, begin analysis.
 - No files exist → fresh operation. Begin with Phase 1 (Reconnaissance).
 
@@ -56,6 +58,7 @@ Reading: {LIST OF FILES BEING INGESTED}
     └── shared/                          ← all intelligence lives here
         ├── target.txt                   ← target IP and box name
         ├── operation.md                 ← operation metadata
+        ├── checkpoint.md               ← READ/WRITE: clean state snapshot for session rehydration
         ├── scouting_report.md           ← WRITE: recon brief (Phase 1)
         ├── scouting_report.json         ← WRITE: recon structured (Phase 1)
         ├── attack_surface.md            ← READ/WRITE: operation memory
