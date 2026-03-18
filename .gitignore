@@ -4,3 +4,4 @@
 *.swo
 *~
 .claude/
+!.claude/commands/

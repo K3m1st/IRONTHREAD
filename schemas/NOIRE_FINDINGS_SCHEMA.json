@@ -14,7 +14,7 @@
     "credentials_and_secrets",
     "misconfigurations",
     "anomalies",
-    "planner_flags",
+    "oracle_flags",
     "tools_executed",
     "evidence_refs"
   ],
@@ -133,7 +133,7 @@
         }
       }
     },
-    "planner_flags": {
+    "oracle_flags": {
       "type": "array",
       "items": {
         "type": "object",

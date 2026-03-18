@@ -5,6 +5,7 @@ set -euo pipefail
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 PHASE BOX_SHARED_DIR"
     echo "Example: $0 webdig ~/Desktop/HTB/boxes/Monitored/shared"
+    echo "Phases: recon, webdig, elliot, noire"
     exit 1
 fi
 
@@ -16,31 +17,36 @@ if [ ! -d "$SHARED_DIR" ]; then
     exit 1
 fi
 
-validate_webdig() {
-    local deploy_json="$SHARED_DIR/deployment_webdig.json"
-    local findings_json="$SHARED_DIR/webdig_findings.json"
+validate_recon() {
+    local report_json="$SHARED_DIR/scouting_report.json"
 
-    [ -f "$deploy_json" ] || { echo "[!] Missing: $deploy_json"; exit 1; }
-    [ -f "$findings_json" ] || { echo "[!] Missing: $findings_json"; exit 1; }
+    [ -f "$report_json" ] || { echo "[!] Missing: $report_json"; exit 1; }
 
     jq -e '
-        .authorized == true and
-        (.objective | type == "string" and length > 0) and
+        (.meta.status == "COMPLETE") and
+        (.meta.agent | type == "string") and
         (.ports | type == "array" and length > 0) and
-        (.priority_paths | type == "array" and length > 0) and
-        (.allowed_actions | type == "array" and length > 0) and
-        (.disallowed_actions | type == "array" and length > 0)
-    ' "$deploy_json" > /dev/null
+        (.oracle_recommendations | type == "array" and length > 0) and
+        (.tools_executed | type == "array" and length > 0)
+    ' "$report_json" > /dev/null
+
+    echo "[+] Recon artifacts validated."
+}
+
+validate_webdig() {
+    local findings_json="$SHARED_DIR/webdig_findings.json"
+
+    [ -f "$findings_json" ] || { echo "[!] Missing: $findings_json"; exit 1; }
 
     jq -e '
         (.objective.statement | type == "string" and length > 0) and
         (.objective.objective_completed | type == "boolean") and
-        (.planner_flags | type == "array") and
+        (.oracle_flags | type == "array") and
         (.evidence_refs | type == "array") and
         (.tools_executed | type == "array")
     ' "$findings_json" > /dev/null
 
-    echo "[+] WEBDIG artifacts validated."
+    echo "[+] WEBDIG findings validated."
 }
 
 validate_elliot() {
@@ -62,33 +68,25 @@ validate_elliot() {
 }
 
 validate_noire() {
-    local deploy_json="$SHARED_DIR/deployment_noire.json"
     local findings_json="$SHARED_DIR/noire_findings.json"
 
-    [ -f "$deploy_json" ] || { echo "[!] Missing: $deploy_json"; exit 1; }
     [ -f "$findings_json" ] || { echo "[!] Missing: $findings_json"; exit 1; }
-
-    jq -e '
-        .authorized == true and
-        (.objective | type == "string" and length > 0) and
-        (.current_access.user | type == "string" and length > 0) and
-        (.in_scope | type == "array" and length > 0) and
-        (.allowed_actions | type == "array" and length > 0) and
-        (.disallowed_actions | type == "array" and length > 0)
-    ' "$deploy_json" > /dev/null
 
     jq -e '
         (.objective.statement | type == "string" and length > 0) and
         (.current_access.user | type == "string" and length > 0) and
         (.privesc_leads | type == "array") and
-        (.planner_flags | type == "array") and
+        (.oracle_flags | type == "array") and
         (.tools_executed | type == "array")
     ' "$findings_json" > /dev/null
 
-    echo "[+] NOIRE artifacts validated."
+    echo "[+] NOIRE findings validated."
 }
 
 case "$PHASE" in
+    recon)
+        validate_recon
+        ;;
     webdig)
         validate_webdig
         ;;
@@ -100,7 +98,7 @@ case "$PHASE" in
         ;;
     *)
         echo "[!] Unknown phase: $PHASE"
-        echo "    Supported: webdig, noire, elliot"
+        echo "    Supported: recon, webdig, elliot, noire"
         exit 1
         ;;
 esac

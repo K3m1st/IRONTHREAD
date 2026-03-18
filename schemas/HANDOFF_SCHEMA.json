@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ironthread.local/schemas/handoff.schema.json",
-  "title": "Planner to Elliot Handoff",
+  "title": "Oracle to Elliot Handoff",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -77,7 +77,7 @@
           "type": "integer",
           "minimum": 5,
           "maximum": 40,
-          "description": "Total turn budget for this deployment. Planner sets based on CVE complexity. ELLIOT hard-stops when exhausted."
+          "description": "Total turn budget for this deployment. Oracle sets based on CVE complexity. ELLIOT hard-stops when exhausted."
         }
       }
     },

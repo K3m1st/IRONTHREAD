@@ -32,44 +32,47 @@ echo ""
 echo "[*] Spinning up operation: $BOX_NAME ($TARGET_IP)"
 
 # ── Build directory tree ─────────────────────────────────────
-mkdir -p "$BOX_DIR/sova"
-mkdir -p "$BOX_DIR/planner"
-mkdir -p "$BOX_DIR/webdig"
+mkdir -p "$BOX_DIR/oracle"
 mkdir -p "$BOX_DIR/elliot"
-mkdir -p "$BOX_DIR/noire"
 mkdir -p "$BOX_DIR/shared/notes"
 mkdir -p "$BOX_DIR/shared/schemas"
 mkdir -p "$BOX_DIR/shared/raw"
 
 # ── Deploy agent files ───────────────────────────────────────
-# Sova
-cp "$TEMPLATES_DIR/sova/CLAUDE.md"                "$BOX_DIR/sova/CLAUDE.md"
-cp "$TEMPLATES_DIR/sova/SOVA_SYSTEM_PROMPT.md"    "$BOX_DIR/sova/SOVA_SYSTEM_PROMPT.md"
-cp "$TEMPLATES_DIR/sova/SOVA_REPORT_TEMPLATE.md"  "$BOX_DIR/sova/SOVA_REPORT_TEMPLATE.md"
-cp "$TEMPLATES_DIR/sova/SOVA_REPORT_SCHEMA.json"  "$BOX_DIR/sova/SOVA_REPORT_SCHEMA.json"
-
-# Planner
-cp "$TEMPLATES_DIR/planner/CLAUDE.md"                  "$BOX_DIR/planner/CLAUDE.md"
-cp "$TEMPLATES_DIR/planner/PLANNER_SYSTEM_PROMPT.md"   "$BOX_DIR/planner/PLANNER_SYSTEM_PROMPT.md"
-
-# Webdig
-cp "$TEMPLATES_DIR/webdig/CLAUDE.md"                   "$BOX_DIR/webdig/CLAUDE.md"
-cp "$TEMPLATES_DIR/webdig/WEBDIG_SYSTEM_PROMPT.md"     "$BOX_DIR/webdig/WEBDIG_SYSTEM_PROMPT.md"
+# Oracle
+cp "$TEMPLATES_DIR/oracle/CLAUDE.md"                  "$BOX_DIR/oracle/CLAUDE.md"
+cp "$TEMPLATES_DIR/oracle/ORACLE_SYSTEM_PROMPT.md"    "$BOX_DIR/oracle/ORACLE_SYSTEM_PROMPT.md"
 
 # Elliot
-cp "$TEMPLATES_DIR/elliot/CLAUDE.md"                   "$BOX_DIR/elliot/CLAUDE.md"
-cp "$TEMPLATES_DIR/elliot/ELLIOT_SYSTEM_PROMPT.md"     "$BOX_DIR/elliot/ELLIOT_SYSTEM_PROMPT.md"
-
-# Noire
-cp "$TEMPLATES_DIR/noire/CLAUDE.md"                    "$BOX_DIR/noire/CLAUDE.md"
-cp "$TEMPLATES_DIR/noire/NOIRE_SYSTEM_PROMPT.md"       "$BOX_DIR/noire/NOIRE_SYSTEM_PROMPT.md"
+cp "$TEMPLATES_DIR/elliot/CLAUDE.md"                  "$BOX_DIR/elliot/CLAUDE.md"
+cp "$TEMPLATES_DIR/elliot/ELLIOT_SYSTEM_PROMPT.md"    "$BOX_DIR/elliot/ELLIOT_SYSTEM_PROMPT.md"
 
 # Shared schemas
-cp "$REPO_DIR/schemas/DEPLOYMENT_WEBDIG_SCHEMA.json"   "$BOX_DIR/shared/schemas/DEPLOYMENT_WEBDIG_SCHEMA.json"
-cp "$REPO_DIR/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"    "$BOX_DIR/shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"
-cp "$REPO_DIR/schemas/HANDOFF_SCHEMA.json"             "$BOX_DIR/shared/schemas/HANDOFF_SCHEMA.json"
-cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"      "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_SCHEMA.json"
-cp "$REPO_DIR/schemas/WEBDIG_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/WEBDIG_FINDINGS_SCHEMA.json"
+cp "$REPO_DIR/schemas/HANDOFF_SCHEMA.json"            "$BOX_DIR/shared/schemas/HANDOFF_SCHEMA.json"
+cp "$REPO_DIR/schemas/SOVA_REPORT_SCHEMA.json"        "$BOX_DIR/shared/schemas/SOVA_REPORT_SCHEMA.json"
+cp "$REPO_DIR/schemas/WEBDIG_FINDINGS_SCHEMA.json"    "$BOX_DIR/shared/schemas/WEBDIG_FINDINGS_SCHEMA.json"
+cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_SCHEMA.json"
+
+# ── Configure MCP servers ────────────────────────────────────
+mkdir -p "$BOX_DIR/oracle/.claude"
+cat > "$BOX_DIR/oracle/.claude/settings.local.json" << MCPEOF
+{
+  "mcpServers": {
+    "sova-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/sova/server.py"]
+    },
+    "webdig-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/webdig/server.py"]
+    },
+    "noire-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/noire/server.py"]
+    }
+  }
+}
+MCPEOF
 
 # ── Write operation metadata ─────────────────────────────────
 cat > "$BOX_DIR/shared/target.txt" << EOF
@@ -86,13 +89,8 @@ cat > "$BOX_DIR/shared/operation.md" << EOF
 ## Agent Status
 | Agent | Status |
 |-------|--------|
-| SOVA | PENDING |
-| PLANNER | PENDING |
-| WEBDIG | PENDING |
+| ORACLE | PENDING |
 | ELLIOT | PENDING |
-| NOIRE | PENDING |
-| SMBREACH | PENDING |
-| DNSMAP | PENDING |
 
 ## Notes
 
@@ -119,13 +117,12 @@ echo "  Target: $TARGET_IP"
 echo "  Location: $BOX_DIR"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "  Step 1 — Run Sova:"
-echo "    cd $BOX_DIR/sova && claude"
+echo "  Step 1 — Run Oracle (recon + analysis + enumeration):"
+echo "    cd $BOX_DIR/oracle && claude"
 echo ""
-echo "  Step 2 — After Sova completes, run Planner:"
-echo "    cd $BOX_DIR/planner && claude"
+echo "  Step 2 — When Oracle writes handoff.json, run Elliot:"
+echo "    cd $BOX_DIR/elliot && claude"
 echo ""
-echo "  Current primary path:"
-echo "    Planner -> webdig -> Planner -> elliot -> noire -> Planner -> elliot (as needed)"
+echo "  Flow: Oracle → Elliot → Oracle → Elliot (as needed)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""

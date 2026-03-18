@@ -1,5 +1,5 @@
 # Infra Wireframe
-> Current Phase 1.5 architecture for `IRONTHREAD`
+> Current Phase 3 architecture for `IRONTHREAD`
 
 ---
 
@@ -7,25 +7,21 @@
 
 ```mermaid
 flowchart LR
-    A["Operator"] --> B["SOVA"]
-    B --> C["shared/scouting_report.md"]
-    B --> D["shared/scouting_report.json"]
-    D --> E["PLANNER"]
-    C --> E
-    E --> F["shared/attack_surface.md"]
-    E --> G["shared/deployment_webdig.json"]
-    G --> H["WEBDIG"]
-    H --> I["shared/webdig_findings.md"]
-    H --> J["shared/webdig_findings.json"]
-    I --> K["PLANNER re-eval"]
-    J --> K
-    K --> L["shared/handoff.json"]
-    L --> M["ELLIOT"]
-    M --> N["shared/exploit_log.md"]
-    N --> O["shared/deployment_noire.json"]
-    O --> P["NOIRE"]
-    P --> Q["shared/noire_findings.md/json"]
-    Q --> K
+    A["Operator"] --> B["ORACLE"]
+    B --> C["sova-mcp tools"]
+    C --> D["shared/scouting_report.md/json"]
+    D --> B
+    B --> E["shared/attack_surface.md"]
+    B --> F["webdig-mcp tools"]
+    F --> G["shared/webdig_findings.md/json"]
+    G --> B
+    B --> H["shared/handoff.json"]
+    H --> I["ELLIOT"]
+    I --> J["shared/exploit_log.md"]
+    J --> B
+    B --> K["noire-mcp tools"]
+    K --> L["shared/noire_findings.md/json"]
+    L --> B
 ```
 
 ---
@@ -35,16 +31,18 @@ flowchart LR
 ```mermaid
 flowchart TD
     A["Prompts"] --> B["Role and reasoning"]
-    C["Schemas"] --> D["Artifact shape"]
-    E["Validation scripts"] --> F["Phase gate checks"]
-    G["Shared state in files"] --> H["Cross-agent memory"]
-    I["Operator confirmations"] --> J["Human approval boundary"]
+    C["MCP Tools"] --> D["Tool execution boundary"]
+    E["Schemas"] --> F["Artifact shape"]
+    G["Validation scripts"] --> H["Phase gate checks"]
+    I["Shared state in files"] --> J["Cross-session memory"]
+    K["Operator confirmations"] --> L["Human approval boundary"]
 
-    B --> K["Phase 1.5 control model"]
-    D --> K
-    F --> K
-    H --> K
-    J --> K
+    B --> M["Phase 3 control model"]
+    D --> M
+    F --> M
+    H --> M
+    J --> M
+    L --> M
 ```
 
 ---
@@ -53,46 +51,28 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["boxes/{BOX_NAME}/"] --> B["sova/"]
-    A --> C["planner/"]
-    A --> D["webdig/"]
-    A --> E["elliot/"]
-    A --> F["shared/"]
-    A --> G["noire/"]
+    A["boxes/{BOX_NAME}/"] --> B["oracle/"]
+    A --> C["elliot/"]
+    A --> D["shared/"]
 
     B --> B1["CLAUDE.md"]
-    B --> B2["SOVA_SYSTEM_PROMPT.md"]
-    B --> B3["SOVA_REPORT_TEMPLATE.md"]
-    B --> B4["SOVA_REPORT_SCHEMA.json"]
+    B --> B2["ORACLE_SYSTEM_PROMPT.md"]
+    B --> B3[".claude/settings.local.json — MCP config"]
 
     C --> C1["CLAUDE.md"]
-    C --> C2["PLANNER_SYSTEM_PROMPT.md"]
+    C --> C2["ELLIOT_SYSTEM_PROMPT.md"]
 
-    D --> D1["CLAUDE.md"]
-    D --> D2["WEBDIG_SYSTEM_PROMPT.md"]
-
-    E --> E1["CLAUDE.md"]
-    E --> E2["ELLIOT_SYSTEM_PROMPT.md"]
-
-    G --> G1["CLAUDE.md"]
-    G --> G2["NOIRE_SYSTEM_PROMPT.md"]
-
-    F --> F1["target.txt"]
-    F --> F2["operation.md"]
-    F --> F3["attack_surface.md"]
-    F --> F4["scouting_report.md"]
-    F --> F5["scouting_report.json"]
-    F --> F6["deployment_webdig.json"]
-    F --> F7["webdig_findings.md"]
-    F --> F8["webdig_findings.json"]
-    F --> F9["handoff.json"]
-    F --> F10["exploit_log.md"]
-    F --> F11["deployment_noire.json"]
-    F --> F12["noire_findings.md"]
-    F --> F13["noire_findings.json"]
-    F --> F14["notes/important_notes.md"]
-    F --> F15["schemas/"]
-    F --> F16["raw/"]
+    D --> D1["target.txt"]
+    D --> D2["operation.md"]
+    D --> D3["attack_surface.md"]
+    D --> D4["scouting_report.md/json"]
+    D --> D5["webdig_findings.md/json"]
+    D --> D6["noire_findings.md/json"]
+    D --> D7["handoff.json"]
+    D --> D8["exploit_log.md"]
+    D --> D9["notes/important_notes.md"]
+    D --> D10["schemas/"]
+    D --> D11["raw/"]
 ```
 
 ---
@@ -101,77 +81,53 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A["SOVA"] --> A1["Identify services"]
-    A --> A2["Stop at identification boundary"]
-    A --> A3["Write scouting report"]
+    A["ORACLE"] --> A1["Run recon via sova-mcp"]
+    A --> A2["Research CVEs and rank attack paths"]
+    A --> A3["Enumerate web via webdig-mcp"]
+    A --> A4["Investigate post-access via noire-mcp"]
+    A --> A5["Brief operator and write handoff.json"]
 
-    B["PLANNER"] --> B1["Read all available intelligence"]
-    B --> B2["Rank attack paths"]
-    B --> B3["Authorize next move"]
-
-    C["WEBDIG"] --> C1["Stay inside deployment_webdig.json scope"]
-    C --> C2["Enumerate web surface"]
-    C --> C3["Return markdown plus JSON"]
-
-    D["ELLIOT"] --> D1["Validate handoff.json"]
-    D --> D2["Exploit only in scope"]
-    D --> D3["Return to Planner on stop condition"]
-
-    E["NOIRE"] --> E1["Confirm current foothold"]
-    E --> E2["Investigate local escalation surface"]
-    E --> E3["Return ranked leads to Planner"]
+    B["ELLIOT"] --> B1["Validate handoff.json"]
+    B --> B2["Exploit only in scope"]
+    B --> B3["Return to Oracle on stop condition"]
 ```
 
 ---
 
-## 5. Web-First Execution Thread
+## 5. Execution Thread
 
 ```mermaid
 sequenceDiagram
     participant O as Operator
-    participant S as SOVA
-    participant P as PLANNER
-    participant W as WEBDIG
+    participant R as ORACLE
     participant E as ELLIOT
-    participant N as NOIRE
     participant X as shared/
 
-    O->>S: Start recon
-    S->>X: Write scouting_report.md/json
-    S->>O: Recommend Planner
+    O->>R: Start operation
+    R->>X: sova-mcp → scouting_report.md/json
+    R->>X: Write attack_surface.md
+    R->>O: Brief — recommend web enum
 
-    O->>P: Start planning
-    P->>X: Read scouting report
-    P->>X: Write attack_surface.md
-    P->>X: Write deployment_webdig.json
-    P->>O: Deploy WEBDIG
-
-    O->>W: Start web enumeration
-    W->>X: Read deployment_webdig.json
-    W->>X: Write webdig_findings.md/json
-    W->>X: Append important notes if needed
-    W->>O: Return to Planner
-
-    O->>P: Re-evaluate findings
-    P->>X: Read webdig findings
-    P->>X: Update attack_surface.md
-    P->>X: Write handoff.json
-    P->>O: Deploy ELLIOT
+    O->>R: Confirm
+    R->>X: webdig-mcp → webdig_findings.md/json
+    R->>X: Update attack_surface.md
+    R->>X: Write handoff.json
+    R->>O: Brief — deploy ELLIOT
 
     O->>E: Start exploitation
     E->>X: Validate handoff.json
     E->>X: Write exploit_log.md
-    E->>X: Append important notes if needed
-    E->>O: Return foothold and recommend NOIRE when needed
+    E->>O: Return with foothold
 
-    O->>P: Re-evaluate foothold
-    P->>X: Write deployment_noire.json
-    P->>O: Deploy NOIRE
+    O->>R: Re-evaluate foothold
+    R->>X: noire-mcp → noire_findings.md/json
+    R->>X: Update attack_surface.md
+    R->>X: Write handoff.json (privesc)
+    R->>O: Brief — deploy ELLIOT for privesc
 
-    O->>N: Start post-access investigation
-    N->>X: Read deployment_noire.json
-    N->>X: Write noire_findings.md/json
-    N->>O: Return to Planner
+    O->>E: Execute privesc
+    E->>X: Write exploit_log.md
+    E->>O: Return
 ```
 
 ---
@@ -180,46 +136,71 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A["scouting_report.json"] --> B["PLANNER"]
-    A --> C["WEBDIG"]
-    D["attack_surface.md"] --> B
-    D --> E["ELLIOT"]
-    F["deployment_webdig.json"] --> C
-    G["webdig_findings.json"] --> B
-    H["handoff.json"] --> E
-    I["deployment_noire.json"] --> J["NOIRE"]
-    K["noire_findings.json"] --> B
-    L["important_notes.md"] --> B
-    L --> C
-    L --> E
-    L --> J
+    A["scouting_report.json"] --> B["ORACLE"]
+    C["attack_surface.md"] --> B
+    C --> D["ELLIOT"]
+    E["webdig_findings.json"] --> B
+    F["noire_findings.json"] --> B
+    G["handoff.json"] --> D
+    H["important_notes.md"] --> B
+    H --> D
 ```
 
 ---
 
-## 7. What Changed In Phase 1.5
+## 7. MCP Tool Servers
 
 ```mermaid
 flowchart TD
-    A["Before"] --> A1["Prompt-heavy coordination"]
-    A --> A2["Operator carried sequencing burden"]
-    A --> A3["WEBDIG handoff was informal"]
+    A["ORACLE"] --> B["sova-mcp"]
+    A --> C["webdig-mcp"]
+    A --> D["noire-mcp"]
 
-    B["After"] --> B1["deployment_webdig.json required"]
-    B --> B2["webdig_findings.json required"]
-    B --> B3["handoff.json schema-backed"]
-    B --> B4["NOIRE added after foothold"]
-    B --> B5["important_notes.md added"]
-    B --> B6["validation scripts added"]
+    B --> B1["sova_full_scan"]
+    B --> B2["sova_whatweb"]
+    B --> B3["sova_banner_grab"]
+    B --> B4["sova_zone_transfer"]
+    B --> B5["sova_null_session"]
+    B --> B6["sova_anon_ftp"]
+
+    C --> C1["webdig_dir_bust"]
+    C --> C2["webdig_vhost_fuzz"]
+    C --> C3["webdig_whatweb"]
+    C --> C4["webdig_curl"]
+    C --> C5["webdig_js_review"]
+
+    D --> D1["noire_system_profile"]
+    D --> D2["noire_sudo_check"]
+    D --> D3["noire_suid_scan"]
+    D --> D4["noire_cron_inspect"]
+    D --> D5["noire_service_enum"]
+    D --> D6["noire_config_harvest"]
+    D --> D7["noire_writable_paths"]
 ```
 
 ---
 
-## 8. Obsidian Note Flow
+## 8. What Changed In Phase 3
+
+```mermaid
+flowchart TD
+    A["Before: 5 agent sessions"] --> A1["Operator cd between sova/ planner/ webdig/ elliot/ noire/"]
+    A --> A2["Manual sequencing of 5 agents"]
+    A --> A3["deployment_webdig.json and deployment_noire.json required"]
+
+    B["After: 2 agent sessions"] --> B1["Oracle handles recon + analysis + enum via MCP tools"]
+    B --> B2["Only Oracle and Elliot as agent sessions"]
+    B --> B3["MCP tools replace 3 separate agents"]
+    B --> B4["Operator flow: Oracle → Elliot → Oracle → Elliot"]
+```
+
+---
+
+## 9. Obsidian Note Flow
 
 ```mermaid
 flowchart LR
-    A["SOVA / PLANNER / WEBDIG / ELLIOT"] --> B["shared/notes/important_notes.md"]
+    A["ORACLE / ELLIOT"] --> B["shared/notes/important_notes.md"]
     B --> C["scripts/publish_obsidian_note.sh"]
     C --> D["~/Desktop/AllSeeing/Agent Orchestration Idea"]
     D --> E["IRONTHREAD/Boxes or Architecture notes"]
@@ -227,14 +208,12 @@ flowchart LR
 
 ---
 
-## 9. Short Explainer
+## 10. Short Explainer
 
-The current infrastructure is a file-backed multi-agent workflow.
+The current infrastructure is a two-agent system with MCP tool servers.
 
-- `SOVA` discovers and identifies.
-- `PLANNER` decides and authorizes.
-- `WEBDIG` enumerates web scope under a bounded deployment contract.
-- `ELLIOT` exploits only after scoped authorization.
-- `NOIRE` investigates the host after foothold and returns ranked local leads.
-- `shared/` is the system bus.
-- `schemas/` and validation scripts are the first step away from prompt-only control.
+- `ORACLE` runs recon (sova-mcp), analyzes and researches CVEs, enumerates web surface (webdig-mcp), investigates post-access (noire-mcp), briefs the operator, and writes scoped handoff.json.
+- `ELLIOT` exploits only after scoped authorization via handoff.json.
+- `shared/` is the system bus — all intelligence flows through files.
+- `schemas/` define artifact contracts.
+- MCP servers wrap CLI tools (nmap, gobuster, ffuf, etc.) as structured tool calls.

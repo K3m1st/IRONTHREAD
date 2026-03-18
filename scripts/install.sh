@@ -19,7 +19,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # ── Step 1 — Check Claude Code ───────────────────────────────
-echo "[1/5] Checking Claude Code..."
+echo "[1/6] Checking Claude Code..."
 if ! command -v claude &> /dev/null; then
     echo "  [!] Claude Code not found."
     echo "  Install it with: npm install -g @anthropic-ai/claude-code"
@@ -29,7 +29,7 @@ fi
 echo "  [✓] Claude Code found: $(claude --version 2>/dev/null || echo 'installed')"
 
 # ── Step 2 — Check API key ───────────────────────────────────
-echo "[2/5] Checking Anthropic API key..."
+echo "[2/6] Checking Anthropic API key..."
 if [ -z "$ANTHROPIC_API_KEY" ]; then
     echo "  [!] ANTHROPIC_API_KEY not set."
     echo "  Add this to your ~/.bashrc or ~/.zshrc:"
@@ -40,27 +40,22 @@ if [ -z "$ANTHROPIC_API_KEY" ]; then
 fi
 echo "  [✓] API key found."
 
-# ── Step 3 — Verify templates ────────────────────────────────
-echo "[3/5] Verifying template files..."
+# ── Step 3 — Verify templates and MCP servers ─────────────────
+echo "[3/6] Verifying template and MCP files..."
 
 REQUIRED_FILES=(
-    "templates/sova/CLAUDE.md"
-    "templates/sova/SOVA_SYSTEM_PROMPT.md"
-    "templates/sova/SOVA_REPORT_TEMPLATE.md"
-    "templates/sova/SOVA_REPORT_SCHEMA.json"
-    "templates/planner/CLAUDE.md"
-    "templates/planner/PLANNER_SYSTEM_PROMPT.md"
-    "templates/webdig/CLAUDE.md"
-    "templates/webdig/WEBDIG_SYSTEM_PROMPT.md"
+    "templates/oracle/CLAUDE.md"
+    "templates/oracle/ORACLE_SYSTEM_PROMPT.md"
     "templates/elliot/CLAUDE.md"
     "templates/elliot/ELLIOT_SYSTEM_PROMPT.md"
-    "templates/noire/CLAUDE.md"
-    "templates/noire/NOIRE_SYSTEM_PROMPT.md"
-    "schemas/DEPLOYMENT_WEBDIG_SCHEMA.json"
-    "schemas/DEPLOYMENT_NOIRE_SCHEMA.json"
     "schemas/HANDOFF_SCHEMA.json"
+    "schemas/SOVA_REPORT_SCHEMA.json"
     "schemas/NOIRE_FINDINGS_SCHEMA.json"
     "schemas/WEBDIG_FINDINGS_SCHEMA.json"
+    "mcp/sova/server.py"
+    "mcp/webdig/server.py"
+    "mcp/noire/server.py"
+    "mcp/requirements.txt"
 )
 
 MISSING=0
@@ -73,19 +68,28 @@ done
 
 if [ $MISSING -eq 1 ]; then
     echo ""
-    echo "  Some template files are missing from the repo."
+    echo "  Some required files are missing from the repo."
     echo "  Check your repo is fully cloned: git pull"
     exit 1
 fi
-echo "  [✓] All template files present."
+echo "  [✓] All required files present."
 
-# ── Step 4 — Create boxes directory ──────────────────────────
-echo "[4/5] Setting up boxes directory..."
+# ── Step 4 — Install MCP dependencies ─────────────────────────
+echo "[4/6] Installing MCP Python dependencies..."
+if pip3 install -q -r "$REPO_DIR/mcp/requirements.txt" 2>/dev/null; then
+    echo "  [✓] MCP dependencies installed."
+else
+    echo "  [!] Failed to install MCP dependencies."
+    echo "  Run manually: pip3 install -r $REPO_DIR/mcp/requirements.txt"
+fi
+
+# ── Step 5 — Create boxes directory ──────────────────────────
+echo "[5/6] Setting up boxes directory..."
 mkdir -p "$BOXES_DIR"
 echo "  [✓] Boxes directory: $BOXES_DIR"
 
-# ── Step 5 — Add new_box.sh to PATH ──────────────────────────
-echo "[5/5] Adding new_box.sh to PATH..."
+# ── Step 6 — Add new_box.sh to PATH ──────────────────────────
+echo "[6/6] Adding new_box.sh to PATH..."
 
 NEW_BOX_SCRIPT=$REPO_DIR/scripts/new_box.sh
 chmod +x "$NEW_BOX_SCRIPT"
@@ -104,7 +108,7 @@ fi
 ALIAS_LINE="alias new_box='$NEW_BOX_SCRIPT'"
 
 if [ -n "$SHELL_RC" ]; then
-    if ! grep -q "adversary-agents/new_box.sh" "$SHELL_RC" 2>/dev/null; then
+    if ! grep -q "alias new_box=" "$SHELL_RC" 2>/dev/null; then
         echo "" >> "$SHELL_RC"
         echo "# Adversary Agent Architecture" >> "$SHELL_RC"
         echo "$ALIAS_LINE" >> "$SHELL_RC"
