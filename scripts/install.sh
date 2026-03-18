@@ -26,17 +26,24 @@ if ! command -v claude &> /dev/null; then
 fi
 echo "  [✓] Claude Code found: $(claude --version 2>/dev/null || echo 'installed')"
 
-# ── Step 2 — Check API key ───────────────────────────────────
-echo "[2/5] Checking Anthropic API key..."
-if [ -z "$ANTHROPIC_API_KEY" ]; then
-    echo "  [!] ANTHROPIC_API_KEY not set."
-    echo "  Add this to your ~/.bashrc or ~/.zshrc:"
+# ── Step 2 — Check authentication ─────────────────────────────
+echo "[2/5] Checking authentication..."
+if [ -n "$ANTHROPIC_API_KEY" ]; then
+    echo "  [✓] API key found (ANTHROPIC_API_KEY)."
+elif claude auth status &> /dev/null; then
+    echo "  [✓] OAuth session active."
+else
+    echo "  [!] No authentication found."
+    echo ""
+    echo "  Option A — API key:"
     echo "    export ANTHROPIC_API_KEY=your_key_here"
-    echo "  Then run: source ~/.bashrc"
+    echo ""
+    echo "  Option B — OAuth login:"
+    echo "    claude login"
+    echo ""
     echo "  Then re-run this script."
     exit 1
 fi
-echo "  [✓] API key found."
 
 # ── Step 3 — Verify templates and MCP servers ─────────────────
 echo "[3/5] Verifying template and MCP files..."
