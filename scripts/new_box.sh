@@ -53,8 +53,11 @@ cp "$REPO_DIR/schemas/SOVA_REPORT_SCHEMA.json"        "$BOX_DIR/shared/schemas/S
 cp "$REPO_DIR/schemas/WEBDIG_FINDINGS_SCHEMA.json"    "$BOX_DIR/shared/schemas/WEBDIG_FINDINGS_SCHEMA.json"
 cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_SCHEMA.json"
 
-# ── Configure MCP servers ────────────────────────────────────
-cat > "$BOX_DIR/oracle/.mcp.json" << MCPEOF
+# ── Ensure MCP servers configured at repo root ─────────────────
+# .mcp.json must live at the git root — Claude Code only reads it there.
+# This is idempotent — same config for all boxes.
+if [ ! -f "$REPO_DIR/.mcp.json" ]; then
+    cat > "$REPO_DIR/.mcp.json" << MCPEOF
 {
   "mcpServers": {
     "sova-mcp": {
@@ -72,6 +75,10 @@ cat > "$BOX_DIR/oracle/.mcp.json" << MCPEOF
   }
 }
 MCPEOF
+    echo "[+] MCP servers configured at $REPO_DIR/.mcp.json"
+else
+    echo "[+] MCP servers already configured."
+fi
 
 # ── Write operation metadata ─────────────────────────────────
 cat > "$BOX_DIR/shared/target.txt" << EOF

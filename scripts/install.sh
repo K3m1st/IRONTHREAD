@@ -79,13 +79,39 @@ if [ $MISSING -eq 1 ]; then
 fi
 echo "  [✓] All required files present."
 
-# ── Step 4 — Install MCP dependencies ─────────────────────────
+# ── Step 4 — Install MCP dependencies and configure servers ────
 echo "[4/5] Installing MCP Python dependencies..."
 if pip3 install -q -r "$REPO_DIR/mcp/requirements.txt" 2>/dev/null; then
     echo "  [✓] MCP dependencies installed."
 else
     echo "  [!] Failed to install MCP dependencies."
     echo "  Run manually: pip3 install -r $REPO_DIR/mcp/requirements.txt"
+    echo "  On Kali, you may need: pip3 install --break-system-packages \"mcp[cli]\""
+fi
+
+# Configure MCP servers at repo root
+if [ ! -f "$REPO_DIR/.mcp.json" ]; then
+    cat > "$REPO_DIR/.mcp.json" << MCPEOF
+{
+  "mcpServers": {
+    "sova-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/sova/server.py"]
+    },
+    "webdig-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/webdig/server.py"]
+    },
+    "noire-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/noire/server.py"]
+    }
+  }
+}
+MCPEOF
+    echo "  [✓] MCP servers configured at .mcp.json"
+else
+    echo "  [✓] MCP servers already configured."
 fi
 
 # ── Step 5 — Add new_box.sh to PATH ──────────────────────────
