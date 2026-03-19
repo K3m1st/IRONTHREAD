@@ -54,8 +54,7 @@ cp "$REPO_DIR/schemas/WEBDIG_FINDINGS_SCHEMA.json"    "$BOX_DIR/shared/schemas/W
 cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_SCHEMA.json"
 
 # ── Configure MCP servers ────────────────────────────────────
-mkdir -p "$BOX_DIR/oracle/.claude"
-cat > "$BOX_DIR/oracle/.claude/settings.local.json" << MCPEOF
+cat > "$BOX_DIR/oracle/.mcp.json" << MCPEOF
 {
   "mcpServers": {
     "sova-mcp": {

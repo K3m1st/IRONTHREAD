@@ -90,6 +90,7 @@ You have three MCP tool servers available. Use them directly — no separate age
 | `sova_zone_transfer` | DNS zone transfer attempt |
 | `sova_null_session` | SMB null session test |
 | `sova_anon_ftp` | FTP anonymous login test |
+| `sova_add_hosts` | Add IP/hostname mappings to /etc/hosts (skips duplicates) |
 
 ### webdig-mcp (Web Enumeration)
 | Tool | What it does |
@@ -136,6 +137,8 @@ Use sova-mcp tools. Apply the SOVA decision framework from `ORACLE_SYSTEM_PROMPT
 **Always start with `sova_full_scan`.**
 
 After the scan, reason through each service using the identification boundary table. Use additional sova tools as needed (whatweb for web services, zone transfer for DNS, null session for SMB, anon FTP for FTP). Stop at identification — do not enumerate beyond what's needed to identify and assess exposure.
+
+**If nmap reveals a hostname or domain** (e.g., via redirect, SSL cert, or service banner), immediately use `sova_add_hosts` to add the IP and all discovered hostnames to `/etc/hosts`. This must happen before any web enumeration — vhost fuzzing and whatweb depend on DNS resolution.
 
 Write both `../shared/scouting_report.md` and `../shared/scouting_report.json` to shared/ using `../shared/schemas/SOVA_REPORT_SCHEMA.json` as the contract reference.
 

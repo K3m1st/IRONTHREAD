@@ -122,6 +122,22 @@ async def list_tools() -> list[Tool]:
                 "required": ["target_ip", "output_dir"],
             },
         ),
+        Tool(
+            name="sova_add_hosts",
+            description="Add IP-to-hostname mappings to /etc/hosts. Skips duplicates. Requires sudo.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "ip": {"type": "string", "description": "IP address to map"},
+                    "hostnames": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Hostnames to map to the IP (e.g. ['target.htb', 'portal.target.htb'])",
+                    },
+                },
+                "required": ["ip", "hostnames"],
+            },
+        ),
     ]
 
 
@@ -241,6 +257,68 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 "anonymous_login": anon_success,
                 "raw_output_file": raw_file,
                 "output": stdout if anon_success else "Anonymous login failed or empty listing",
+                "errors": stderr if stderr else None,
+            }),
+        )]
+
+    elif name == "sova_add_hosts":
+        import re
+        ip = arguments["ip"]
+        hostnames = arguments.get("hostnames", [])
+
+        # Validate IP format
+        if not re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', ip):
+            return [TextContent(type="text", text=json.dumps({"error": f"Invalid IP: {ip}"}))]
+
+        # Validate hostnames — alphanumeric, dots, hyphens only
+        for h in hostnames:
+            if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9.\-]+$', h):
+                return [TextContent(type="text", text=json.dumps({"error": f"Invalid hostname: {h}"}))]
+
+        if not hostnames:
+            return [TextContent(type="text", text=json.dumps({"error": "No hostnames provided"}))]
+
+        # Read current /etc/hosts and check for existing entries
+        try:
+            with open("/etc/hosts", "r") as f:
+                current_hosts = f.read()
+        except PermissionError:
+            current_hosts = ""
+
+        added = []
+        skipped = []
+        for h in hostnames:
+            if h in current_hosts:
+                skipped.append(h)
+            else:
+                added.append(h)
+
+        if not added:
+            return [TextContent(
+                type="text",
+                text=json.dumps({
+                    "tool": "sova_add_hosts",
+                    "ip": ip,
+                    "added": [],
+                    "skipped": skipped,
+                    "message": "All hostnames already present in /etc/hosts",
+                }),
+            )]
+
+        # Build the line and append via sudo tee
+        hosts_line = f"{ip}\t{' '.join(added)}"
+        cmd = ["sudo", "bash", "-c", f"echo '{hosts_line}' >> /etc/hosts"]
+        rc, stdout, stderr = _run(cmd, timeout=10)
+
+        return [TextContent(
+            type="text",
+            text=json.dumps({
+                "tool": "sova_add_hosts",
+                "ip": ip,
+                "added": added,
+                "skipped": skipped,
+                "return_code": rc,
+                "line_added": hosts_line if rc == 0 else None,
                 "errors": stderr if stderr else None,
             }),
         )]

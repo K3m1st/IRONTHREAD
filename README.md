@@ -150,6 +150,7 @@ Oracle uses three MCP servers for tool execution:
 - `sova_zone_transfer` — dig axfr
 - `sova_null_session` — smbclient -N -L
 - `sova_anon_ftp` — anonymous FTP test
+- `sova_add_hosts` — add IP/hostname to /etc/hosts (skips duplicates)
 
 ### webdig-mcp (Web Enumeration)
 - `webdig_dir_bust` — gobuster dir
