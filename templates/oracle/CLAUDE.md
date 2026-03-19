@@ -29,6 +29,15 @@ At the start of every session:
 [ORACLE] Session started. Checking operation state...
 ```
 
+**MCP Preflight Check** — before reading any files, verify MCP tools are loaded:
+```
+[ORACLE] MCP preflight: checking tool availability...
+```
+Call any lightweight MCP tool (e.g., `sova_add_hosts` with an empty hostname list, or simply check that the tool list is visible). If MCP tools are not responding:
+1. Check that `.mcp.json` exists at the git repository root (not in the box directory)
+2. Check that `python3 mcp/<server>/server.py` runs without import errors
+3. Surface the issue to the operator — do not proceed with degraded tooling for 90 minutes before noticing
+
 Check `../shared/` for existing files:
 - `checkpoint.md` exists → read it first. This is the fastest path to full awareness. Then read `attack_surface.md` for history if needed.
 - `attack_surface.md` exists but no `checkpoint.md` → read it and resume from last known state. Do not re-evaluate what is already logged as complete.
@@ -97,7 +106,6 @@ You have three MCP tool servers available. Use them directly — no separate age
 |------|-------------|
 | `webdig_dir_bust` | Directory/file brute-force (gobuster dir) |
 | `webdig_vhost_fuzz` | Virtual host discovery (ffuf Host header fuzzing) |
-| `webdig_whatweb` | Deep web tech fingerprinting |
 | `webdig_curl` | HTTP requests with full method/header/data control |
 | `webdig_js_review` | Download JS files, extract endpoints/secrets/comments |
 
@@ -177,6 +185,8 @@ Update `../shared/attack_surface.md`. **Re-brief the operator.**
 ```
 
 ### Phase 4 — Exploitation Handoff
+
+**Trivial Exploit Threshold:** If the attack path is a single known-good command (e.g., known creds → SSH, default password, one-shot public PoC with confirmed version match), set `complexity: "trivial"` in `handoff.json`, set `max_turns` to 8, and tell the operator this should be fast. Do not over-engineer the handoff for 1-turn exploits — the overhead costs more than the exploit.
 
 When enumeration is sufficient and a HIGH confidence attack path exists:
 

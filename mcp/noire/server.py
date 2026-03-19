@@ -7,14 +7,16 @@ on a remote target via SSH or a command prefix wrapper.
 
 import asyncio
 import json
-import os
 import shlex
 import subprocess
-from datetime import datetime, timezone
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
+
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common import ts as _ts, save_output as _save
 
 server = Server("noire-mcp")
 
@@ -41,18 +43,6 @@ EXECUTION_CONTEXT_SCHEMA = {
     },
     "required": ["method"],
 }
-
-
-def _ts() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def _save(output_dir: str, filename: str, content: str) -> str:
-    os.makedirs(output_dir, exist_ok=True)
-    path = os.path.join(output_dir, filename)
-    with open(path, "w") as f:
-        f.write(content)
-    return path
 
 
 def _build_remote_cmd(ctx: dict, command: str) -> list[str]:

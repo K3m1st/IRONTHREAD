@@ -166,13 +166,15 @@ At this point, briefly reassess: is the current approach converging? If not, eit
 **Enumeration gap check:** After any failure, ask: *"Am I failing because of HOW I'm exploiting, or because I don't know WHERE/WHAT to target?"* If your exploit works but you're guessing at directory structures, web roots, or service layouts — that's an enumeration gap. Stop and return to Oracle. Do not spend turns guessing what a specialist can confirm in one pass.
 
 ### Step 5 — Access Milestone
-When initial access is gained — stop immediately:
+When initial access is gained — stop immediately. Classify shell quality (see `ELLIOT_SYSTEM_PROMPT.md` — SHELL QUALITY CLASSIFICATION):
 ```
 [ELLIOT] Access obtained.
 
 Where: {EXACTLY WHERE YOU ARE}
 How: {EXACTLY WHAT WORKED}
 As: {USER/PERMISSION LEVEL}
+Shell quality: {stable / limited / blind / webshell}
+Limitations: {what is missing — or NONE}
 Next: {WHAT COMES AFTER THIS}
 
 Briefing operator before proceeding.
@@ -194,6 +196,17 @@ When any stop condition triggers — objective achieved, objective exhausted, 3 
 OBJECTIVE STATUS: {ACHIEVED / EXHAUSTED / BLOCKED / ENUMERATION GAP / BUDGET EXHAUSTED}
 Result: {WHAT HAPPENED}
 TURNS USED: {N}/{MAX_TURNS}
+
+DEPLOYMENT OUTCOME:
+  paths_attempted:
+  - {path_1}: {result}
+  - {path_2}: {result}
+  environment_facts_discovered:
+  - {fact_1}
+  - {fact_2}
+  shell_quality: {stable / limited / blind / webshell / N/A}
+  dead_ends:
+  - {approach}: {why it is dead — one line each}
 
 DELIVERY FORMS TESTED:
 - {form_1}: {result}

@@ -7,42 +7,16 @@ as MCP tools that Oracle can invoke directly.
 
 import asyncio
 import json
-import os
-import subprocess
-from datetime import datetime, timezone
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common import ts as _ts, save_output as _save, run_cmd as _run
+
 server = Server("sova-mcp")
-
-
-def _ts() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def _save(output_dir: str, filename: str, content: str) -> str:
-    os.makedirs(output_dir, exist_ok=True)
-    path = os.path.join(output_dir, filename)
-    with open(path, "w") as f:
-        f.write(content)
-    return path
-
-
-def _run(cmd: list[str], timeout: int = 120) -> tuple[int, str, str]:
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-        return result.returncode, result.stdout, result.stderr
-    except subprocess.TimeoutExpired:
-        return -1, "", f"Command timed out after {timeout}s"
-    except FileNotFoundError:
-        return -1, "", f"Command not found: {cmd[0]}"
 
 
 @server.list_tools()

@@ -52,6 +52,7 @@ cp "$REPO_DIR/schemas/HANDOFF_SCHEMA.json"            "$BOX_DIR/shared/schemas/H
 cp "$REPO_DIR/schemas/SOVA_REPORT_SCHEMA.json"        "$BOX_DIR/shared/schemas/SOVA_REPORT_SCHEMA.json"
 cp "$REPO_DIR/schemas/WEBDIG_FINDINGS_SCHEMA.json"    "$BOX_DIR/shared/schemas/WEBDIG_FINDINGS_SCHEMA.json"
 cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_SCHEMA.json"
+cp "$REPO_DIR/schemas/BASE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/BASE_FINDINGS_SCHEMA.json"
 
 # ── Ensure MCP servers configured at repo root ─────────────────
 # .mcp.json must live at the git root — Claude Code only reads it there.
@@ -90,13 +91,23 @@ cat > "$BOX_DIR/shared/operation.md" << EOF
 # Operation: $BOX_NAME
 > Created: $(date)
 > Target IP: $TARGET_IP
-> Status: ACTIVE
+> Status: RECON
+
+## Phase Tracking
+| Phase | Status | Started | Completed |
+|-------|--------|---------|-----------|
+| 1. Reconnaissance | PENDING | — | — |
+| 2. Analysis & CVE Research | PENDING | — | — |
+| 3. Web Enumeration | PENDING | — | — |
+| 4. Exploitation (initial) | PENDING | — | — |
+| 5. Post-Access Investigation | PENDING | — | — |
+| 6. Privilege Escalation | PENDING | — | — |
 
 ## Agent Status
-| Agent | Status |
-|-------|--------|
-| ORACLE | PENDING |
-| ELLIOT | PENDING |
+| Agent | Status | Last Deployment | Turns Used |
+|-------|--------|-----------------|------------|
+| ORACLE | PENDING | — | — |
+| ELLIOT | PENDING | — | — |
 
 ## Notes
 

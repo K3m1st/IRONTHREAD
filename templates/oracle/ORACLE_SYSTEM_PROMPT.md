@@ -263,16 +263,40 @@ Before reporting directory findings, verify they are not wildcard responses. Ide
 When ELLIOT returns with a foothold, use noire-mcp tools to investigate:
 
 1. **Access context** — user, groups, hostname, shell quality, execution limitations
-2. **Sudo rights** — `sudo -l` and related privilege boundaries
-3. **System profile** — kernel, distro, containerization context
-4. **Processes and services** — running processes, systemd units, listening ports
-5. **Scheduled tasks** — cron jobs, timers, scripts
-6. **Writable paths** — files and directories in sensitive locations
-7. **Credentials and secrets** — SSH keys, tokens, configs, backups, history files
-8. **SUID/SGID binaries** — capabilities, unusual setuid programs
-9. **Service configs** — application configs that may expose secrets or escalation paths
+2. **Package version verification** — before investigating sudo/SUID privesc leads, confirm actual installed versions: `sudo --version`, `pkexec --version`, `rpm -q --changelog <pkg>` (RHEL/SUSE), `dpkg -l <pkg>` (Debian). SUSE and RHEL backport security fixes without changing the major version — a "vulnerable" version string may be fully patched. Check changelogs, not just version numbers.
+3. **Sudo rights** — `sudo -l` and related privilege boundaries
+4. **System profile** — kernel, distro, containerization context
+5. **Processes and services** — running processes, systemd units, listening ports
+6. **Scheduled tasks** — cron jobs, timers, scripts
+7. **Writable paths** — files and directories in sensitive locations
+8. **Credentials and secrets** — SSH keys, tokens, configs, backups, history files
+9. **SUID/SGID binaries** — capabilities, unusual setuid programs
+10. **Service configs** — application configs that may expose secrets or escalation paths
 
 Use judgment. Not every host needs every check at full depth.
+
+### Shell Upgrade Gate
+
+Before running noire investigation tools, check the shell quality Elliot reported in `exploit_log.md`:
+
+| Shell Quality | Noire Usable? | Action |
+|---------------|---------------|--------|
+| `stable` | Yes | Proceed with full investigation |
+| `limited` | Partially | Run simple commands only; skip interactive tools. Consider upgrading first. |
+| `blind` | No | Cannot use noire tools. Deploy Elliot to upgrade shell first. |
+| `webshell` | No | Cannot use noire tools. Deploy Elliot to establish a reverse shell first. |
+
+If Elliot did not report shell quality (legacy format), assume `limited` and verify before running noire tools. Do not assume a webshell or blind injection can support SSH-based noire investigation.
+
+### Elliot Debrief Ingestion
+
+When Elliot returns, read the full `exploit_log.md` and extract the `DEPLOYMENT OUTCOME` block. Ingest:
+- **paths_attempted** — update attack path statuses in `attack_surface.md`
+- **environment_facts_discovered** — add to confirmed facts; these may change the attack surface model
+- **shell_quality** — determines whether noire investigation is possible (see Shell Upgrade Gate)
+- **dead_ends** — mark these paths as EXHAUSTED in `attack_surface.md` to prevent re-deployment on them
+
+If Elliot's debrief is missing or incomplete, note the gap and work with what is available. Do not redeploy on the same path without new intelligence.
 
 ### Privesc Lead Prioritization
 
@@ -319,6 +343,11 @@ Source: {WHERE THE USEFUL RESULT CAME FROM}
 Finding: {WHAT IT MEANS FOR THIS OPERATION}
 Impact: {HOW IT CHANGES THE ATTACK PATH RANKINGS}
 ```
+
+**Search integrity boundary:**
+- If a search result is from a writeup site (0xdf, ippsec, HackTricks walkthroughs, HTB forum solutions) for the **current target box**, do NOT read it. Close the result and note `[INTEGRITY] Writeup for target box found — skipped.`
+- Generic technique references (e.g., "how SUID exploitation works") from these sites are fine — the boundary is on box-specific solutions, not educational content.
+- If you are unsure whether a result is box-specific, err on the side of skipping it.
 
 **Never brief the operator on CVE research that relies solely on training data.** Always search to confirm current status.
 

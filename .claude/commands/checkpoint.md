@@ -64,9 +64,15 @@ Write `../shared/checkpoint.md` with this exact structure:
 - The "Where We Are Right Now" section must be actionable enough that a fresh session can pick up without reading anything else first.
 - Overwrite the previous checkpoint — there is only ever one `checkpoint.md`. It reflects NOW, not history.
 
-After writing, confirm:
+After writing `checkpoint.md`, also update `../shared/operation.md`:
+- Set the `Status` line to the current phase (e.g., `RECON`, `WEB ENUM`, `EXPLOITATION`, `POST-ACCESS`, `PRIVESC`, `COMPLETE`)
+- Update the Agent Status table to reflect which agents are active/pending/done
+- If operation.md does not exist or has no phase tracking section, add one
+
+Then confirm:
 ```
 [CHECKPOINT] Saved to ../shared/checkpoint.md
+Operation state updated in ../shared/operation.md
 Phase: {CURRENT PHASE}
 Next action: {ONE LINE}
 ```

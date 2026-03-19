@@ -7,43 +7,17 @@ as MCP tools that Oracle can invoke directly.
 
 import asyncio
 import json
-import os
 import re
-import subprocess
-from datetime import datetime, timezone
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common import ts as _ts, save_output as _save, run_cmd as _run
+
 server = Server("webdig-mcp")
-
-
-def _ts() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-
-
-def _save(output_dir: str, filename: str, content: str) -> str:
-    os.makedirs(output_dir, exist_ok=True)
-    path = os.path.join(output_dir, filename)
-    with open(path, "w") as f:
-        f.write(content)
-    return path
-
-
-def _run(cmd: list[str], timeout: int = 120) -> tuple[int, str, str]:
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-        return result.returncode, result.stdout, result.stderr
-    except subprocess.TimeoutExpired:
-        return -1, "", f"Command timed out after {timeout}s"
-    except FileNotFoundError:
-        return -1, "", f"Command not found: {cmd[0]}"
 
 
 @server.list_tools()
@@ -75,18 +49,6 @@ async def list_tools() -> list[Tool]:
                     "output_dir": {"type": "string", "description": "Directory to save raw output"},
                 },
                 "required": ["target_url", "domain", "wordlist", "output_dir"],
-            },
-        ),
-        Tool(
-            name="webdig_whatweb",
-            description="Deep web technology fingerprinting. Wraps: whatweb -a 3",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "target_url": {"type": "string", "description": "Target URL"},
-                    "output_dir": {"type": "string", "description": "Directory to save raw output"},
-                },
-                "required": ["target_url", "output_dir"],
             },
         ),
         Tool(
@@ -173,24 +135,6 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 "target": target_url,
                 "domain": domain,
                 "wordlist": wordlist,
-                "command": " ".join(cmd),
-                "return_code": rc,
-                "raw_output_file": raw_file,
-                "output": stdout,
-                "errors": stderr if stderr else None,
-            }),
-        )]
-
-    elif name == "webdig_whatweb":
-        target_url = arguments["target_url"]
-        cmd = ["whatweb", "-a", "3", target_url]
-        rc, stdout, stderr = _run(cmd, timeout=60)
-        raw_file = _save(output_dir, f"webdig_whatweb_{ts}.txt", stdout + "\n" + stderr)
-        return [TextContent(
-            type="text",
-            text=json.dumps({
-                "tool": "webdig_whatweb",
-                "target": target_url,
                 "command": " ".join(cmd),
                 "return_code": rc,
                 "raw_output_file": raw_file,

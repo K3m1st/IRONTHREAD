@@ -128,6 +128,30 @@
         }
       }
     },
+    "complexity": {
+      "type": "string",
+      "enum": ["trivial", "standard", "complex"],
+      "description": "Oracle's assessment of exploit complexity. Guides Elliot's expectations and turn budget pacing."
+    },
+    "process_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "foreground": {
+          "type": "string",
+          "description": "What runs in the foreground (e.g., 'reverse shell listener', 'SSH session')"
+        },
+        "background": {
+          "type": "string",
+          "description": "What runs in the background (e.g., 'chisel tunnel on :8081', 'none')"
+        },
+        "critical_note": {
+          "type": "string",
+          "description": "Process lifecycle warning (e.g., 'do not ctrl-c the listener — shell dies')"
+        }
+      },
+      "description": "Describes the process model Elliot inherits or must maintain. Prevents foreground/background bugs."
+    },
     "notes": {
       "type": "string"
     }
