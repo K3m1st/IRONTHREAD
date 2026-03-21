@@ -34,6 +34,7 @@ echo "[*] Spinning up operation: $BOX_NAME ($TARGET_IP)"
 # ── Build directory tree ─────────────────────────────────────
 mkdir -p "$BOX_DIR/oracle"
 mkdir -p "$BOX_DIR/elliot"
+mkdir -p "$BOX_DIR/noire"
 mkdir -p "$BOX_DIR/shared/notes"
 mkdir -p "$BOX_DIR/shared/schemas"
 mkdir -p "$BOX_DIR/shared/raw"
@@ -47,11 +48,16 @@ cp "$TEMPLATES_DIR/oracle/ORACLE_SYSTEM_PROMPT.md"    "$BOX_DIR/oracle/ORACLE_SY
 cp "$TEMPLATES_DIR/elliot/CLAUDE.md"                  "$BOX_DIR/elliot/CLAUDE.md"
 cp "$TEMPLATES_DIR/elliot/ELLIOT_SYSTEM_PROMPT.md"    "$BOX_DIR/elliot/ELLIOT_SYSTEM_PROMPT.md"
 
+# Noire
+cp "$TEMPLATES_DIR/noire/CLAUDE.md"                   "$BOX_DIR/noire/CLAUDE.md"
+cp "$TEMPLATES_DIR/noire/NOIRE_SYSTEM_PROMPT.md"      "$BOX_DIR/noire/NOIRE_SYSTEM_PROMPT.md"
+
 # Shared schemas
 cp "$REPO_DIR/schemas/HANDOFF_SCHEMA.json"            "$BOX_DIR/shared/schemas/HANDOFF_SCHEMA.json"
 cp "$REPO_DIR/schemas/SOVA_REPORT_SCHEMA.json"        "$BOX_DIR/shared/schemas/SOVA_REPORT_SCHEMA.json"
 cp "$REPO_DIR/schemas/WEBDIG_FINDINGS_SCHEMA.json"    "$BOX_DIR/shared/schemas/WEBDIG_FINDINGS_SCHEMA.json"
 cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_SCHEMA.json"
+cp "$REPO_DIR/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"  "$BOX_DIR/shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"
 cp "$REPO_DIR/schemas/BASE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/BASE_FINDINGS_SCHEMA.json"
 
 # ── Ensure MCP servers configured at repo root ─────────────────
@@ -108,6 +114,7 @@ cat > "$BOX_DIR/shared/operation.md" << EOF
 |-------|--------|-----------------|------------|
 | ORACLE | PENDING | — | — |
 | ELLIOT | PENDING | — | — |
+| NOIRE | PENDING | — | — |
 
 ## Notes
 
@@ -140,6 +147,9 @@ echo ""
 echo "  Step 2 — When Oracle writes handoff.json, run Elliot:"
 echo "    cd $BOX_DIR/elliot && claude"
 echo ""
-echo "  Flow: Oracle → Elliot → Oracle → Elliot (as needed)"
+echo "  Step 3 — After foothold, Oracle deploys NOIRE:"
+echo "    cd $BOX_DIR/noire && claude"
+echo ""
+echo "  Flow: Oracle → Elliot → NOIRE → Oracle → Elliot (as needed)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""

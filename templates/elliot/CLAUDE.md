@@ -180,7 +180,7 @@ Next: {WHAT COMES AFTER THIS}
 Briefing operator before proceeding.
 ```
 
-If the objective was initial access and you landed as a low-privilege user such as `www-data`, `apache`, `nginx`, or another constrained account, your default recommendation is post-access investigation before privilege escalation. Oracle will handle this using noire-mcp tools.
+If the objective was initial access and you landed as a low-privilege user such as `www-data`, `apache`, `nginx`, or another constrained account, your default recommendation is NOIRE deployment for post-access investigation before privilege escalation.
 
 Wait for operator acknowledgment before moving further.
 

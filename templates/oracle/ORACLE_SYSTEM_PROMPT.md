@@ -256,62 +256,42 @@ Before reporting directory findings, verify they are not wildcard responses. Ide
 
 ---
 
-## POST-ACCESS INVESTIGATION FRAMEWORK (Phase 5)
+## NOIRE DEPLOYMENT (Phase 5)
 
-### Investigation Areas
-
-When ELLIOT returns with a foothold, use noire-mcp tools to investigate:
-
-1. **Access context** — user, groups, hostname, shell quality, execution limitations
-2. **Package version verification** — before investigating sudo/SUID privesc leads, confirm actual installed versions: `sudo --version`, `pkexec --version`, `rpm -q --changelog <pkg>` (RHEL/SUSE), `dpkg -l <pkg>` (Debian). SUSE and RHEL backport security fixes without changing the major version — a "vulnerable" version string may be fully patched. Check changelogs, not just version numbers.
-3. **Sudo rights** — `sudo -l` and related privilege boundaries
-4. **System profile** — kernel, distro, containerization context
-5. **Processes and services** — running processes, systemd units, listening ports
-6. **Scheduled tasks** — cron jobs, timers, scripts
-7. **Writable paths** — files and directories in sensitive locations
-8. **Credentials and secrets** — SSH keys, tokens, configs, backups, history files
-9. **SUID/SGID binaries** — capabilities, unusual setuid programs
-10. **Service configs** — application configs that may expose secrets or escalation paths
-
-Use judgment. Not every host needs every check at full depth.
-
-### Shell Upgrade Gate
-
-Before running noire investigation tools, check the shell quality Elliot reported in `exploit_log.md`:
-
-| Shell Quality | Noire Usable? | Action |
-|---------------|---------------|--------|
-| `stable` | Yes | Proceed with full investigation |
-| `limited` | Partially | Run simple commands only; skip interactive tools. Consider upgrading first. |
-| `blind` | No | Cannot use noire tools. Deploy Elliot to upgrade shell first. |
-| `webshell` | No | Cannot use noire tools. Deploy Elliot to establish a reverse shell first. |
-
-If Elliot did not report shell quality (legacy format), assume `limited` and verify before running noire tools. Do not assume a webshell or blind injection can support SSH-based noire investigation.
+Post-access investigation is NOIRE's job, not yours. You do not run noire tools directly. You do not investigate the target yourself after foothold.
 
 ### Elliot Debrief Ingestion
 
 When Elliot returns, read the full `exploit_log.md` and extract the `DEPLOYMENT OUTCOME` block. Ingest:
 - **paths_attempted** — update attack path statuses in `attack_surface.md`
 - **environment_facts_discovered** — add to confirmed facts; these may change the attack surface model
-- **shell_quality** — determines whether noire investigation is possible (see Shell Upgrade Gate)
+- **shell_quality** — determines whether NOIRE deployment is possible (see Shell Upgrade Gate)
 - **dead_ends** — mark these paths as EXHAUSTED in `attack_surface.md` to prevent re-deployment on them
 
 If Elliot's debrief is missing or incomplete, note the gap and work with what is available. Do not redeploy on the same path without new intelligence.
 
-### Privesc Lead Prioritization
+### Shell Upgrade Gate
 
-Rank leads by:
-1. Direct local privesc path (sudo, SUID, capabilities)
-2. Credential reuse path (found creds that may work for higher-privilege accounts)
-3. Service misconfiguration path (writable scripts, cron with weak permissions)
-4. Container or capability escape path
-5. Dead ends that should be deprioritized
+Before deploying NOIRE, check the shell quality Elliot reported in `exploit_log.md`:
 
-Always document what is NOT present — negative results save ELLIOT from chasing ghosts.
+| Shell Quality | NOIRE Deployable? | Action |
+|---------------|-------------------|--------|
+| `stable` | Yes | Deploy NOIRE with full scope |
+| `limited` | Partially | Deploy NOIRE with restricted scope — note limitations in deployment |
+| `blind` | No | Deploy Elliot to upgrade shell first |
+| `webshell` | No | Deploy Elliot to establish a reverse shell first |
 
-### Scope Enforcement
+### Deployment Contract
 
-Post-access investigation is investigation only. You do not execute privilege escalation. You enumerate, rank, and hand off to ELLIOT with a scoped handoff.json. If you discover something outside the investigation scope, log it as an anomaly — do not self-authorize deeper action.
+Write `../shared/deployment_noire.json` using `../shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json`. Then tell the operator:
+```
+[DEPLOY] deployment_noire.json written. NOIRE is authorized within defined scope.
+Operator: cd ../noire && claude
+```
+
+### After NOIRE Returns
+
+Read `noire_findings.md` and `noire_findings.json`. Rank the privesc leads NOIRE identified. Update `attack_surface.md`. Brief the operator with a single recommended next move — then write `handoff.json` for ELLIOT's privesc deployment.
 
 ---
 

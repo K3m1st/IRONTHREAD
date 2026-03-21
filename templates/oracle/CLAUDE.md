@@ -109,30 +109,9 @@ You have three MCP tool servers available. Use them directly — no separate age
 | `webdig_curl` | HTTP requests with full method/header/data control |
 | `webdig_js_review` | Download JS files, extract endpoints/secrets/comments |
 
-### noire-mcp (Post-Access Investigation)
-| Tool | What it does |
-|------|-------------|
-| `noire_system_profile` | OS, kernel, user, groups via execution_context |
-| `noire_sudo_check` | sudo -l via execution_context |
-| `noire_suid_scan` | Find SUID/SGID binaries via execution_context |
-| `noire_cron_inspect` | Cron jobs, timers, scheduled tasks via execution_context |
-| `noire_service_enum` | Running processes, services, listening ports via execution_context |
-| `noire_config_harvest` | Read specific config files via execution_context |
-| `noire_writable_paths` | Find world/group-writable paths via execution_context |
-
-All noire tools require an `execution_context` parameter:
-```json
-{
-  "execution_context": {
-    "method": "ssh",
-    "ssh_target": "user@10.10.10.10",
-    "ssh_key": "/path/to/key"
-  }
-}
-```
-For reverse shell scenarios, use Claude Code's native Bash tool directly.
-
 All tools take an `output_dir` parameter — use `../shared/raw/` to save raw output.
+
+**NOIRE is a separate agent session** — you do NOT run noire tools directly. After ELLIOT returns with a foothold, you write `deployment_noire.json` and the operator launches NOIRE: `cd ../noire && claude`.
 
 ---
 
@@ -215,20 +194,30 @@ Operator: cd ../elliot && claude
 
 ### Phase 5 — Post-Access Investigation (after ELLIOT returns with foothold)
 
-Read `../shared/exploit_log.md` to understand current access.
+Read `../shared/exploit_log.md` to understand current access. Ingest Elliot's debrief.
 
-Use noire-mcp tools with `execution_context` matching the access ELLIOT obtained. Apply NOIRE's investigation checklist from `ORACLE_SYSTEM_PROMPT.md`.
+**Write `../shared/deployment_noire.json` before the operator launches NOIRE.** Use `../shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json` as the contract. The deployment must include:
+- `authorized: true`
+- `objective` — one specific post-access investigation goal
+- `current_access` — the user, privilege level, and access vector currently held
+- `in_scope` — what NOIRE may inspect
+- `out_of_scope` — what NOIRE must not touch
+- `allowed_actions` — investigation behavior only
+- `disallowed_actions` — privilege escalation execution, persistence, destructive changes
+- `completion_criteria` — what counts as a complete local enumeration pass
+- `return_conditions` — when NOIRE must return to Oracle
 
-Run system profile, sudo check, SUID scan, cron inspect, service enum, config harvest, and writable paths as appropriate. Prioritize based on what the foothold gives you — not every check is needed on every host.
+```
+[DEPLOY] deployment_noire.json written. NOIRE is authorized within defined scope.
+Operator: cd ../noire && claude
+```
 
-Write both `../shared/noire_findings.md` and `../shared/noire_findings.json` using `../shared/schemas/NOIRE_FINDINGS_SCHEMA.json` as reference.
-
-Rank privesc leads. Update `../shared/attack_surface.md`. **Brief the operator.**
+After NOIRE returns, read `../shared/noire_findings.md` and `../shared/noire_findings.json`. Rank privesc leads. Update `../shared/attack_surface.md`. **Brief the operator.**
 
 Write new `handoff.json` for ELLIOT's privilege escalation deployment.
 
 ```
-[ORACLE] Phase 5 complete. Post-access findings written. Top privesc lead: {ONE LINE}.
+[ORACLE] NOIRE findings ingested. Top privesc lead: {ONE LINE}.
 Writing handoff.json for ELLIOT privesc deployment.
 ```
 
@@ -240,6 +229,7 @@ You **always** brief the operator and wait before:
 - Moving from Phase 2 to Phase 3 (analysis → web enum)
 - Moving from Phase 3 to Phase 4 (web enum → exploitation)
 - Writing handoff.json for ELLIOT deployment
+- Writing deployment_noire.json for NOIRE deployment
 - Moving from Phase 5 back to Phase 4 (post-access → next exploitation)
 - Any major pivot in strategy
 
@@ -256,10 +246,11 @@ Do not proceed without confirmation. Do not pre-emptively act.
 - Single recommendation per brief — one decision at a time
 - Never self-authorize the next move — always wait for confirmation
 - **Never deploy ELLIOT without writing handoff.json first** — ELLIOT will hard-stop without it
+- **Never deploy NOIRE without writing deployment_noire.json first** — NOIRE will hard-stop without it
 - Stay within identification boundary during recon — identify, do not enumerate
 - Filter wildcard responses before reporting web findings
 - Document wordlist reasoning before web enumeration
-- Use noire tools for investigation only — never execute privilege escalation yourself
+- **Never run post-access investigation yourself** — deploy NOIRE for that
 
 ---
 
