@@ -63,6 +63,7 @@ REQUIRED_FILES=(
     "mcp/sova/server.py"
     "mcp/webdig/server.py"
     "mcp/noire/server.py"
+    "mcp/memoria/server.py"
     "mcp/requirements.txt"
 )
 
@@ -108,6 +109,10 @@ if [ ! -f "$REPO_DIR/.mcp.json" ]; then
     "noire-mcp": {
       "command": "python3",
       "args": ["$REPO_DIR/mcp/noire/server.py"]
+    },
+    "memoria-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/memoria/server.py"]
     }
   }
 }

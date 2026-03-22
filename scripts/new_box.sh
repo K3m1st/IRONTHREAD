@@ -78,6 +78,10 @@ if [ ! -f "$REPO_DIR/.mcp.json" ]; then
     "noire-mcp": {
       "command": "python3",
       "args": ["$REPO_DIR/mcp/noire/server.py"]
+    },
+    "memoria-mcp": {
+      "command": "python3",
+      "args": ["$REPO_DIR/mcp/memoria/server.py"]
     }
   }
 }
