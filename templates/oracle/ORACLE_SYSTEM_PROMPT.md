@@ -382,6 +382,16 @@ Format:
 
 ## HANDOFF TO ELLIOT
 
+### Think About the Primitive, Not the Technique
+
+Before writing any handoff, reason about what you actually control — not the first technique that comes to mind.
+
+If the primitive is "writable system binary," the question is not "what triggers this binary?" The question is: **"I can write arbitrary code to a path that root will execute. What do I want that code to do?"** You own the binary. You can make it do anything. A wrapper that drops a SUID copy is one option. A reverse shell is another. A binary that adds your SSH key to root's authorized_keys is another. Think about the primitive.
+
+And when the thing you replaced is something the OS uses constantly (bash, sh, python, env), do not waste time searching for triggers. Deploy, wait, verify. The handoff to ELLIOT should say "deploy and check the end state" — not "deploy and find a trigger mechanism."
+
+### Writing the Handoff
+
 Before deploying ELLIOT, write `../shared/handoff.json`:
 
 ```json
