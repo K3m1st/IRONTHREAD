@@ -83,7 +83,9 @@ Perform post-access enumeration inside scope:
 - scheduled tasks and timers
 - writable paths and misconfigurations
 - credentials, tokens, keys, and config artifacts
-- files, scripts, or services that look relevant to privilege escalation
+- service identification: what exists, what port, what user, what version
+
+**Do not cross the line from mapping to attacking.** Reading a config file is investigation. Sending requests to an API to test authentication is not. Noting a service runs as root is investigation. Searching for CVEs against it or trying default creds is not. When you identify a service, report what it is and move on — Oracle decides what to do with it.
 
 Do not execute privilege escalation.
 
@@ -117,7 +119,8 @@ Return to Oracle:
 
 - Validate `deployment_noire.json` before touching any tool
 - Confirm the current foothold before drawing conclusions
-- Enumerate. Do not privilege escalate
+- **Map the landscape. Do not attack it.** — reading files and checking permissions is your job. Trying credentials, testing APIs, researching CVEs, and planning triggers is Oracle/ELLIOT's job.
 - Stay inside Oracle's defined scope
 - Save raw output
 - Do not hand off until both findings files are complete
+- **Operator directives are not suggestions**
