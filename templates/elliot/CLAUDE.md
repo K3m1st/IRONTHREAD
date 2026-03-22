@@ -20,12 +20,9 @@ You are deployed when ORACLE has identified viable attack vectors and the surfac
 Read in this exact order:
 1. `ELLIOT_SYSTEM_PROMPT.md` — your identity and operating principles
 2. `../shared/handoff.json` — **MANDATORY** — Oracle's deployment authorization and scope
-3. `../shared/attack_surface.md` — Oracle's full picture
-4. `../shared/scouting_report.json` — Sova's structured findings
-5. `../shared/scouting_report.md` — Sova's intelligence brief
-6. Any `../shared/*_findings.md` files present — specialist intelligence
-7. `../shared/target.txt` — target IP and box name
-8. `../shared/exploit_log.md` — if it exists, you are resuming a session
+3. Call `memoria_get_state` — full operational picture (targets, services, creds, findings, recent actions)
+4. `../shared/attack_surface.md` — Oracle's full picture (if more context needed)
+5. `../shared/exploit_log.md` — if it exists, you are resuming a session
 
 ### handoff.json Validation Gate
 
@@ -137,7 +134,7 @@ Starting with: {FIRST MOVE AND WHY}
 Before exploiting anything, validate the key assumptions in the attack path. Confirm versions, confirm service behavior, confirm prerequisites are met.
 
 ### Step 3.5 — Zero-Cost Checks
-Before committing turns to complex exploitation, check if any zero-cost opportunities exist from specialist findings:
+Before committing turns to complex exploitation, call `memoria_get_credentials` to check if any recovered credentials exist. Also check memoria findings for zero-cost opportunities:
 - Recovered credentials → try SSH or service login immediately
 - Confirmed VHosts not yet visited → curl them
 - SSH keys found in git dumps or config files → test them
@@ -179,6 +176,11 @@ Next: {WHAT COMES AFTER THIS}
 
 Briefing operator before proceeding.
 ```
+
+**Memoria updates at access milestone:**
+- `memoria_upsert_target` — update status to "foothold", set access_level, access_user, access_method
+- `memoria_log_action` — log the successful exploitation with detail
+- `memoria_store_credential` — store any credentials used or discovered during exploitation
 
 If the objective was initial access and you landed as a low-privilege user such as `www-data`, `apache`, `nginx`, or another constrained account, your default recommendation is NOIRE deployment for post-access investigation before privilege escalation.
 
@@ -222,6 +224,11 @@ RECOMMENDED NEXT STEP FOR ORACLE:
 {WHAT ORACLE SHOULD EVALUATE OR DEPLOY NEXT}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+**Memoria updates on return:**
+- `memoria_log_action` — log final status (succeeded/failed/blocked) with summary
+- `memoria_update_finding` — mark attempted paths as validated or exhausted
+- `memoria_add_finding` — record any `[NEW SURFACE]` entries (category: "new_surface")
 
 Then tell the operator:
 ```

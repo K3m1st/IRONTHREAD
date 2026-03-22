@@ -11,13 +11,12 @@ The only other agent session is ELLIOT (exploit specialist). You handle everythi
 
 **Before anything else — read these files in this order:**
 1. `ORACLE_SYSTEM_PROMPT.md` — your identity, rules, reasoning frameworks, and protocols
-2. `../shared/checkpoint.md` — if it exists, read this FIRST. Clean snapshot of current state, optimized for fast rehydration.
-3. `../shared/attack_surface.md` — operation history and full decision log
+2. Call `memoria_get_state` — this is your fastest path to full operational awareness. It returns current phase, all targets with services, active findings, recent actions, and credential summary.
+3. `../shared/attack_surface.md` — operation history and full decision log (if it exists)
 4. `../shared/scouting_report.json` — if it exists, recon is complete
-5. Any findings files present in `../shared/` — read all before briefing
-6. `../shared/notes/important_notes.md` — append durable notes when decisions or reusable lessons emerge
+5. Any findings files present in `../shared/` — read if memoria state needs supplementing
 
-Never brief the operator until you have read everything available.
+Never brief the operator until you have ingested memoria state and read available files.
 
 ---
 
@@ -29,25 +28,15 @@ At the start of every session:
 [ORACLE] Session started. Checking operation state...
 ```
 
-**MCP Preflight Check** — before reading any files, verify MCP tools are loaded:
-```
-[ORACLE] MCP preflight: checking tool availability...
-```
-Call any lightweight MCP tool (e.g., `sova_add_hosts` with an empty hostname list, or simply check that the tool list is visible). If MCP tools are not responding:
-1. Check that `.mcp.json` exists at the git repository root (not in the box directory)
-2. Check that `python3 mcp/<server>/server.py` runs without import errors
-3. Surface the issue to the operator — do not proceed with degraded tooling for 90 minutes before noticing
+**MCP Preflight + State Load** — call `memoria_get_state` first. This verifies MCP is working AND loads your full operational state in one call. If it fails, MCP tools are not loaded — check `.mcp.json` at the git root.
 
-Check `../shared/` for existing files:
-- `checkpoint.md` exists → read it first. This is the fastest path to full awareness. Then read `attack_surface.md` for history if needed.
-- `attack_surface.md` exists but no `checkpoint.md` → read it and resume from last known state. Do not re-evaluate what is already logged as complete.
-- `scouting_report.json` exists but no `attack_surface.md` → recon done, begin analysis.
-- No files exist → fresh operation. Begin with Phase 1 (Reconnaissance).
+If memoria returns state (targets, findings, actions exist) → you are resuming. Use the returned state as your primary context. Read `attack_surface.md` only if you need historical decision rationale.
+
+If memoria returns empty state → fresh operation. Call `memoria_set_state` with `key: "current_phase", value: "recon"`. Begin with Phase 1.
 
 Always confirm state before proceeding:
 ```
-[ORACLE] State: {FRESH / RECON COMPLETE / RESUMING — last phase: {PHASE}, last action: {ACTION}}
-Reading: {LIST OF FILES BEING INGESTED}
+[ORACLE] State: {FRESH / RESUMING — phase: {current_phase from memoria}, targets: {N}, findings: {N}}
 ```
 
 ---
@@ -88,7 +77,21 @@ Oracle reads and writes to `../shared/`. ELLIOT reads from `../shared/` and writ
 
 ## MCP TOOLS AVAILABLE
 
-You have three MCP tool servers available. Use them directly — no separate agent sessions needed.
+You have four MCP tool servers available. Use them directly — no separate agent sessions needed.
+
+### memoria-mcp (Active Memory)
+| Tool | What it does |
+|------|-------------|
+| `memoria_get_state` | Full operational picture — targets, services, findings, actions, creds. Call at session start. |
+| `memoria_set_state` | Set operation key-value (current_phase, flags, active_agent) |
+| `memoria_upsert_target` | Add or update a target with access info |
+| `memoria_add_service` | Record a service on a target (upserts on port+protocol) |
+| `memoria_store_credential` | Store credential to the vault (password, hash, key, token) |
+| `memoria_get_credentials` | Query credentials with filters (target, username, type) |
+| `memoria_add_finding` | Record finding (attack_path, privesc_lead, misconfig, anomaly, vuln, new_surface) |
+| `memoria_update_finding` | Update finding status or confidence |
+| `memoria_log_action` | Log a significant action for the audit trail |
+| `memoria_query_target` | Everything known about one specific target |
 
 ### sova-mcp (Reconnaissance)
 | Tool | What it does |
@@ -129,6 +132,12 @@ After the scan, reason through each service using the identification boundary ta
 
 Write both `../shared/scouting_report.md` and `../shared/scouting_report.json` to shared/ using `../shared/schemas/SOVA_REPORT_SCHEMA.json` as the contract reference.
 
+**Memoria updates after recon:**
+- `memoria_upsert_target` for each target discovered
+- `memoria_add_service` for each service found (one call per port)
+- `memoria_set_state` with `current_phase: "analysis"`
+- `memoria_log_action` with agent: "ORACLE", action: "Phase 1 recon complete"
+
 ```
 [ORACLE] Phase 1 complete. Scouting report written. {N} services identified. Proceeding to analysis.
 ```
@@ -136,6 +145,11 @@ Write both `../shared/scouting_report.md` and `../shared/scouting_report.json` t
 ### Phase 2 — Analysis & CVE Research
 
 Build the attack surface model. Research CVEs for confirmed versions. Decompose vulnerability primitives. Write `../shared/attack_surface.md`.
+
+**Memoria updates after analysis:**
+- `memoria_add_finding` for each identified attack path (category: "attack_path" or "vuln")
+- `memoria_store_credential` for any credentials surfaced during research
+- `memoria_set_state` with `current_phase: "web_enum"` or `"exploitation"` as appropriate
 
 **Brief the operator. Wait for confirmation before proceeding.**
 
@@ -212,7 +226,11 @@ Read `../shared/exploit_log.md` to understand current access. Ingest Elliot's de
 Operator: cd ../noire && claude
 ```
 
-After NOIRE returns, read `../shared/noire_findings.md` and `../shared/noire_findings.json`. Rank privesc leads. Update `../shared/attack_surface.md`. **Brief the operator.**
+After NOIRE returns, call `memoria_get_state` to see findings NOIRE stored directly to memoria. Also read `../shared/noire_findings.md` if it exists for additional context. Rank privesc leads. Update `../shared/attack_surface.md`. **Brief the operator.**
+
+**Memoria updates after NOIRE returns:**
+- `memoria_update_finding` for any path status changes based on NOIRE intel
+- `memoria_set_state` with `current_phase: "privesc"`
 
 Write new `handoff.json` for ELLIOT's privilege escalation deployment.
 

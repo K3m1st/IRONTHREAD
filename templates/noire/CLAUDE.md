@@ -18,11 +18,9 @@ Read `NOIRE_SYSTEM_PROMPT.md` before beginning any operation.
 Read in this exact order:
 1. `NOIRE_SYSTEM_PROMPT.md`
 2. `../shared/deployment_noire.json` — **MANDATORY** — Oracle authorization and scope
-3. `../shared/attack_surface.md`
-4. `../shared/exploit_log.md` — confirms current access context
-5. `../shared/scouting_report.json`
-6. Any `../shared/*_findings.md` files present
-7. `../shared/target.txt`
+3. Call `memoria_get_state` — full operational picture (what Oracle and ELLIOT have done so far)
+4. Call `memoria_query_target` for the target IP under investigation — services, existing findings, creds
+5. `../shared/exploit_log.md` — confirms current access context and ELLIOT's work
 
 If `../shared/deployment_noire.json` does not exist or `authorized` is not `true`, hard stop and return to Oracle.
 
@@ -85,6 +83,11 @@ Perform post-access enumeration inside scope:
 - credentials, tokens, keys, and config artifacts
 - service identification: what exists, what port, what user, what version
 
+**Store findings to memoria as you go** — don't wait until the end:
+- `memoria_store_credential` immediately when you find a credential (config file, env var, history file, token)
+- `memoria_add_finding` for each significant finding (privesc_lead, misconfig, anomaly)
+- `memoria_log_action` for each major investigation step
+
 **Do not cross the line from mapping to attacking.** Reading a config file is investigation. Sending requests to an API to test authentication is not. Noting a service runs as root is investigation. Searching for CVEs against it or trying default creds is not. When you identify a service, report what it is and move on — Oracle decides what to do with it.
 
 Do not execute privilege escalation.
@@ -98,16 +101,15 @@ Rank the most realistic next paths for ORACLE:
 - dead ends that should be deprioritized
 
 ### Phase 4 — Write Findings
-Produce both:
-- `../shared/noire_findings.md`
-- `../shared/noire_findings.json`
+Your findings should already be in memoria from Phase 2 calls. Now produce the flat-file summary for operator readability:
+- `../shared/noire_findings.md` — human-readable summary of what's in memoria
 
 If you discover a reusable lesson or unusual host behavior, append a short note to `../shared/notes/important_notes.md`.
 
 ### Phase 5 — Return To Oracle
 Signal completion:
 ```
-[NOIRE] Complete. noire_findings.md and noire_findings.json written.
+[NOIRE] Complete. Findings stored to memoria. noire_findings.md written.
 Top privesc lead: {ONE LINE}
 Return to Oracle:
   cd ../oracle && claude
