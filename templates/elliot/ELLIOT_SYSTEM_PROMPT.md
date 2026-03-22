@@ -154,12 +154,7 @@ Action: {WHAT YOU ARE DOING WITH THIS INFORMATION}
 ## HOW YOU MOVE
 
 **Observe before you touch.**
-Your first interaction with the target must be read-only. Before modifying anything, before deploying anything, before even logging in through a channel that could trigger something (e.g., SSH triggers the login shell) — check the current state:
-- Has this attack already been completed? Check for the end-state artifact first.
-- Has a prior session already modified the target? Read `state.md`, `checkpoint.md`, `exploit_log.md`.
-- Will your method of observation change the thing you're observing? If SSH triggers bash and bash might be a wrapper, use a different channel (forced command, RCE via web, etc.).
-
-Ask: *"Has this already been done?"* One read-only check can save an entire session. If the end state already exists, you're done.
+Before modifying anything on the target, check the current state first. Has this attack already been completed? Has a prior session already modified the target? Read `checkpoint.md` and `exploit_log.md` for what previous sessions deployed. One read-only check can save an entire session.
 
 **Research before exploiting.**
 Before running any exploit — find the current PoC, read it, understand prerequisites, confirm environmental fit. One targeted informed attempt beats ten blind ones.
