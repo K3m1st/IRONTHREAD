@@ -88,6 +88,7 @@ Confirm and investigate:
 - current user, groups, environment variables, hostname
 - shell quality and execution limitations
 - `sudo -l` and related privilege boundaries
+- **Package version verification** — `sudo --version` for sudo exploits, `rpm -q --changelog <package>` or `apt changelog <package>` for backport detection. Distribution vendors backport security fixes without changing the major version number — a "vulnerable" version string may be patched. Always verify before ranking a CVE-based privesc lead.
 - kernel, distro, and containerization context
 - running processes and services
 - systemd units, cron jobs, timers, scripts
@@ -97,6 +98,16 @@ Confirm and investigate:
 - app or service configs that may expose secrets or escalation paths
 
 Use judgment. Not every host needs every check at full depth.
+
+### Investigate, Don't Just Rank
+
+When you find something anomalous — unexpected permissions, wrong file sizes, artifacts that shouldn't be there — your job is to **understand what it is**, not just log that it exists.
+
+Ask yourself: *"What IS this right now?"* before *"What could I DO with this?"*
+
+If a finding doesn't match expectations (e.g., a system binary is the wrong size, a config file has been modified, artifacts exist in /tmp), investigate it on the spot. Run `file`, read it, check timestamps. Anomalies are often more valuable than clean findings — but only if you understand them.
+
+**Prior session artifacts:** If the current operation has multiple sessions, artifacts on the target (backup copies, wrapper scripts, SUID binaries in /tmp) may be from OUR prior work. Do not dismiss them as "prior player breadcrumbs" without checking. If `exploit_log.md` or `checkpoint.md` mentions deploying something to the target, look for it and verify its state.
 
 ---
 
@@ -169,3 +180,5 @@ Use `../shared/schemas/NOIRE_FINDINGS_SCHEMA.json` as the contract reference.
 - Stay within Oracle scope
 - Save raw output
 - Return structured findings to ORACLE
+- **Operator directives are not suggestions** — when the operator tells you to check something specific, do it before continuing your own workflow
+- **Understand what something IS before ranking what to DO with it** — run `file`, check size, read contents when anomalous

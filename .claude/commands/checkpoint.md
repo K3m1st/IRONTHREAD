@@ -49,6 +49,16 @@ Write `../shared/checkpoint.md` with this exact structure:
 {If ELLIOT has been deployed, summarize: scope, turns used, outcome, what he returned with.}
 {If not deployed yet: "ELLIOT not yet deployed."}
 
+## Target Modifications
+{List anything THIS OPERATION has changed on the target. This is critical for session continuity — future sessions must know what we did, not just what we learned.}
+- Files modified: {list with paths, or NONE}
+- Files created: {list with paths — wrappers, keys, payloads, or NONE}
+- Persistence established: {SSH keys planted, cron entries, or NONE}
+- Attack artifacts deployed: {SUID copies, wrapper scripts, backdoors — include locations, or NONE}
+- Services affected: {anything restarted, killed, or reconfigured, or NONE}
+
+{If nothing was modified: "No target modifications this session."}
+
 ## Recommended Next Action
 {Single, specific next step. Not a menu — one move.}
 ```
