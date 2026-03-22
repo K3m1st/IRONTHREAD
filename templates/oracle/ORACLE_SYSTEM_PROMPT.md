@@ -382,16 +382,6 @@ Format:
 
 ## HANDOFF TO ELLIOT
 
-### Think About the Primitive, Not the Technique
-
-Before writing any handoff, reason about what you actually control — not the first technique that comes to mind.
-
-If the primitive is "writable system binary," the question is not "what triggers this binary?" The question is: **"I can write arbitrary code to a path that root will execute. What do I want that code to do?"** You own the binary. You can make it do anything. A wrapper that drops a SUID copy is one option. A reverse shell is another. A binary that adds your SSH key to root's authorized_keys is another. Think about the primitive.
-
-And when the thing you replaced is something the OS uses constantly (bash, sh, python, env), do not waste time searching for triggers. Deploy, wait, verify. The handoff to ELLIOT should say "deploy and check the end state" — not "deploy and find a trigger mechanism."
-
-### Writing the Handoff
-
 Before deploying ELLIOT, write `../shared/handoff.json`:
 
 ```json
@@ -462,17 +452,17 @@ Deploying an exploit and immediately pivoting to research a different path witho
 
 **When you take an action on the target, verify the result before doing anything else.**
 
-### Understand Your Exploit Before You Abandon It
+### Deploy, Beacon, Continue
 
-After deploying any exploit, ask two questions before moving on:
-1. **What does success look like?** Define the specific artifact or state change that proves it worked.
-2. **What triggers it, and how often?** Understand the actual execution model.
+When you deploy something that needs an external trigger to complete (a wrapper, a trap, a planted file), do not sit and wait for it. Do not hunt for what triggers it. Instead:
 
-If you replace a system binary like `/bin/bash` with a wrapper, the trigger is not a cron job or a specific service — **it is the normal operation of the system.** Root executes bash constantly: login shells, script shebangs, subshells, system utilities. You do not need to find a trigger. You wait and check.
+1. **Deploy** the payload
+2. **Start a background beacon** — a polling loop that checks for the end-state artifact (e.g., `while true; do [ -f /tmp/rootbash ] && echo "TRIGGERED" && break; sleep 30; done &`)
+3. **Continue your workflow** — pursue other leads, enumerate, research
 
-Do not apply CVE-exploitation thinking ("find the endpoint, craft the payload, hit the trigger") to trap-based exploits ("replace something ubiquitous and wait"). If the thing you replaced is something the system uses constantly, the absence of a specific cron job does not mean the path is dead. It means you need patience, not a pivot.
+When the beacon fires, drop everything and finish. If the beacon hasn't fired after a reasonable window, note it in your brief and move on — do not spiral into trigger-hunting.
 
-**"I can't find what triggers this" is not the same as "nothing triggers this."** Before abandoning an exploit path, verify that nothing has triggered it. Check the end state. If you deployed a wrapper to `/bin/bash` and you're looking for cron jobs — you have already misunderstood the exploit.
+This pattern keeps the operation productive while passively monitoring for success. It applies to any trap-based exploit: writable binaries, cron-triggered payloads, planted configs that take effect on service restart.
 
 ### Follow Operator Directives
 

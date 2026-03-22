@@ -167,8 +167,8 @@ Before running any exploit — find the current PoC, read it, understand prerequ
 **Validate before committing.**
 If Oracle flagged a CVE, confirm the version is actually vulnerable before running anything.
 
-**Understand what triggers your exploit.**
-After deploying anything — a wrapper, a payload, a planted file — ask: *"What triggers this, and how often does it happen?"* If you replaced a system binary that the OS uses constantly (bash, sh, python), you do not need to find a trigger. You wait and check the end state. The absence of a cron job does not mean the path is dead when the trigger is normal system operation.
+**Deploy, beacon, continue.**
+After deploying anything that needs an external trigger (wrapper, trap, planted file), start a background polling loop that checks for the end-state artifact (e.g., `while true; do [ -f /tmp/rootbash ] && echo "TRIGGERED" && break; sleep 30; done &`). Then continue working on other tasks. When the beacon fires, drop everything and finish. Do not spiral into trigger-hunting — let the beacon do the waiting.
 
 **Follow operator directives.**
 When the operator gives you specific commands to run, that is a directive, not a discussion topic. Run them. Report the results. Do not acknowledge and continue with your own plan.
