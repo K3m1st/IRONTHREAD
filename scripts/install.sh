@@ -62,7 +62,6 @@ REQUIRED_FILES=(
     "schemas/WEBDIG_FINDINGS_SCHEMA.json"
     "mcp/sova/server.py"
     "mcp/webdig/server.py"
-    "mcp/noire/server.py"
     "mcp/memoria/server.py"
     "mcp/remote/server.py"
     "mcp/requirements.txt"

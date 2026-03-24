@@ -37,6 +37,8 @@ NOIRE writes to `../shared/` (noire_findings.md, noire_findings.json, raw/noire_
 ## WORKFLOW
 
 ### Phase 1 — Confirm Current Access
+Use `remote_exec` from remote-mcp for all target commands. It maintains a persistent SSH connection — no per-command overhead. Pass the target IP, user, and key/password from `deployment_noire.json`.
+
 Determine exactly what access exists right now: user identity, groups, hostname, current working context, shell quality, whether the session is interactive or constrained. Do not assume anything from old logs until confirmed.
 
 ### Phase 2 — Investigate, Do Not Escalate

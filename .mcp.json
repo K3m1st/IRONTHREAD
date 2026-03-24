@@ -8,10 +8,6 @@
       "command": "bash",
       "args": ["-c", "exec python3 \"$(git rev-parse --show-toplevel)/mcp/webdig/server.py\""]
     },
-    "noire-mcp": {
-      "command": "bash",
-      "args": ["-c", "exec python3 \"$(git rev-parse --show-toplevel)/mcp/noire/server.py\""]
-    },
     "memoria-mcp": {
       "command": "bash",
       "args": ["-c", "exec python3 \"$(git rev-parse --show-toplevel)/mcp/memoria/server.py\""]
