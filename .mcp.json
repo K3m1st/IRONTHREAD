@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "sova-mcp": {
+      "command": "python3",
+      "args": ["mcp/sova/server.py"]
+    },
+    "webdig-mcp": {
+      "command": "python3",
+      "args": ["mcp/webdig/server.py"]
+    },
+    "noire-mcp": {
+      "command": "python3",
+      "args": ["mcp/noire/server.py"]
+    },
+    "memoria-mcp": {
+      "command": "python3",
+      "args": ["mcp/memoria/server.py"]
+    },
+    "remote-mcp": {
+      "command": "python3",
+      "args": ["mcp/remote/server.py"]
+    }
+  }
+}

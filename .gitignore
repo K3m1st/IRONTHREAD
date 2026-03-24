@@ -5,6 +5,5 @@
 *~
 .claude/
 !.claude/commands/
-.mcp.json
 boxes/
 __pycache__/

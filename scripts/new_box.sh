@@ -66,36 +66,8 @@ cp "$REPO_DIR/schemas/ATTACK_SURFACE_TEMPLATE.md"    "$BOX_DIR/shared/schemas/AT
 cp "$REPO_DIR/schemas/NOIRE_FINDINGS_TEMPLATE.md"    "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_TEMPLATE.md"
 cp "$REPO_DIR/schemas/EXPLOIT_LOG_TEMPLATE.md"       "$BOX_DIR/shared/schemas/EXPLOIT_LOG_TEMPLATE.md"
 
-# ── Ensure MCP servers configured at repo root ─────────────────
-# .mcp.json must live at the git root — Claude Code only reads it there.
-# This is idempotent — same config for all boxes.
-if [ ! -f "$REPO_DIR/.mcp.json" ]; then
-    cat > "$REPO_DIR/.mcp.json" << MCPEOF
-{
-  "mcpServers": {
-    "sova-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/sova/server.py"]
-    },
-    "webdig-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/webdig/server.py"]
-    },
-    "noire-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/noire/server.py"]
-    },
-    "memoria-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/memoria/server.py"]
-    }
-  }
-}
-MCPEOF
-    echo "[+] MCP servers configured at $REPO_DIR/.mcp.json"
-else
-    echo "[+] MCP servers already configured."
-fi
+# .mcp.json is checked into the repo with relative paths — no generation needed.
+echo "[+] MCP servers configured (.mcp.json in repo)"
 
 # ── Write operation metadata ─────────────────────────────────
 cat > "$BOX_DIR/shared/target.txt" << EOF

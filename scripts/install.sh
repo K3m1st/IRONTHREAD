@@ -64,6 +64,7 @@ REQUIRED_FILES=(
     "mcp/webdig/server.py"
     "mcp/noire/server.py"
     "mcp/memoria/server.py"
+    "mcp/remote/server.py"
     "mcp/requirements.txt"
 )
 
@@ -93,31 +94,10 @@ else
     echo "  On Kali, you may need: pip3 install --break-system-packages \"mcp[cli]\""
 fi
 
-# Configure MCP servers at repo root
-if [ ! -f "$REPO_DIR/.mcp.json" ]; then
-    cat > "$REPO_DIR/.mcp.json" << MCPEOF
-{
-  "mcpServers": {
-    "sova-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/sova/server.py"]
-    },
-    "webdig-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/webdig/server.py"]
-    },
-    "noire-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/noire/server.py"]
-    },
-    "memoria-mcp": {
-      "command": "python3",
-      "args": ["$REPO_DIR/mcp/memoria/server.py"]
-    }
-  }
-}
-MCPEOF
-    echo "  [✓] MCP servers configured at .mcp.json"
+# MCP config is now checked into the repo with relative paths.
+# No need to generate it — it ships with the repo.
+if [ -f "$REPO_DIR/.mcp.json" ]; then
+    echo "  [✓] MCP servers configured (.mcp.json in repo)"
 else
     echo "  [✓] MCP servers already configured."
 fi
