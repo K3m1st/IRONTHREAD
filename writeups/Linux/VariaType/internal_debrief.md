@@ -1,5 +1,5 @@
 # VariaType — Internal Debrief
-> For: Operator + AI Crew (Sova, Oracle, WEBDIG, NOIRE, Elliot)
+> For: Operator + AI Crew (Scout, Planner, WEBDIG, NOIRE, Elliot)
 > Box: VariaType | Completed: 2026-03-17 | Sessions: 9 | Elliot turns: 13/40
 
 ---
@@ -8,10 +8,10 @@
 
 | Session | Agent | Duration | What Happened |
 |---------|-------|----------|---------------|
-| 1 | SOVA | Quick | Port scan, service ID, attack surface mapped. 2 ports, Flask + nginx. |
+| 1 | SCOUT | Quick | Port scan, service ID, attack surface mapped. 2 ports, Flask + nginx. |
 | 2 | WEBDIG | Quick | VHost discovery (portal.variatype.htb), .git dump, gitbot creds recovered, full endpoint map. |
 | 3 | ELLIOT (session 1) | Long | Massive enumeration — XXE, XInclude, SSRF, LFI, SQLi, PHP inclusion, nginx confusion, extension bypass. **All dead.** But mapped the entire font pipeline. |
-| 4 | ORACLE | Medium | CVE research. Identified CVE-2025-66034 as primary. Deprioritized regreSSHion. Researched Werkzeug debug, auth.php source. |
+| 4 | PLANNER | Medium | CVE research. Identified CVE-2025-66034 as primary. Deprioritized regreSSHion. Researched Werkzeug debug, auth.php source. |
 | 5 | ELLIOT (session 2) | Long | CVE-2025-66034 exploitation. Relative traversal exhausted — fontmake sandboxed to /tmp/. gitbot SSH dead (pubkey only). dev VHost dead. **Got stuck here for hours on ../traversal.** |
 | 6 | ELLIOT (session 3) | Short | **Breakthrough.** Absolute path bypass. Webshell landed. www-data obtained. |
 | 7 | NOIRE | Quick | Full local enumeration. Mapped both privesc chains in one pass. FontForge pickle + setuptools path traversal. |
@@ -24,10 +24,10 @@
 
 ## What Every Agent Did Well
 
-### SOVA
+### SCOUT
 - Clean, structured output. Service inventory was accurate. Attack surface map was immediately actionable.
 - Correctly identified the `.designspace` XML upload as HIGH PRIORITY from the jump.
-- Knew to stop — didn't try to enumerate things outside sova scope.
+- Knew to stop — didn't try to enumerate things outside scout scope.
 
 ### WEBDIG
 - Found `portal.variatype.htb` via VHost fuzzing. This was the entire second half of the box.
@@ -35,7 +35,7 @@
 - Correctly flagged `download.php` + `files/` as LFI candidates and `view.php` as a viewer.
 - CSS comment path leak (`/var/www/dev.variatype.htb/`) was noted — this became critical later for understanding the filesystem layout.
 
-### ORACLE
+### PLANNER
 - CVE research was strong. Correctly identified CVE-2025-66034 as primary, deprioritized regreSSHion (64-bit makes it impractical), and dismissed nginx CVEs.
 - The attack surface document was the single source of truth throughout. Decision log tracked every pivot.
 - Correctly ordered the priority: portal creds → CVE exploitation → SSH as fallback.
@@ -159,13 +159,13 @@ NOIRE (analyst) mapped both privesc vectors without attempting exploitation. Ell
 
 ### The Turn System + Proper Scoping Made Elliot Effective
 
-Elliot's early sessions were unfocused — doing enumeration work, chasing PoC patterns without constraints. Once we implemented the turn budget system (40 turns max) and fed Elliot properly scoped tasks from NOIRE's research and Oracle's CVE analysis, he became a different agent. 13 turns for 3 CVEs. The lesson: Elliot needs to be fed, not set loose.
+Elliot's early sessions were unfocused — doing enumeration work, chasing PoC patterns without constraints. Once we implemented the turn budget system (40 turns max) and fed Elliot properly scoped tasks from NOIRE's research and Planner's CVE analysis, he became a different agent. 13 turns for 3 CVEs. The lesson: Elliot needs to be fed, not set loose.
 
 ### Structured Dead-End Tracking Prevented Retry Loops
 
 The 16+ dead ends documented across sessions meant:
 - Later sessions never re-attempted XXE, LFI, or extension bypass
-- Oracle's CVE research was targeted (knew exactly which primitives were and weren't available)
+- Planner's CVE research was targeted (knew exactly which primitives were and weren't available)
 - The attack surface document became the single source of truth
 
 ### The Shell Bridge Was Essential
@@ -190,7 +190,7 @@ Executing commands through a PHP webshell embedded in a font binary file is inhe
 | Metric | Value |
 |--------|-------|
 | Total sessions | 9 |
-| Agents deployed | 5 (Sova, WEBDIG, Oracle, NOIRE, Elliot) |
+| Agents deployed | 5 (Scout, WEBDIG, Planner, NOIRE, Elliot) |
 | Elliot execution turns (all exploits) | 13/40 |
 | CVEs exploited | 3 |
 | Dead ends documented | 16+ |

@@ -34,7 +34,7 @@ Oracle reads and writes to `../shared/`. ELLIOT reads from `../shared/` and writ
 
 Key paths:
 - `../shared/target.txt` — IP and box name
-- `../shared/checkpoint.md` — clean state snapshot (read on resume, write via /checkpoint)
+- `../shared/checkpoint.md` — clean state snapshot (read on resume; memoria is primary state)
 - `../shared/attack_surface.md` — living operation memory (read/write)
 - `../shared/scouting_report.{md,json}` — recon output (write in Phase 1)
 - `../shared/webdig_findings.{md,json}` — web enum output (write in Phase 3)
