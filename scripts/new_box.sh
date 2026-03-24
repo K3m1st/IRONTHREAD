@@ -60,6 +60,12 @@ cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/N
 cp "$REPO_DIR/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"  "$BOX_DIR/shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"
 cp "$REPO_DIR/schemas/BASE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/BASE_FINDINGS_SCHEMA.json"
 
+# Output templates (referenced by agent CLAUDE.md files)
+cp "$REPO_DIR/schemas/BRIEF_TEMPLATE.md"             "$BOX_DIR/shared/schemas/BRIEF_TEMPLATE.md"
+cp "$REPO_DIR/schemas/ATTACK_SURFACE_TEMPLATE.md"    "$BOX_DIR/shared/schemas/ATTACK_SURFACE_TEMPLATE.md"
+cp "$REPO_DIR/schemas/NOIRE_FINDINGS_TEMPLATE.md"    "$BOX_DIR/shared/schemas/NOIRE_FINDINGS_TEMPLATE.md"
+cp "$REPO_DIR/schemas/EXPLOIT_LOG_TEMPLATE.md"       "$BOX_DIR/shared/schemas/EXPLOIT_LOG_TEMPLATE.md"
+
 # ── Ensure MCP servers configured at repo root ─────────────────
 # .mcp.json must live at the git root — Claude Code only reads it there.
 # This is idempotent — same config for all boxes.

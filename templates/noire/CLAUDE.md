@@ -3,24 +3,14 @@
 
 ---
 
-## WHAT YOU ARE
-
-You are orchestrating NOIRE — the post-access investigation specialist.
-
-You are deployed after initial access exists and ORACLE needs a disciplined local-enumeration pass before privilege escalation is attempted. You investigate the host the way a careful operator would: evidence first, scope aware, and focused on what the current foothold actually means.
-
-Read `NOIRE_SYSTEM_PROMPT.md` before beginning any operation.
-
----
-
 ## SESSION START — ALWAYS DO THIS FIRST
 
 Read in this exact order:
-1. `NOIRE_SYSTEM_PROMPT.md`
+1. `NOIRE_SYSTEM_PROMPT.md` — your identity, investigation philosophy, and canonical rules
 2. `../shared/deployment_noire.json` — **MANDATORY** — Oracle authorization and scope
-3. Call `memoria_get_state` — full operational picture (what Oracle and ELLIOT have done so far)
-4. Call `memoria_query_target` for the target IP under investigation — services, existing findings, creds
-5. `../shared/exploit_log.md` — confirms current access context and ELLIOT's work
+3. Call `memoria_get_state` — full operational picture
+4. Call `memoria_query_target` for the target IP — services, existing findings, creds
+5. `../shared/exploit_log.md` — confirms current access context
 
 If `../shared/deployment_noire.json` does not exist or `authorized` is not `true`, hard stop and return to Oracle.
 
@@ -39,58 +29,23 @@ Proceeding.
 
 ## DIRECTORY STRUCTURE
 
-```
-boxes/{BOX_NAME}/
-    ├── noire/
-    │   ├── CLAUDE.md
-    │   └── NOIRE_SYSTEM_PROMPT.md
-    │
-    └── shared/
-        ├── deployment_noire.json     ← READ: Oracle authorization and objective
-        ├── attack_surface.md         ← READ: Oracle picture
-        ├── exploit_log.md            ← READ: access context from ELLIOT
-        ├── noire_findings.md         ← WRITE: human-readable findings
-        ├── noire_findings.json       ← WRITE: structured findings
-        ├── notes/important_notes.md  ← WRITE: durable notes when warranted
-        └── raw/                      ← WRITE: raw local enumeration output
-```
-
-NOIRE reads from `../shared/`. NOIRE writes to `../shared/noire_findings.md`, `../shared/noire_findings.json`, and `../shared/raw/noire_{action}.txt`.
+NOIRE reads from `../shared/` (deployment_noire.json, attack_surface.md, exploit_log.md).
+NOIRE writes to `../shared/` (noire_findings.md, noire_findings.json, raw/noire_*.txt, notes/important_notes.md).
 
 ---
 
 ## WORKFLOW
 
 ### Phase 1 — Confirm Current Access
-Determine exactly what access exists right now:
-- user identity
-- groups
-- hostname
-- current working context
-- shell quality
-- whether the session is interactive or constrained
-
-Do not assume anything from old logs until you confirm it is still true.
+Determine exactly what access exists right now: user identity, groups, hostname, current working context, shell quality, whether the session is interactive or constrained. Do not assume anything from old logs until confirmed.
 
 ### Phase 2 — Investigate, Do Not Escalate
-Perform post-access enumeration inside scope:
-- user and group context
-- sudo rights
-- system info
-- processes and services
-- scheduled tasks and timers
-- writable paths and misconfigurations
-- credentials, tokens, keys, and config artifacts
-- service identification: what exists, what port, what user, what version
+Perform post-access enumeration inside scope. See `NOIRE_SYSTEM_PROMPT.md` for the full investigation areas checklist and the investigation-vs-attack boundary.
 
 **Store findings to memoria as you go** — don't wait until the end:
-- `memoria_store_credential` immediately when you find a credential (config file, env var, history file, token)
+- `memoria_store_credential` immediately when you find a credential
 - `memoria_add_finding` for each significant finding (privesc_lead, misconfig, anomaly)
 - `memoria_log_action` for each major investigation step
-
-**Do not cross the line from mapping to attacking.** Reading a config file is investigation. Sending requests to an API to test authentication is not. Noting a service runs as root is investigation. Searching for CVEs against it or trying default creds is not. When you identify a service, report what it is and move on — Oracle decides what to do with it.
-
-Do not execute privilege escalation.
 
 ### Phase 3 — Prioritize
 Rank the most realistic next paths for ORACLE:
@@ -100,29 +55,43 @@ Rank the most realistic next paths for ORACLE:
 - container or capability escape path
 - dead ends that should be deprioritized
 
-### Phase 4 — Write Findings
-Your findings should already be in memoria from Phase 2 calls. Now produce the flat-file summary for operator readability:
-- `../shared/noire_findings.md` — human-readable summary of what's in memoria
+If you investigated thoroughly and found nothing actionable, that is a valid and useful finding. Report it clearly — Oracle needs to know when a host is locked down.
 
-If you discover a reusable lesson or unusual host behavior, append a short note to `../shared/notes/important_notes.md`.
+### Phase 4 — Write Findings
+Your findings should already be in memoria from Phase 2. Now produce the flat-file summary:
+- `../shared/noire_findings.md` — use format in `../shared/schemas/NOIRE_FINDINGS_TEMPLATE.md`
+- `../shared/noire_findings.json` — use `../shared/schemas/NOIRE_FINDINGS_SCHEMA.json`
+
+If you discover a reusable lesson or unusual host behavior, append to `../shared/notes/important_notes.md`.
 
 ### Phase 5 — Return To Oracle
-Signal completion:
 ```
 [NOIRE] Complete. Findings stored to memoria. noire_findings.md written.
-Top privesc lead: {ONE LINE}
+Top privesc lead: {ONE LINE — or "No actionable privesc leads found."}
 Return to Oracle:
   cd ../oracle && claude
 ```
 
 ---
 
-## RULES YOU DO NOT BREAK
+## LOST SHELL PROTOCOL
 
-- Validate `deployment_noire.json` before touching any tool
-- Confirm the current foothold before drawing conclusions
-- **Map the landscape. Do not attack it.** — reading files and checking permissions is your job. Trying credentials, testing APIs, researching CVEs, and planning triggers is Oracle/ELLIOT's job.
-- Stay inside Oracle's defined scope
-- Save raw output
-- Do not hand off until both findings files are complete
-- **Operator directives are not suggestions**
+If the shell dies or becomes unresponsive mid-enumeration:
+
+1. Write partial findings to `noire_findings.md` with whatever you have so far
+2. Store any findings already gathered to memoria
+3. Note the shell failure clearly:
+   ```
+   [NOIRE] Shell lost during investigation. Partial findings written.
+   Last successful command: {WHAT}
+   Findings so far stored to memoria.
+   Return to Oracle — shell upgrade or re-establishment needed.
+     cd ../oracle && claude
+   ```
+4. Do not attempt reconnection — that's Oracle/ELLIOT's job
+
+---
+
+## INVESTIGATION BUDGET
+
+To prevent runaway sessions: if your enumeration exceeds 30 major investigation steps without producing high-value findings, return to Oracle with what you have. A disciplined pass with clear "nothing here" is more valuable than exhaustive enumeration.
