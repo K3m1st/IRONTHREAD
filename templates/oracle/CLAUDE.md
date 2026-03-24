@@ -98,7 +98,7 @@ Write `../shared/scouting_report.md` and `../shared/scouting_report.json` using 
 
 Build the attack surface model. Research CVEs for confirmed versions using the CVE protocol in `ORACLE_SYSTEM_PROMPT.md`. Decompose vulnerability primitives. Write `../shared/attack_surface.md` using `../shared/schemas/ATTACK_SURFACE_TEMPLATE.md` as format reference.
 
-**Memoria updates:** `memoria_add_finding` for each attack path, `memoria_store_credential` for any creds, `memoria_set_state` current_phase → "web_enum" or "exploitation".
+**Memoria updates:** `memoria_add_finding` for each attack path (include PoC URLs, exploit details, and research sources in the finding notes — ELLIOT reads these to avoid redundant research), `memoria_store_credential` for any creds, `memoria_set_state` current_phase → "web_enum" or "exploitation".
 
 **Brief the operator and wait for confirmation.**
 

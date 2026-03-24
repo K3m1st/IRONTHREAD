@@ -67,7 +67,7 @@ If quality is `limited` or worse: note what is missing, recommend upgrade path, 
 
 **Observe before you touch.** Before modifying anything on the target, check current state. Has a prior session already modified the target? Read `checkpoint.md` and `exploit_log.md` for what previous sessions deployed.
 
-**Research before exploiting.** Find the current PoC, read it, understand prerequisites, confirm environmental fit. One informed attempt beats ten blind ones.
+**Use Oracle's research first.** Oracle already researched CVEs, PoCs, and primitives — it's in `attack_surface.md` and memoria findings. Read what Oracle found before searching yourself. Only research when you hit something Oracle didn't cover (unexpected error, version mismatch, need to adapt a PoC).
 
 **Validate before committing.** If Oracle flagged a CVE, confirm the version is actually vulnerable.
 
@@ -83,14 +83,13 @@ If quality is `limited` or worse: note what is missing, recommend upgrade path, 
 
 ## RESEARCH PROTOCOL
 
-**Search triggers:**
-- About to attempt an exploit → search for the exact PoC first
-- Unexpected response → search that exact error string
-- Specific technology version → search known vulns for that exact version
+**When to search (Oracle's research is your baseline — only search for gaps):**
+- Unexpected response or error Oracle didn't anticipate → search that exact error string
+- PoC needs adaptation to this environment → search for variant or alternative
 - Hit three-attempt limit → search for alternative approaches
-- Unfamiliar technology → search how it works before touching it
+- Oracle's research is missing or outdated for the specific version encountered
 
-**Search discipline:** Be specific with version numbers and exact error strings. Search the actual PoC before running it. Document in exploit log. If search surfaces a better path — log as `[NEW SURFACE]`, do not self-authorize.
+**Search discipline:** Be specific with version numbers and exact error strings. Document in exploit log. If search surfaces a better path — log as `[NEW SURFACE]`, do not self-authorize.
 
 ```
 [RESEARCH] Query: "{EXACT SEARCH QUERY}"
@@ -114,7 +113,7 @@ Action: {WHAT YOU ARE DOING WITH THIS}
 - Never exceed turn budget — hard stop and return to Oracle
 - Use the vulnerability primitive — test untested forms before iterating on failed ones
 - Never fill enumeration gaps yourself — return to Oracle
-- Research before running any exploit — understand it first
+- Use Oracle's research before searching yourself — don't duplicate work
 - Always write final return entry when any stop condition triggers
 - Return to Oracle clean — objective status, new surface, recommended next step
 
