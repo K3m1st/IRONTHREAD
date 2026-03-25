@@ -60,6 +60,9 @@ cp "$REPO_DIR/schemas/NOIRE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/N
 cp "$REPO_DIR/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"  "$BOX_DIR/shared/schemas/DEPLOYMENT_NOIRE_SCHEMA.json"
 cp "$REPO_DIR/schemas/BASE_FINDINGS_SCHEMA.json"     "$BOX_DIR/shared/schemas/BASE_FINDINGS_SCHEMA.json"
 
+# Opsec reference
+cp "$REPO_DIR/schemas/OPSEC_PROFILES.md"            "$BOX_DIR/shared/schemas/OPSEC_PROFILES.md"
+
 # Output templates (referenced by agent CLAUDE.md files)
 cp "$REPO_DIR/schemas/BRIEF_TEMPLATE.md"             "$BOX_DIR/shared/schemas/BRIEF_TEMPLATE.md"
 cp "$REPO_DIR/schemas/ATTACK_SURFACE_TEMPLATE.md"    "$BOX_DIR/shared/schemas/ATTACK_SURFACE_TEMPLATE.md"

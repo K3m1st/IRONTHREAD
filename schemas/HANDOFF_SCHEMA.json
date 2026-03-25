@@ -152,6 +152,12 @@
       },
       "description": "Describes the process model Elliot inherits or must maintain. Prevents foreground/background bugs."
     },
+    "opsec_profile": {
+      "type": "string",
+      "enum": ["LOUD", "MODERATE", "GHOST"],
+      "default": "LOUD",
+      "description": "Engagement noise profile. LOUD = pentest speed, detection acceptable. MODERATE = avoid automated IDS/WAF alerts. GHOST = zero detection, ops take days. See schemas/OPSEC_PROFILES.md for tool-specific rate limits per profile."
+    },
     "notes": {
       "type": "string"
     }
