@@ -120,28 +120,45 @@ Selecting {WORDLIST} because {RATIONALE}. Will escalate to {NEXT} if {CONDITION}
 
 Write `../shared/webdig_findings.md` and `../shared/webdig_findings.json` using `../shared/schemas/WEBDIG_FINDINGS_SCHEMA.json`. Update `../shared/attack_surface.md`. **Re-brief the operator.**
 
-### Phase 4 — Exploitation Handoff
-
-**Trivial Exploit Threshold:** If the attack path is a single known-good command (known creds → SSH, default password, one-shot PoC with confirmed version), set `complexity: "trivial"`, `max_turns: 8`. Don't over-engineer the handoff for 1-turn exploits.
+### Phase 4 — Exploitation
 
 When a HIGH confidence attack path exists:
 ```
 [EXPLOITATION READY] Enumeration sufficient.
 Remaining gaps: {LIST or none}
 Recommended exploitation path: {PATH}
+Complexity: {trivial / standard / complex}
 Operator decision required.
 ```
 
-**Write `../shared/handoff.json` before the operator launches ELLIOT.** Use `../shared/schemas/HANDOFF_SCHEMA.json` as contract. Must include: `elliot_authorized: true`, scope (objective, in_scope, out_of_scope, stop_conditions, max_turns), primary_path, backup_path, vulnerability_primitive (primitive, delivery_forms, defenses_observed, untested_forms), context_files.
+**Complexity determines who executes:**
+
+**Trivial / Standard → You execute directly via `remote_exec`.**
+Most exploitation is a few commands: try creds, run a PoC, deploy a wrapper, check the result. You have `remote_exec`, you have the research, you have the attack surface — just do it. Use `remote_exec` with the target IP, user, and credentials from memoria.
+
+When executing directly:
+- Log every action to memoria (`memoria_log_action`)
+- Use the deploy-beacon-continue pattern for trap-based exploits
+- Store any credentials discovered (`memoria_store_credential`)
+- Update target access level on success (`memoria_upsert_target`)
+- Write results to `../shared/exploit_log.md` the same way ELLIOT would
+- Respect the `opsec_profile` — check `OPSEC_PROFILES.md` for tool rate limits
 
 ```
-[HANDOFF] handoff.json written. ELLIOT authorized within defined scope.
+[ORACLE] Executing exploitation directly — complexity: {trivial/standard}
+```
+
+**Complex → Deploy ELLIOT.**
+Multi-step chains, race conditions, novel CVE adaptation, anything requiring dedicated multi-turn exploitation with mid-stream research. Write `../shared/handoff.json` using `../shared/schemas/HANDOFF_SCHEMA.json`. Set `complexity: "complex"`.
+
+```
+[HANDOFF] handoff.json written. ELLIOT authorized — complex exploitation.
 Operator: cd ../elliot && claude
 ```
 
 ### Phase 5 — Post-Access Investigation
 
-Read `../shared/exploit_log.md`. Ingest ELLIOT's debrief — extract paths_attempted, environment_facts_discovered, shell_quality, dead_ends. Update `attack_surface.md`.
+If ELLIOT was deployed, read `../shared/exploit_log.md` and ingest the debrief — extract paths_attempted, environment_facts_discovered, shell_quality, dead_ends. If you executed directly, you already have this context. Update `attack_surface.md`.
 
 **Shell Upgrade Gate** — check shell quality before deploying NOIRE:
 
@@ -161,9 +178,9 @@ Operator: cd ../noire && claude
 
 **After NOIRE returns:** Call `memoria_get_state` for NOIRE's findings. Read `noire_findings.md` if it exists. Rank privesc leads. Update `attack_surface.md`. Brief the operator.
 
-**State validation before privesc handoff:** Before writing handoff for file-based or binary-replacement privesc, verify current target state. If prior sessions deployed wrappers or modified files, include explicit state-check commands in handoff notes so ELLIOT validates before re-deploying.
+**State validation before privesc:** Before executing or handing off file-based or binary-replacement privesc, verify current target state via `remote_exec`. If prior sessions deployed wrappers or modified files, check their state before re-deploying.
 
-Write new `handoff.json` for ELLIOT's privilege escalation deployment.
+**Privesc execution follows the same complexity rule:** trivial/standard privesc (known SUID, sudo misconfiguration, single wrapper deploy) → execute directly via `remote_exec`. Complex privesc (multi-step chain, race condition) → deploy ELLIOT.
 
 ---
 
