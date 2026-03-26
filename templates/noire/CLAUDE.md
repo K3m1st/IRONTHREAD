@@ -59,16 +59,13 @@ Rank the most realistic next paths for ORACLE:
 
 If you investigated thoroughly and found nothing actionable, that is a valid and useful finding. Report it clearly — Oracle needs to know when a host is locked down.
 
-### Phase 4 — Write Findings
-Your findings should already be in memoria from Phase 2. Now produce the flat-file summary:
-- `../shared/noire_findings.md` — use format in `../shared/schemas/NOIRE_FINDINGS_TEMPLATE.md`
-- `../shared/noire_findings.json` — use `../shared/schemas/NOIRE_FINDINGS_SCHEMA.json`
+### Phase 4 — Return To Oracle
+Your findings are already in memoria from Phase 2. Verify with `memoria_get_state` that everything was stored.
 
 If you discover a reusable lesson or unusual host behavior, append to `../shared/notes/important_notes.md`.
 
-### Phase 5 — Return To Oracle
 ```
-[NOIRE] Complete. Findings stored to memoria. noire_findings.md written.
+[NOIRE] Complete. Findings stored to memoria.
 Top privesc lead: {ONE LINE — or "No actionable privesc leads found."}
 Return to Oracle:
   cd ../oracle && claude
@@ -80,9 +77,8 @@ Return to Oracle:
 
 If the shell dies or becomes unresponsive mid-enumeration:
 
-1. Write partial findings to `noire_findings.md` with whatever you have so far
-2. Store any findings already gathered to memoria
-3. Note the shell failure clearly:
+1. Verify partial findings are stored to memoria (they should be — you store as you go)
+2. Note the shell failure clearly:
    ```
    [NOIRE] Shell lost during investigation. Partial findings written.
    Last successful command: {WHAT}
