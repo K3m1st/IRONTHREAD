@@ -1,0 +1,8 @@
+/dashboard            (Status: 200) [Size: 3930]
+/error                (Status: 500) [Size: 73]
+/login                (Status: 200) [Size: 6152]
+/meta-inf             (Status: 500) [Size: 0]
+/META-INF             (Status: 500) [Size: 0]
+/web-inf              (Status: 500) [Size: 0]
+/WEB-INF              (Status: 500) [Size: 0]
+

@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Minecraft Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="global.css">
+</head>
+
+<body class="body">
+    <header style="position: relative; text-align: center;">
+        <img alt="Header Image" src="Public/Header.png" style="width: 100%; height: auto; max-height: 25rem; object-fit: cover; display: block;" />
+        <h1 class="title">MonitorLand</h1>
+        <hr class="separator">
+    </header>
+    
+    <main>
+        <p>
+            Join our awesome Minecraft community!
+        </p>
+        <div class="ip-box" id="server-ip">play.pterodactyl.htb</div>
+        <button onclick="copyIP()">Copy Server IP</button>
+        <p style="margin-top:2rem;">
+            Version: 1.20.x <br>SMP and Vanilla Servers.<br> <a href="/changelog.txt">Changelogs</a>
+        </p>
+    </main>
+
+    <footer>
+        &copy; 2025 MonitorLand. Not affiliated with Mojang.
+    </footer>
+
+    <script>
+        function copyIP() {
+            const ip = document.getElementById('server-ip').innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = ip;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand("copy");
+                alert("Server IP copied to clipboard");
+            } catch (err) {
+                alert("Failed to copy");
+            }
+
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>

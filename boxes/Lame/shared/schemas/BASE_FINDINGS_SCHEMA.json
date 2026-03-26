@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ironthread.local/schemas/base-findings.schema.json",
+  "title": "IRONTHREAD Base Findings Schema",
+  "$comment": "Documents the shared fields present in all findings schemas (SOVA_REPORT, WEBDIG_FINDINGS, NOIRE_FINDINGS). Not used for direct validation — this is a reference document. Each schema duplicates these definitions because JSON Schema 2020-12 $ref composition adds complexity without benefit for our use case.",
+  "description": "Shared field definitions used across all IRONTHREAD agent output schemas.",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "$comment": "Present in: SOVA_REPORT, WEBDIG_FINDINGS, NOIRE_FINDINGS. Always required.",
+      "type": "object",
+      "required": ["operation", "target", "date", "agent", "status"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "description": "Box/operation name"
+        },
+        "target": {
+          "type": "string",
+          "description": "Target IP address"
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO date string"
+        },
+        "agent": {
+          "type": "string",
+          "description": "Agent identifier and version (e.g., 'SOVA v1.0')"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["COMPLETE", "PARTIAL"],
+          "description": "Whether the agent completed its full checklist"
+        }
+      }
+    },
+    "anomalies": {
+      "$comment": "Present in: SOVA_REPORT, WEBDIG_FINDINGS, NOIRE_FINDINGS. Optional in SOVA.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "What is anomalous"
+          },
+          "location": {
+            "type": "string",
+            "description": "Where it was found (port, URL, path, etc.)"
+          },
+          "significance": {
+            "type": "string",
+            "description": "Why it matters for the operation"
+          }
+        }
+      }
+    },
+    "tools_executed": {
+      "$comment": "Present in: SOVA_REPORT, WEBDIG_FINDINGS, NOIRE_FINDINGS. Always required.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "description": "MCP tool name that was called"
+          },
+          "command": {
+            "type": "string",
+            "description": "Underlying CLI command executed"
+          },
+          "output_file": {
+            "type": "string",
+            "description": "Path to raw output file in shared/raw/"
+          }
+        }
+      }
+    }
+  }
+}

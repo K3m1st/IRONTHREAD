@@ -1,0 +1,96 @@
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Thu, 26 Mar 2026 15:31:49 GMT
+Content-Type: text/html
+Content-Length: 4641
+Last-Modified: Mon, 15 Dec 2025 08:23:53 GMT
+Connection: keep-alive
+ETag: "693fc599-1221"
+Accept-Ranges: bytes
+
+<!DOCTYPE HTML>
+<!--
+	Landed by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Browsed</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body>
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1 id="logo"><a href="index.html">Browsed.htb</a></h1>
+					<nav id="nav">
+						<ul>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="samples.html">Samples</a></li>
+							<li><a href="upload.php" class="button primary">Upload Extension</a></li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Banner -->
+				<section id="banner">
+					<div class="content" style="padding-top: 0px; text-align: center;">
+                        <!-- Extension A -->
+                        <div style="background: #222; border-radius: 8px; padding: 2em 1em; width: 250px; box-shadow: 0 2px 8px #0002; display: flex; flex-direction: column; align-items: center; float: left; margin: 20px;">
+                            <img src="images/pic01.jpg" alt="Extension A" style="width:80px; height:80px; border-radius: 50%; margin-bottom: 1em;">
+                            <h3 style="margin-bottom: 0.5em;">Fontify</h3>
+                            <p style="font-size: 0.95em;">An extension to change fonts to your choosing, what's funnier than reading in Comic Sans MS ?</p>
+                            <a href="fontify.zip" class="button primary">Download</a>
+                        </div>
+                        <!-- Extension B -->
+                        <div style="background: #222; border-radius: 8px; padding: 2em 1em; width: 250px; box-shadow: 0 2px 8px #0002; display: flex; flex-direction: column; align-items: center; float: left; margin: 20px;">
+                            <img src="images/pic02.jpg" alt="Extension B" style="width:80px; height:80px; border-radius: 50%; margin-bottom: 1em;">
+                            <h3 style="margin-bottom: 0.5em;">ReplaceImages</h3>
+                            <p style="font-size: 0.95em;">A fun way to navigate the internet ! This extension can replace every image with the one you love.</p>
+                            <a href="replaceimages.zip" class="button primary">Download</a>
+                        </div>
+                        <!-- Extension C -->
+                        <div style="background: #222; border-radius: 8px; padding: 2em 1em; width: 250px; box-shadow: 0 2px 8px #0002; display: flex; flex-direction: column; align-items: center; float: left; margin: 20px;">
+                            <img src="images/pic03.jpg" alt="Extension C" style="width:80px; height:80px; border-radius: 50%; margin-bottom: 1em;">
+                            <h3 style="margin-bottom: 0.5em;">Timer</h3>
+                            <p style="font-size: 0.95em;">Timer helps you for various tasks, like cooking, because who even uses a pressure cooker ?</p>
+                            <a href="timer.zip" class="button primary">Download</a>
+                        </div>
+					</div>
+                </section>
+
+			<!-- Footer -->
+				<footer id="footer">
+					<ul class="icons">
+						<li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+						<li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+						<li><a href="#" class="icon solid alt fa-envelope"><span class="label">Email</span></a></li>
+					</ul>
+					<ul class="copyright">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</footer>
+
+		</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.dropotron.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
+

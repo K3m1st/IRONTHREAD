@@ -1,0 +1,7 @@
+HTTP/1.1 200 OK
+Server: nginx/1.21.5
+Date: Thu, 19 Mar 2026 02:24:18 GMT
+Content-Type: text/html; charset=UTF-8
+Connection: keep-alive
+X-Powered-By: PHP/8.4.8
+

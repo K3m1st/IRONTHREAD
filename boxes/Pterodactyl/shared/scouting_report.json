@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "operation": "Pterodactyl",
+    "target": "10.129.6.130",
+    "date": "2026-03-18T21:24:00-05:00",
+    "agent": "SOVA v1.0",
+    "status": "COMPLETE"
+  },
+  "target_profile": {
+    "ip": "10.129.6.130",
+    "hostname": "pterodactyl.htb",
+    "os_guess": "Linux (SUSE-based), kernel 6.4.0-150600.23.65-default x86_64",
+    "os_confidence": "HIGH"
+  },
+  "ports": [
+    {
+      "port": 22,
+      "protocol": "tcp",
+      "state": "open",
+      "service": "ssh",
+      "version": "OpenSSH 9.6",
+      "version_confidence": "HIGH",
+      "notes": "Protocol 2.0, ECDSA and ED25519 host keys"
+    },
+    {
+      "port": 80,
+      "protocol": "tcp",
+      "state": "open",
+      "service": "http",
+      "version": "nginx 1.21.5",
+      "version_confidence": "HIGH",
+      "notes": "Redirects to http://pterodactyl.htb/. Multiple vhosts: pterodactyl.htb (landing page), panel.pterodactyl.htb (Pterodactyl Panel), play.pterodactyl.htb (redirects to main)"
+    },
+    {
+      "port": 443,
+      "protocol": "tcp",
+      "state": "closed",
+      "service": "https",
+      "notes": "Closed"
+    },
+    {
+      "port": 8080,
+      "protocol": "tcp",
+      "state": "closed",
+      "service": "http-proxy",
+      "notes": "Closed"
+    }
+  ],
+  "web_services": [
+    {
+      "port": 80,
+      "technology": "nginx 1.21.5 + PHP 8.4.8 (FPM/FastCGI)",
+      "server": "nginx/1.21.5",
+      "redirects_to": "http://pterodactyl.htb/",
+      "notable_headers": [
+        "X-Powered-By: PHP/8.4.8",
+        "Server: nginx/1.21.5"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "port": 80,
+      "technology": "Pterodactyl Panel v1.11.10 (Laravel/React SPA)",
+      "server": "nginx/1.21.5",
+      "redirects_to": null,
+      "notable_headers": [
+        "Set-Cookie: XSRF-TOKEN (Laravel)",
+        "Set-Cookie: pterodactyl_session"
+      ],
+      "confidence": "HIGH"
+    }
+  ],
+  "remote_access": [
+    {
+      "service": "SSH",
+      "port": 22,
+      "version": "OpenSSH 9.6",
+      "auth_methods": ["publickey"],
+      "notes": "Modern version, no known CVEs"
+    }
+  ],
+  "anomalies": [
+    {
+      "description": "phpinfo.php exposed on main domain — reveals full PHP config, PEAR paths, disabled functions (none), open_basedir (none)",
+      "location": "http://pterodactyl.htb/phpinfo.php",
+      "significance": "Critical information disclosure — confirms attack prerequisites for CVE-2025-49132"
+    },
+    {
+      "description": "changelog.txt publicly accessible — reveals exact software versions, installation details, and security-relevant config decisions",
+      "location": "http://pterodactyl.htb/changelog.txt",
+      "significance": "Operational intelligence — confirms Pterodactyl Panel v1.11.10, MariaDB 11.8.3, PHP-PEAR installed"
+    }
+  ],
+  "gaps": [],
+  "oracle_recommendations": [
+    {
+      "priority": 1,
+      "action": "Exploit CVE-2025-49132 (Pterodactyl Panel unauthenticated LFI-to-RCE) on panel.pterodactyl.htb",
+      "rationale": "CVSS 10.0, unauthenticated, public exploit available. Target runs exact vulnerable version (1.11.10). All prerequisites confirmed: PHP-PEAR installed, register_argc_argv=On, no disable_functions, no open_basedir. PEAR path confirmed at /usr/share/php/PEAR."
+    },
+    {
+      "priority": 2,
+      "action": "Extract .env credentials via LFI before RCE (Laravel APP_KEY, DB creds)",
+      "rationale": "Credential extraction may provide additional lateral movement paths and is a free byproduct of the LFI"
+    }
+  ],
+  "tools_executed": [
+    {
+      "tool": "nmap",
+      "command": "nmap -p- -sC -sV -T4 --min-rate=1000 10.129.6.130",
+      "output_file": "../shared/raw/nmap_full.txt"
+    },
+    {
+      "tool": "whatweb",
+      "command": "whatweb -a 3 http://pterodactyl.htb",
+      "output_file": "../shared/raw/whatweb_pterodactyl.txt"
+    },
+    {
+      "tool": "curl",
+      "command": "curl -sI http://pterodactyl.htb/ and http://panel.pterodactyl.htb/",
+      "output_file": "../shared/raw/curl_headers.txt"
+    },
+    {
+      "tool": "curl",
+      "command": "curl -s http://pterodactyl.htb/phpinfo.php",
+      "output_file": "inline"
+    },
+    {
+      "tool": "curl",
+      "command": "curl -s http://pterodactyl.htb/changelog.txt",
+      "output_file": "../shared/raw/changelog.txt"
+    }
+  ],
+  "raw_output_dir": "../shared/raw/"
+}

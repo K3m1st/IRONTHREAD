@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ironthread.local/schemas/sova-report.schema.json",
+  "title": "SOVA Scouting Report",
+  "$comment": "Shared fields (meta, anomalies, tools_executed) documented in BASE_FINDINGS_SCHEMA.json",
+  "type": "object",
+  "required": [
+    "meta",
+    "target_profile",
+    "ports",
+    "oracle_recommendations",
+    "tools_executed"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["operation", "target", "date", "agent", "status"],
+      "properties": {
+        "operation": { "type": "string" },
+        "target": { "type": "string" },
+        "date": { "type": "string" },
+        "agent": { "type": "string", "const": "SOVA v1.0" },
+        "status": { "type": "string", "enum": ["COMPLETE", "PARTIAL"] }
+      }
+    },
+    "target_profile": {
+      "type": "object",
+      "properties": {
+        "ip": { "type": "string" },
+        "hostname": { "type": "string" },
+        "os_guess": { "type": "string" },
+        "os_confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] }
+      }
+    },
+    "ports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["port", "protocol", "state", "service"],
+        "properties": {
+          "port": { "type": "integer" },
+          "protocol": { "type": "string" },
+          "state": { "type": "string" },
+          "service": { "type": "string" },
+          "version": { "type": "string" },
+          "version_confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "web_services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "port": { "type": "integer" },
+          "technology": { "type": "string" },
+          "server": { "type": "string" },
+          "redirects_to": { "type": "string" },
+          "notable_headers": { "type": "array", "items": { "type": "string" } },
+          "confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] }
+        }
+      }
+    },
+    "file_sharing": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": { "type": "string" },
+          "port": { "type": "integer" },
+          "anonymous_access": { "type": "boolean" },
+          "null_session": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "remote_access": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": { "type": "string" },
+          "port": { "type": "integer" },
+          "version": { "type": "string" },
+          "auth_methods": { "type": "array", "items": { "type": "string" } },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "dns": {
+      "type": "object",
+      "properties": {
+        "port": { "type": "integer" },
+        "zone_transfer": { "type": "string", "enum": ["SUCCESS", "FAILED", "NOT_TESTED"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "databases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": { "type": "string" },
+          "port": { "type": "integer" },
+          "version": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "other_services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": { "type": "string" },
+          "port": { "type": "integer" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "anomalies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "location": { "type": "string" },
+          "significance": { "type": "string" }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "recommended_specialist": { "type": "string" }
+        }
+      }
+    },
+    "oracle_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "priority": { "type": "integer" },
+          "action": { "type": "string" },
+          "rationale": { "type": "string" }
+        }
+      }
+    },
+    "tools_executed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tool": { "type": "string" },
+          "command": { "type": "string" },
+          "output_file": { "type": "string" }
+        }
+      }
+    },
+    "raw_output_dir": {
+      "type": "string"
+    }
+  }
+}

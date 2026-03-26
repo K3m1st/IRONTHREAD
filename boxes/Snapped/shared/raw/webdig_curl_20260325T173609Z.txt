@@ -1,0 +1,9 @@
+HTTP/1.1 403 Forbidden
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 25 Mar 2026 17:36:10 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 34
+Connection: keep-alive
+Request-Id: c5380dc1-3948-4eb9-8e40-183dd647fe6b
+
+{"message":"Authorization failed"}

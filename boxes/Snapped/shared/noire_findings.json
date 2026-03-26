@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "operation": "Snapped",
+    "target": "10.129.9.2",
+    "date": "2026-03-25",
+    "agent": "NOIRE v1.0",
+    "status": "COMPLETE"
+  },
+  "objective": {
+    "statement": "Enumerate privilege escalation vectors from jonathan (uid=1000) on Snapped (10.129.9.2). Report findings — do not attempt exploitation.",
+    "objective_completed": true,
+    "completion_notes": "All completion criteria met. sudo checked, SUID/SGID/caps enumerated, cron/timers reviewed, services and users identified, nginx-ui process user and config confirmed, kernel/OS recorded, all leads documented."
+  },
+  "current_access": {
+    "user": "jonathan",
+    "privilege_level": "user (uid=1000, gid=1000)",
+    "groups": ["jonathan"],
+    "shell_quality": "Full interactive bash via SSH, no restrictions"
+  },
+  "system_profile": {
+    "hostname": "snapped",
+    "os": "Ubuntu 24.04.4 LTS (Noble Numbat)",
+    "kernel": "6.17.0-19-generic x86_64",
+    "containerization": "None"
+  },
+  "high_value_findings": [
+    {
+      "title": "No OTP/2FA on any Nginx UI account",
+      "summary": "Database confirms otp_secret=None for admin (id=1) and jonathan (id=2). JWT forgery requires only correct claim structure — no TOTP bypass needed.",
+      "confidence": "HIGH",
+      "evidence": "python3 sqlite3 query: SELECT id, name, otp_secret FROM users → admin: None, jonathan: None"
+    },
+    {
+      "title": "Nginx UI app.ini and database world-readable",
+      "summary": "All Nginx UI secrets (JWT, crypto, node) and user bcrypt hashes readable by any local user. Files are 644 www-data:www-data at /usr/local/etc/nginx-ui/.",
+      "confidence": "HIGH",
+      "evidence": "stat: 644 www-data:www-data for app.ini and database.db"
+    },
+    {
+      "title": "Nginx master process runs as root",
+      "summary": "Nginx master (PID 1888) runs as root. Workers and nginx-ui run as www-data. If www-data shell obtained, nginx control could lead to root execution.",
+      "confidence": "HIGH",
+      "evidence": "ps aux: root 1888 0.0 0.0 11172 1772 ? Ss nginx: master process"
+    },
+    {
+      "title": "Nginx UI terminal StartCmd = login",
+      "summary": "Terminal feature configured to spawn /usr/bin/login. login is 755 root:root (not SUID). Runs as www-data — can authenticate users via PAM but cannot setuid.",
+      "confidence": "MEDIUM",
+      "evidence": "app.ini [terminal] StartCmd = login. /usr/bin/login: 755 root root"
+    }
+  ],
+  "privesc_leads": [
+    {
+      "rank": 1,
+      "path": "JWT forgery → Nginx UI authenticated access → terminal or settings modification",
+      "evidence": "JWT secret 6c4af436-035a-4942-9ca6-172b36696ce9 known. No OTP on any account. ELLIOT's prior attempt failed with wrong claims (sub/name). Need correct Nginx UI JWT payload structure from source code.",
+      "complexity": "MEDIUM",
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 2,
+      "path": "www-data → root via nginx master process control",
+      "evidence": "Nginx master runs as root. Nginx UI (www-data) can restart nginx via start-stop-daemon (confirmed working by ELLIOT). Config writes to /etc/nginx/ fail (root-owned 755/644). Need alternative write mechanism or RestartCmd manipulation.",
+      "complexity": "HIGH",
+      "confidence": "MEDIUM"
+    },
+    {
+      "rank": 3,
+      "path": "Crack admin bcrypt hash for potential new credentials",
+      "evidence": "$2a$10$8YdBq4e.WeQn8gv9E0ehh.quy8D/4mXHHY4ALLMAzgFPTrIVltEvm — bcrypt cost 10",
+      "complexity": "MEDIUM",
+      "confidence": "LOW"
+    }
+  ],
+  "credentials_and_secrets": [
+    {
+      "type": "JWT secret",
+      "location": "/usr/local/etc/nginx-ui/app.ini [app] JwtSecret",
+      "notes": "6c4af436-035a-4942-9ca6-172b36696ce9 — signs all Nginx UI auth tokens"
+    },
+    {
+      "type": "Crypto secret",
+      "location": "/usr/local/etc/nginx-ui/app.ini [crypto] Secret",
+      "notes": "5c942292647d73f597f47c0be2237bf7347cdb70a0e8e8558e448318862357d6 — used for OTP encryption"
+    },
+    {
+      "type": "Node secret",
+      "location": "/usr/local/etc/nginx-ui/app.ini [node] Secret",
+      "notes": "c64d7ca1-19cb-4ebe-96d4-49037e7df78e — cluster auth, bypasses AuthRequired but not SecureSession"
+    },
+    {
+      "type": "bcrypt hash (admin)",
+      "location": "/usr/local/etc/nginx-ui/database.db users table (id=1)",
+      "notes": "$2a$10$8YdBq4e.WeQn8gv9E0ehh.quy8D/4mXHHY4ALLMAzgFPTrIVltEvm — NOT cracked"
+    },
+    {
+      "type": "bcrypt hash (jonathan)",
+      "location": "/usr/local/etc/nginx-ui/database.db users table (id=2)",
+      "notes": "$2a$10$8M7JZSRLKdtJpx9YRUNTmODN.pKoBsoGCBi5Z8/WVGO2od9oCSyWq — cracked: linkinpark"
+    }
+  ],
+  "misconfigurations": [
+    {
+      "category": "File permissions",
+      "summary": "Nginx UI config and database world-readable (644 www-data:www-data)",
+      "evidence": "/usr/local/etc/nginx-ui/app.ini and database.db both 644, readable by jonathan"
+    },
+    {
+      "category": "History",
+      "summary": ".bash_history owned by root with 0 bytes — deliberately locked to prevent history collection",
+      "evidence": "-rw-r--r-- 1 root jonathan 0 Mar 20 12:28 .bash_history"
+    }
+  ],
+  "anomalies": [
+    {
+      "description": "Nginx UI binary /usr/local/bin/nginx-ui owned by uid 1001 (UNKNOWN) — no user with uid 1001 in /etc/passwd",
+      "impact": "Suggests binary was deployed from a different system. No security impact but indicates manual installation."
+    },
+    {
+      "description": "Database path mismatch: app.ini says /var/lib/nginx-ui/database.db but dir is empty. Active DB at /usr/local/etc/nginx-ui/database.db",
+      "impact": "Nginx UI appears to fall back to config directory. No direct security impact."
+    }
+  ],
+  "oracle_flags": [
+    {
+      "priority": 1,
+      "action": "Research Nginx UI JWT claim structure from source code (GitHub: 0xJacky/nginx-ui)",
+      "rationale": "JWT secret is known and no OTP is required. ELLIOT's attempt with {sub, name} claims returned 403. Need exact payload fields (uid? user_id?), SecureSession token format, and whether terminal WebSocket uses JWT or session cookie auth."
+    },
+    {
+      "priority": 2,
+      "action": "Research Nginx UI v2.3.2 specific CVEs — especially template injection, terminal auth bypass, config write bypass",
+      "rationale": "Version now confirmed as 2.3.2 (build cb1fb691, go1.25.4). CVE-2024-22197 template injection and similar version-specific vulns may provide direct RCE without JWT forgery."
+    },
+    {
+      "priority": 3,
+      "action": "Plan www-data → root escalation chain once www-data shell is obtained",
+      "rationale": "Nginx master is root, nginx-ui can restart it. If www-data can modify app.ini RestartCmd (app.ini is owned by www-data), restart could execute arbitrary commands. Alternatively, if config writes work from www-data's filesystem context (not API), nginx config manipulation + restart = root."
+    },
+    {
+      "priority": 4,
+      "action": "Run admin bcrypt hash through hashcat in background",
+      "rationale": "Low priority but costless to run. Admin may have a stronger or different password useful for system access."
+    }
+  ],
+  "tools_executed": [
+    {"tool": "remote_exec", "command": "id; hostname; uname -a; cat /etc/os-release", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "echo password | sudo -S -l", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "find / -perm -4000/-2000 -type f", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "getcap -r /", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "ps aux --sort=-%mem", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "ss -tlnp; ss -ulnp", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "cat /usr/local/etc/nginx-ui/app.ini", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "systemctl cat nginx-ui.service / nginx.service", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "python3 sqlite3 database dump", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "find / -writable -type f/d", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "cat /etc/nginx/ configs + sites", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "cat /proc/1858/status (nginx-ui caps)", "output_file": "inline"},
+    {"tool": "remote_exec", "command": "snap list; dpkg -l cups", "output_file": "inline"}
+  ],
+  "evidence_refs": [
+    "memoria finding #4: JWT forgery path — no OTP, JWT secret known",
+    "memoria finding #5: Nginx master runs as root",
+    "memoria finding #6: Nginx UI config/database world-readable"
+  ]
+}

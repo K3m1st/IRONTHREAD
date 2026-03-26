@@ -1,0 +1,52 @@
+{
+  "operation": "Lame",
+  "timestamp": "2026-03-24T17:31:00Z",
+  "phase": "EXPLOITATION",
+  "elliot_authorized": true,
+  "complexity": "trivial",
+  "scope": {
+    "objective": "Obtain root shell on 10.129.8.218 via Samba CVE-2007-2447 and capture both user.txt and root.txt flags",
+    "in_scope": [
+      "10.129.8.218 port 445 (SMB — Samba 3.0.20)",
+      "10.129.8.218 port 139 (NetBIOS/SMB)",
+      "10.129.8.218 port 6200 (vsftpd backdoor — backup only)",
+      "10.129.8.218 port 3632 (distccd — fallback only)"
+    ],
+    "out_of_scope": "everything not listed above",
+    "stop_conditions": [
+      "root shell obtained and both flags captured",
+      "objective exhausted — all paths failed",
+      "3 failed attempts on single path",
+      "turn budget exhausted"
+    ],
+    "max_attempts_per_path": 3,
+    "max_turns": 8
+  },
+  "context_files": [
+    "../shared/attack_surface.md",
+    "../shared/scouting_report.json"
+  ],
+  "primary_path": "Samba 3.0.20 CVE-2007-2447 — username map script command injection via shell metacharacters in SMB username field. Pre-auth, runs as root. Use smbclient or Python PoC with backtick/nohup reverse shell in username.",
+  "backup_path": "vsftpd 2.3.4 CVE-2011-2523 — send username containing ':)' to trigger backdoor on port 6200. If that fails, distccd CVE-2004-2687 on port 3632 for user shell (nmap NSE script or Metasploit).",
+  "vulnerability_primitive": {
+    "primitive": "Unsanitized username string passed directly to /bin/sh via MS-RPC calls in Samba smbd",
+    "delivery_forms": [
+      "Backtick injection in username: `/bin/sh -c 'PAYLOAD'`",
+      "Command substitution: $(PAYLOAD)",
+      "Semicolon chaining: ; PAYLOAD",
+      "smbclient logon command with injected username",
+      "Direct MS-RPC SamrChangePassword() call via impacket",
+      "Metasploit exploit/multi/samba/usermap_script"
+    ],
+    "defenses_observed": "None — pre-authentication, no input sanitization observed",
+    "untested_forms": [
+      "All forms untested — first attempt"
+    ]
+  },
+  "process_model": {
+    "foreground": "reverse shell listener (nc -lvnp)",
+    "background": "none",
+    "critical_note": "Exploit fires a reverse shell — start listener BEFORE triggering the injection"
+  },
+  "notes": "This is a trivial exploit. Start listener, inject reverse shell payload into SMB username via smbclient or Python, catch root shell. Capture /root/root.txt and /home/*/user.txt. Should complete in 1-3 turns."
+}

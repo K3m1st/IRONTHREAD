@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "operation": "Facts",
+    "target": "10.129.6.121",
+    "date": "2026-03-18T19:02:00-05:00",
+    "agent": "SOVA v1.0",
+    "status": "COMPLETE"
+  },
+  "target_profile": {
+    "ip": "10.129.6.121",
+    "hostname": "facts.htb",
+    "os_guess": "Ubuntu Linux (recent)",
+    "os_confidence": "HIGH"
+  },
+  "ports": [
+    {
+      "port": 22,
+      "protocol": "tcp",
+      "state": "open",
+      "service": "ssh",
+      "version": "OpenSSH 9.9p1 Ubuntu 3ubuntu3.2",
+      "version_confidence": "HIGH",
+      "notes": "Current version, ECDSA and ED25519 host keys"
+    },
+    {
+      "port": 80,
+      "protocol": "tcp",
+      "state": "open",
+      "service": "http",
+      "version": "nginx 1.26.3 (Ubuntu)",
+      "version_confidence": "HIGH",
+      "notes": "Redirects to http://facts.htb/. Proxies CamaleonCMS (Ruby on Rails). Images served from MinIO via /randomfacts/ path."
+    },
+    {
+      "port": 54321,
+      "protocol": "tcp",
+      "state": "open",
+      "service": "http",
+      "version": "MinIO (version unknown)",
+      "version_confidence": "MEDIUM",
+      "notes": "S3-compatible object storage API. Redirects to port 9001 (console) which is not externally accessible. Health endpoints respond 200."
+    }
+  ],
+  "web_services": [
+    {
+      "port": 80,
+      "technology": "CamaleonCMS (Ruby on Rails)",
+      "server": "nginx/1.26.3",
+      "redirects_to": "http://facts.htb/",
+      "notable_headers": [
+        "_factsapp_session cookie (Rails)",
+        "authenticity_token CSRF (Rails)",
+        "x-request-id",
+        "plugin_front_cache",
+        "camaleon_first theme"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "port": 54321,
+      "technology": "MinIO S3 API",
+      "server": "MinIO",
+      "redirects_to": "http://10.129.6.121:9001 (inaccessible)",
+      "notable_headers": [
+        "X-Amz-Request-Id",
+        "X-Amz-Id-2",
+        "Strict-Transport-Security"
+      ],
+      "confidence": "HIGH"
+    }
+  ],
+  "remote_access": [
+    {
+      "service": "SSH",
+      "port": 22,
+      "version": "OpenSSH 9.9p1",
+      "auth_methods": ["publickey"],
+      "notes": "Current version, no known CVEs"
+    }
+  ],
+  "anomalies": [
+    {
+      "description": "MinIO console (port 9001) referenced in redirect but not externally accessible. Port scan shows 65532 closed ports. Console likely bound to localhost only.",
+      "location": "Port 54321 → 9001 redirect",
+      "significance": "Console access would reveal version and admin interface. May be accessible from within the host after foothold."
+    },
+    {
+      "description": "CamaleonCMS has open user registration at /admin/register with CAPTCHA protection",
+      "location": "/admin/register",
+      "significance": "Critical — all known CamaleonCMS CVEs require authenticated access. Open registration provides that access vector."
+    },
+    {
+      "description": "MinIO randomfacts bucket is publicly listable via S3 API on port 54321, but nginx blocks directory listing on port 80",
+      "location": "Port 54321 /randomfacts/",
+      "significance": "Public bucket policy. Only contains image files. Owner DisplayName is 'minio' (default)."
+    }
+  ],
+  "gaps": [
+    {
+      "description": "MinIO exact version unknown — no version header exposed. Need console access (post-foothold) or authenticated API call to determine version.",
+      "recommended_specialist": "ORACLE Phase 5 (post-access)"
+    },
+    {
+      "description": "CamaleonCMS exact version unknown — need to confirm whether vulnerable versions are running. Asset digests suggest modern deployment.",
+      "recommended_specialist": "WEBDIG (Phase 3)"
+    },
+    {
+      "description": "Other MinIO buckets not enumerated — root listing denied. May contain sensitive data.",
+      "recommended_specialist": "WEBDIG (Phase 3)"
+    }
+  ],
+  "oracle_recommendations": [
+    {
+      "priority": 1,
+      "action": "Web enumeration of CamaleonCMS — identify version, enumerate paths, check for additional attack surface",
+      "rationale": "CamaleonCMS has three high-severity CVEs (2024-46986, 2024-46987, 2025-2304) all requiring auth. Registration is open. Version confirmation is critical."
+    },
+    {
+      "priority": 2,
+      "action": "Register account on CamaleonCMS and test CVE-2025-2304 (mass assignment privesc)",
+      "rationale": "If CamaleonCMS version < 2.9.1, mass assignment during registration can escalate to admin. Admin access enables file write (RCE) and path traversal."
+    },
+    {
+      "priority": 3,
+      "action": "Enumerate MinIO buckets via authenticated access or brute-force common bucket names",
+      "rationale": "MinIO may contain application secrets, backups, or credentials. Root listing denied but individual bucket names can be guessed."
+    }
+  ],
+  "tools_executed": [
+    {
+      "tool": "nmap",
+      "command": "nmap -p- -sC -sV -T4 --min-rate=1000 10.129.6.121",
+      "output_file": "../shared/raw/full_scan.txt"
+    },
+    {
+      "tool": "whatweb",
+      "command": "whatweb -a 3 http://facts.htb/",
+      "output_file": "inline"
+    },
+    {
+      "tool": "curl",
+      "command": "curl -sI http://10.129.6.121:54321/",
+      "output_file": "inline"
+    },
+    {
+      "tool": "curl",
+      "command": "curl -s http://10.129.6.121:54321/randomfacts/",
+      "output_file": "inline"
+    }
+  ],
+  "raw_output_dir": "../shared/raw/"
+}

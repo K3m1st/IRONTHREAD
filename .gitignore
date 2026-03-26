@@ -6,3 +6,4 @@
 .claude/
 !.claude/commands/
 __pycache__/
+boxes/Kobold/oracle/hydra.restore

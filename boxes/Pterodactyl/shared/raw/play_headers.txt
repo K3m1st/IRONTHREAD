@@ -1,0 +1,8 @@
+HTTP/1.1 302 Moved Temporarily
+Server: nginx/1.21.5
+Date: Thu, 19 Mar 2026 02:24:45 GMT
+Content-Type: text/html
+Content-Length: 145
+Connection: keep-alive
+Location: http://pterodactyl.htb/
+

@@ -1,0 +1,119 @@
+
+[2K.svn/entries            [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 49ms][0m
+
+[2K.git/HEAD               [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 51ms][0m
+
+[2K@                       [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 52ms][0m
+
+[2K_vti_bin/shtml.dll      [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 53ms][0m
+
+[2K_vti_bin/_vti_adm/admin.dll [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 53ms][0m
+
+[2K_vti_bin/_vti_aut/author.dll [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 53ms][0m
+
+[2Kadmin                   [Status: 200, Size: 1407, Words: 164, Lines: 50, Duration: 44ms][0m
+
+[2KADMIN                   [Status: 200, Size: 1407, Words: 164, Lines: 50, Duration: 44ms][0m
+
+[2KAdmin                   [Status: 200, Size: 1407, Words: 164, Lines: 50, Duration: 44ms][0m
+
+[2Kcgi-bin/                [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 45ms][0m
+
+[2KCVS/Entries             [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 39ms][0m
+
+[2KCVS/Root                [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 42ms][0m
+
+[2KCVS/Repository          [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 41ms][0m
+
+[2KDocuments and Settings  [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 47ms][0m
+
+[2KProgram Files           [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 46ms][0m
+
+[2Kreports list            [Status: 400, Size: 166, Words: 6, Lines: 8, Duration: 46ms][0m
+
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.129.9.2
+ :: Wordlist         : FUZZ: /usr/share/wordlists/dirb/common.txt
+ :: Header           : Host: FUZZ.snapped.htb
+ :: Follow redirects : false
+ :: Calibration      : true
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: all
+ :: Filter           : Response status: 301,302
+________________________________________________
+
+
+[2K:: Progress: [40/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [40/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [40/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [53/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [56/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [75/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [81/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [147/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [154/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [156/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [199/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [296/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [328/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [329/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [330/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [416/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [535/4614] :: Job [1/1] :: 0 req/sec :: Duration: [0:00:00] :: Errors: 0 ::
+[2K:: Progress: [644/4614] :: Job [1/1] :: 881 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [753/4614] :: Job [1/1] :: 892 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [864/4614] :: Job [1/1] :: 995 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [867/4614] :: Job [1/1] :: 930 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [991/4614] :: Job [1/1] :: 947 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1098/4614] :: Job [1/1] :: 881 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1174/4614] :: Job [1/1] :: 913 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1175/4614] :: Job [1/1] :: 900 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1177/4614] :: Job [1/1] :: 900 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1213/4614] :: Job [1/1] :: 947 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1316/4614] :: Job [1/1] :: 904 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1365/4614] :: Job [1/1] :: 843 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1436/4614] :: Job [1/1] :: 956 req/sec :: Duration: [0:00:01] :: Errors: 0 ::
+[2K:: Progress: [1520/4614] :: Job [1/1] :: 917 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [1640/4614] :: Job [1/1] :: 961 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [1724/4614] :: Job [1/1] :: 843 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [1844/4614] :: Job [1/1] :: 985 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [1964/4614] :: Job [1/1] :: 1030 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [2089/4614] :: Job [1/1] :: 1030 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [2190/4614] :: Job [1/1] :: 925 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [2302/4614] :: Job [1/1] :: 943 req/sec :: Duration: [0:00:02] :: Errors: 0 ::
+[2K:: Progress: [2419/4614] :: Job [1/1] :: 952 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [2528/4614] :: Job [1/1] :: 865 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [2638/4614] :: Job [1/1] :: 913 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [2759/4614] :: Job [1/1] :: 975 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [2881/4614] :: Job [1/1] :: 995 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [3002/4614] :: Job [1/1] :: 1041 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [3107/4614] :: Job [1/1] :: 943 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [3204/4614] :: Job [1/1] :: 975 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [3210/4614] :: Job [1/1] :: 943 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+[2K:: Progress: [3315/4614] :: Job [1/1] :: 836 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [3416/4614] :: Job [1/1] :: 888 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [3432/4614] :: Job [1/1] :: 952 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [3553/4614] :: Job [1/1] :: 975 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [3658/4614] :: Job [1/1] :: 943 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [3760/4614] :: Job [1/1] :: 884 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [3882/4614] :: Job [1/1] :: 938 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [4002/4614] :: Job [1/1] :: 1020 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [4122/4614] :: Job [1/1] :: 1075 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
+[2K:: Progress: [4206/4614] :: Job [1/1] :: 909 req/sec :: Duration: [0:00:05] :: Errors: 0 ::
+[2K:: Progress: [4329/4614] :: Job [1/1] :: 956 req/sec :: Duration: [0:00:05] :: Errors: 0 ::
+[2K:: Progress: [4449/4614] :: Job [1/1] :: 1000 req/sec :: Duration: [0:00:05] :: Errors: 0 ::
+[2K:: Progress: [4553/4614] :: Job [1/1] :: 858 req/sec :: Duration: [0:00:05] :: Errors: 0 ::
+[2K:: Progress: [4614/4614] :: Job [1/1] :: 925 req/sec :: Duration: [0:00:05] :: Errors: 0 ::
+[2K:: Progress: [4614/4614] :: Job [1/1] :: 925 req/sec :: Duration: [0:00:05] :: Errors: 0 ::

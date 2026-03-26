@@ -1,0 +1,181 @@
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Thu, 26 Mar 2026 15:39:58 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+
+<!DOCTYPE html>
+<!--
+	Landed by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <style>
+    #output {
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        background: #111;
+        color: #eee;
+        padding: 1em;
+        border-radius: 5px;
+        height: 400px;
+        overflow-y: auto;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    #banner .content {
+        text-align: center;
+        margin: 0 auto;
+    }
+    #banner form {
+        display: inline-block;
+        text-align: left;
+        margin: 1em auto;
+    }
+</style>
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+    <title>Emulate Chrome Extension</title>
+    <!-- <style>
+        body { font-family: monospace; background: #222; color: #eee; }
+        #output { background: #111; padding: 1em; border-radius: 5px; height: 400px; overflow-y: auto; }
+    </style> -->
+    <script>
+        function pollOutput() {
+            fetch('upload.php?output=1')
+                .then(r => r.text())
+                .then(txt => {
+                    // Split output into lines
+                    const lines = txt.split('\n');
+                    // Build output preserving line breaks
+                    const outputElem = document.getElementById('output');
+                    outputElem.innerHTML = ''; // Clear previous
+                    lines.forEach(line => {
+                        if (line.includes('extension')) {
+                            const span = document.createElement('span');
+                            span.style.color = 'red';
+                            span.textContent = line;
+                            outputElem.appendChild(span);
+                        } else {
+                            outputElem.appendChild(document.createTextNode(line));
+                        }
+                        outputElem.appendChild(document.createTextNode('\n'));
+                    });
+                });
+        }
+        window.onload = function() {
+                    }
+</script>
+</head>
+    <body>
+        <div id="page-wrapper">
+
+            <!-- Header -->
+            <header id="header">
+                <h1 id="logo"><a href="index.html">Browsed.htb</a></h1>
+                <nav id="nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+			<li><a href="samples.html">Samples</a></li>
+                        <li><a href="upload.php" class="button primary">Upload Extension</a></li>
+                    </ul>
+                </nav>
+            </header>
+
+            <!-- Banner / Upload Form -->
+            <section id="banner">
+                <div class="content">
+                    <header>
+                        <h2>Upload Your Chrome Extension</h2>
+                        <p>Share your Chrome extension (zip format) with us! <br>A developper will use it and reach back with some feedback<br>
+                        Files must be directly inside the archive, not in a folder.</p>
+                    </header>
+                    <br>
+                    <form method="post" enctype="multipart/form-data">
+                        <label>Upload Chrome Extension (.zip):</label>
+                        <input type="file" name="extension" accept=".zip" required>
+                        <button type="submit" class="button primary">Send to the developer</button>
+                    </form>
+                    <h3>Output (takes ~10s)</h3>
+                    <pre id="output"></pre>
+<button id="copyBtn" class="button primary" style="margin-top:10px;">Copy Output</button>
+                </div>
+            </section>
+            <!-- Footer -->
+            <footer id="footer">
+                <ul class="icons">
+                    <li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
+                    <li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+                    <li><a href="#" class="icon solid alt fa-envelope"><span class="label">Email</span></a></li>
+                </ul>
+                <ul class="copyright">
+                    <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </footer>
+
+        </div>
+
+        <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/jquery.dropotron.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+    </body>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const copyBtn = document.getElementById('copyBtn');
+    const output = document.getElementById('output');
+
+    if (copyBtn && output) {
+        copyBtn.addEventListener('click', function() {
+            const text = output.innerText;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                // Modern way (requires HTTPS/localhost)
+                navigator.clipboard.writeText(text).then(() => {
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => copyBtn.textContent = "Copy Output", 1500);
+                });
+            } else {
+                // Fallback for HTTP
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.style.position = "fixed"; // avoid scrolling
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => copyBtn.textContent = "Copy Output", 1500);
+                } catch (err) {
+                    alert("Copy failed: " + err);
+                }
+                document.body.removeChild(textarea);
+            }
+        });
+    }
+});
+    </script>
+</html>
+
+

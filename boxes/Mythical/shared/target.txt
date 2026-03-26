@@ -1,0 +1,2 @@
+BOX_NAME=Mythical
+TARGET_IP=10.13.38.32

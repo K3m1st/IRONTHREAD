@@ -1,0 +1,46 @@
+{
+  "operation": "Facts",
+  "timestamp": "2026-03-18T19:25:00-05:00",
+  "phase": "EXPLOITATION",
+  "elliot_authorized": true,
+  "scope": {
+    "objective": "Escalate from trivia (uid 1000) to root via sudo facter privilege escalation. Read /root/root.txt.",
+    "in_scope": [
+      "10.129.6.121 via SSH as trivia (key: /tmp/trivia_key, no passphrase)",
+      "sudo /usr/bin/facter — runs as ALL with NOPASSWD",
+      "Facter custom fact loading for Ruby code execution",
+      "Local privilege escalation techniques on the target host"
+    ],
+    "out_of_scope": "everything not listed above",
+    "stop_conditions": [
+      "root shell obtained and root.txt read",
+      "objective exhausted — facter approach fails after 3 attempts",
+      "3 failed attempts on single path",
+      "turn budget exhausted"
+    ],
+    "max_attempts_per_path": 3,
+    "max_turns": 10
+  },
+  "context_files": [
+    "../shared/attack_surface.md",
+    "../shared/scouting_report.json"
+  ],
+  "primary_path": "Facter custom facts: Create a malicious Ruby fact file in a custom facts directory (e.g., /tmp/facts/), then run 'sudo /usr/bin/facter --custom-dir /tmp/facts/' to execute arbitrary Ruby code as root. The fact file should contain a Facter.add block with system() or exec() calls. Read /root/root.txt.",
+  "backup_path": "If --custom-dir flag is restricted, try FACTERLIB environment variable: 'sudo FACTERLIB=/tmp/facts /usr/bin/facter'. Also try: facter loads facts from ~/.puppetlabs/opt/puppet/cache/lib/facter/ or /opt/puppetlabs/puppet/cache/lib/facter/. Check 'facter --help' for all options.",
+  "vulnerability_primitive": {
+    "primitive": "Arbitrary Ruby code execution via sudo facter — facter is a Ruby-based tool that loads and evaluates Ruby files from custom fact directories",
+    "delivery_forms": [
+      "Custom fact via --custom-dir flag: sudo /usr/bin/facter --custom-dir /tmp/facts/",
+      "Custom fact via FACTERLIB env var: sudo FACTERLIB=/tmp/facts /usr/bin/facter",
+      "Custom fact placed in default fact search paths",
+      "Direct Ruby execution if facter is a Ruby script: manipulate RUBYLIB or GEM_PATH"
+    ],
+    "defenses_observed": "None — sudo grants NOPASSWD access with no env restrictions visible. env_reset is set but FACTERLIB may still pass through.",
+    "untested_forms": [
+      "FACTERLIB environment variable passthrough with sudo",
+      "Default custom fact directories writeable by trivia",
+      "--custom-dir flag accepted with sudo"
+    ]
+  },
+  "notes": "SSH access: ssh -i /tmp/trivia_key trivia@10.129.6.121 (key has no passphrase, already decrypted). The trivia user has sudo NOPASSWD on /usr/bin/facter. Facter is a Puppet tool that evaluates Ruby facts files. Write a malicious .rb fact file and point facter to it. This should give immediate root code execution."
+}
