@@ -113,7 +113,9 @@ Before complex exploitation, call `memoria_get_credentials` to check for recover
 These cost seconds, not turns. Only use what is already surfaced — do not enumerate or guess.
 
 ### Step 4 — Execute
-Move deliberately. Document every action in `../shared/exploit_log.md` as you go — not after. Use the format in `../shared/schemas/EXPLOIT_LOG_TEMPLATE.md`.
+Move deliberately. Document every action in `../shared/exploit_log.md` as you go — not after.
+
+**Credential rule:** Any time you encounter a credential during exploitation — in a config file, database dump, web response, environment variable — call `memoria_store_credential` immediately. Do not wait until the access milestone. The vault is how Oracle and NOIRE access creds without parsing your exploit log.
 
 **Turn counting:** Every significant action (running a tool, exploit attempt, validation step, web research) increments your counter. Log writing is not a turn.
 

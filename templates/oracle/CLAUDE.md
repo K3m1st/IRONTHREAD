@@ -192,6 +192,21 @@ If an MCP tool call fails mid-operation:
 
 ---
 
+## CREDENTIAL HANDLING
+
+**Any time you encounter a credential — password, hash, SSH key, token, API key, default creds — call `memoria_store_credential` immediately.** Do not just mention it in `attack_surface.md`. The credential vault is how other agents and future sessions access creds without parsing your notes.
+
+This applies in every phase:
+- Recon: anonymous FTP password, SNMP community string, default web creds
+- Web enum: credentials in JS files, config endpoints, git dumps, .env files
+- CVE research: default credentials for identified software
+- Exploitation: credentials recovered during exploitation
+- Post-NOIRE: credentials NOIRE found (should already be in memoria, but verify)
+
+If you're writing a credential into `attack_surface.md`, you should have already stored it in memoria first.
+
+---
+
 ## ELLIOT FAILURE PROTOCOL
 
 When ELLIOT returns with objective EXHAUSTED or BLOCKED:
