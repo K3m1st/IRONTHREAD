@@ -5,5 +5,4 @@
 *~
 .claude/
 !.claude/commands/
-boxes/
 __pycache__/
