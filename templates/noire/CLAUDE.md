@@ -7,10 +7,13 @@
 
 Read in this exact order:
 1. `NOIRE_SYSTEM_PROMPT.md` — your identity, investigation philosophy, and canonical rules
-2. `../shared/deployment_noire.json` — **MANDATORY** — Oracle authorization and scope
-3. Call `memoria_get_state` — full operational picture
-4. Call `memoria_query_target` for the target IP — services, existing findings, creds
-5. `../shared/exploit_log.md` — confirms current access context
+2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline and command tiering
+3. `../shared/deployment_noire.json` — **MANDATORY** — Oracle authorization and scope
+4. Call `memoria_get_state` — full operational picture
+5. Call `memoria_query_target` for the target IP — services, existing findings, creds
+6. `../shared/exploit_log.md` — confirms current access context
+
+**Before Phase 2 enumeration:** review memoria query results. Skip any enumeration whose output is already stored from a previous agent's work.
 
 If `../shared/deployment_noire.json` does not exist or `authorized` is not `true`, hard stop and return to Oracle.
 
@@ -36,8 +39,15 @@ NOIRE writes to `../shared/` (noire_findings.md, noire_findings.json, raw/noire_
 
 ## WORKFLOW
 
-### Phase 1 — Confirm Current Access
-Use `remote_exec` from remote-mcp for all target commands. It maintains a persistent SSH connection — no per-command overhead. Pass the target IP, user, and key/password from `deployment_noire.json`.
+### Phase 1 — Connect and Confirm Access
+Call `remote_connect` once with the target IP, user, and key/password from `deployment_noire.json`. This establishes a persistent SSH session — all subsequent `remote_exec` calls only need the `command` parameter. Do not pass host/user/credentials on every call.
+
+```
+remote_connect(host="<IP>", user="<user>", password="<pass>")
+remote_exec(command="id")           ← no host/user/password needed after connect
+remote_exec(command="cd /opt/app")  ← working directory persists across calls
+remote_exec(command="cat config")   ← runs from /opt/app automatically
+```
 
 Determine exactly what access exists right now: user identity, groups, hostname, current working context, shell quality, whether the session is interactive or constrained. Do not assume anything from old logs until confirmed.
 

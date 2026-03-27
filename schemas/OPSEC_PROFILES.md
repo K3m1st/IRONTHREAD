@@ -125,16 +125,40 @@ Goal: Zero automated detection. Accept operations take days/weeks.
 
 ### Post-Access / LOTL
 
-| Technique | Rating | Notes |
-|-----------|--------|-------|
-| Built-in OS commands (id, whoami, cat) | NONE | Normal system operation |
-| sudo -l | NONE | Standard user action |
-| find -perm -4000 | LOW | Logged in audit but common |
-| ps aux / ss -tlnp | NONE | Normal admin activity |
-| cat /etc/shadow (as root) | LOW | Logged in audit |
-| SSH key planting | LOW | Single file write |
-| Reverse shell (bash -i) | MEDIUM | Outbound connection anomaly |
-| Process injection | HIGH | EDR behavioral detection |
+> **Important:** These ratings assume no EDR/auditd. For environments with monitoring,
+> see `TRADECRAFT_PLAYBOOK.md` Section 8 for adjusted ratings by detection stack.
+> The single noisiest pattern is a **discovery burst** — 5+ enumeration commands within 60s.
+
+| Technique | Rating (No EDR) | Rating (auditd/SIEM) | Notes |
+|-----------|-----------------|----------------------|-------|
+| /proc filesystem reads | NONE | NONE | Always prefer these — zero execve events |
+| `id` (single) | NONE | LOW | Splunk `d1ff2e22` (informational severity) |
+| `whoami` (single) | NONE | MEDIUM | Splunk + FortiSIEM have dedicated rules |
+| `getent passwd` | NONE | NONE | NSS lookup, not file access — prefer over `cat /etc/passwd` |
+| `cat /etc/passwd` | NONE | MEDIUM | auditd file watch (Splunk `0419cb7a`) |
+| `sudo -n -l` | NONE | LOW | Non-interactive, minimal auth.log entry |
+| `echo pass \| sudo -S` | NONE | **HIGH** | Password in EXECVE + /proc/PID/cmdline — NEVER DO THIS |
+| `find /usr/bin -perm -4000` | NONE | LOW | Scoped to binary dirs — acceptable |
+| `find / -perm -4000` | LOW | **HIGH** | Elastic `5b06a27f`, massive I/O |
+| `getcap /usr/bin/python3` | NONE | NONE | Targeted — no detection rule |
+| `getcap -r /` | LOW | MEDIUM | Sigma `fe10751f` |
+| `ps aux` / `ss -tlnp` | NONE | LOW | Normal admin activity |
+| `cat /etc/shadow` (as root) | NONE | **HIGH** | auditd file watch always fires |
+| `find / -writable` | LOW | **HIGH** | Massive syscall volume, SIEM correlation |
+| SSH key planting | LOW | MEDIUM | Elastic authorized_keys rule |
+| `ssh-keygen` on target | LOW | MEDIUM | Elastic SSH key generation rule |
+| Localhost SSH | LOW | MEDIUM | Anomalous — easy syslog correlation |
+| Discovery burst (5+ cmds/60s) | NONE | **HIGH** | SIEM correlation — the #1 detection signal |
+| Reverse shell (bash -i) | MEDIUM | MEDIUM | Outbound connection anomaly |
+| Process injection | HIGH | HIGH | EDR behavioral detection |
+
+**Post-access timing requirements by profile:**
+
+| Profile | Inter-command delay | Batching | Tier 3+ commands |
+|---------|-------------------|----------|------------------|
+| LOUD | None | Unrestricted | Unrestricted |
+| MODERATE | 15-45s jitter | Batch by intent only | Justify before running |
+| GHOST | 60-180s Gaussian | Single purpose per command | Operator approval required |
 
 ---
 

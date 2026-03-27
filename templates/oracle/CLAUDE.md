@@ -7,8 +7,11 @@
 
 **Before anything else, read in this exact order:**
 1. `ORACLE_SYSTEM_PROMPT.md` — your identity, rules, and reasoning frameworks
-2. Call `memoria_get_state` — full operational awareness (phase, targets, services, findings, creds, recent actions)
-3. `../shared/attack_surface.md` — your analytical notebook and decision log (if it exists)
+2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline reference for the full team
+3. Call `memoria_get_state` — full operational awareness (phase, targets, services, findings, creds, recent actions)
+4. `../shared/attack_surface.md` — your analytical notebook and decision log (if it exists)
+
+When writing handoff.json or deployment_noire.json, include the operation's `opsec_profile` (LOUD/MODERATE/GHOST) so downstream agents know their timing and command discipline constraints. Reference the tradecraft playbook for post-access noise ratings — the old OPSEC_PROFILES.md underrates post-access command noise.
 
 Memoria is the source of truth for structured state. `attack_surface.md` is your thinking document — reasoning, primitive analysis, decision rationale.
 
@@ -18,7 +21,12 @@ Call `memoria_get_state` first. This verifies MCP is working AND loads operation
 
 - **If MCP fails** → tools are not loaded. Check `.mcp.json` at the git root.
 - **If memoria returns state** → you are resuming. Use returned state as primary context.
-- **If memoria returns empty** → fresh operation. Call `memoria_set_state` with `key: "current_phase", value: "recon"`. Begin Phase 1.
+- **If memoria returns empty** → fresh operation. Initialize state:
+  ```
+  memoria_set_state(key: "current_phase", value: "recon")
+  memoria_set_state(key: "system_version", value: "v2.0-tradecraft")
+  ```
+  Begin Phase 1.
 
 ```
 [ORACLE] State: {FRESH / RESUMING — phase: {phase}, targets: {N}, findings: {N}}
@@ -59,7 +67,7 @@ You have four MCP tool servers. Use them directly.
 | `memoria_query_target` | Everything known about one specific target |
 
 ### sova-mcp (Reconnaissance)
-Tools: `sova_full_scan`, `sova_whatweb`, `sova_banner_grab`, `sova_zone_transfer`, `sova_null_session`, `sova_anon_ftp`, `sova_add_hosts`. All take `output_dir` — use `../shared/raw/`.
+Tools: `sova_full_scan`, `sova_udp_scan`, `sova_whatweb`, `sova_banner_grab`, `sova_zone_transfer`, `sova_null_session`, `sova_anon_ftp`, `sova_add_hosts`. All take `output_dir` — use `../shared/raw/`.
 
 ### webdig-mcp (Web Enumeration)
 Tools: `webdig_dir_bust`, `webdig_vhost_fuzz`, `webdig_curl`, `webdig_js_review`. All take `output_dir` — use `../shared/raw/`.
@@ -70,7 +78,7 @@ Tools: `webdig_dir_bust`, `webdig_vhost_fuzz`, `webdig_curl`, `webdig_js_review`
 
 ### Phase 1 — Reconnaissance
 
-**Always start with `sova_full_scan`.** Then reason through each service. Use additional sova tools as needed (whatweb for web, zone transfer for DNS, null session for SMB, anon FTP for FTP). Stop at identification — do not enumerate beyond what's needed to assess exposure.
+**Always start with `sova_full_scan`.** Then reason through each service. Use additional sova tools as needed (whatweb for web, zone transfer for DNS, null session for SMB, anon FTP for FTP). Use `sova_udp_scan` when SNMP, TFTP, or other UDP services are likely (infrastructure targets, network devices, boxes with few TCP services). Stop at identification — do not enumerate beyond what's needed to assess exposure.
 
 **If nmap reveals a hostname or domain**, immediately use `sova_add_hosts` before any web enumeration.
 
@@ -119,7 +127,9 @@ Operator decision required.
 
 **Complexity determines who executes:**
 
-**Trivial / Standard → You execute directly via `remote_exec`.**
+**Trivial / Standard → You execute directly via remote-mcp.**
+
+Call `remote_connect` once with the target's credentials, then use `remote_exec` with just the command. Working directory persists across calls.
 
 When executing directly:
 - Log every action to memoria (`memoria_log_action`)

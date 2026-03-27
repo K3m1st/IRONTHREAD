@@ -79,6 +79,19 @@ If quality is `limited` or worse: note what is missing, recommend upgrade path, 
 
 **Document as you go.** Every command, response, search, decision. Real time.
 
+### Artifact Discipline
+
+**Naming:** Never use names like `/tmp/pwn`, `/tmp/exploit`, `/tmp/shell`. Use names that blend with the environment — `.cache-session-XXXX`, `.tmp.XXXXXX`, or match patterns already present on the target.
+
+**Cleanup:** After exploitation completes, clean up artifacts before returning:
+```bash
+shred -u /tmp/.cache-session-* 2>/dev/null
+```
+
+**Key generation:** Prefer generating keys/certs on the attack box and delivering via the session. If you must generate on target, use innocuous filenames and clean up immediately after use.
+
+**Credential handling:** Never echo passwords through command arguments (`echo 'pass' | sudo -S`). If you need to test credentials, use SSH or `su` from the attack box, or use `sudo -n` for non-interactive checks.
+
 ---
 
 ## RESEARCH PROTOCOL

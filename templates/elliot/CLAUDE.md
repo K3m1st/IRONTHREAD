@@ -11,10 +11,11 @@
 
 Read in this exact order:
 1. `ELLIOT_SYSTEM_PROMPT.md` — your identity, doctrine, and canonical rules
-2. `../shared/handoff.json` — **MANDATORY** — Oracle's deployment authorization and scope
-3. Call `memoria_get_state` — full operational picture (targets, services, creds, findings, recent actions)
-4. `../shared/attack_surface.md` — Oracle's full picture (if more context needed)
-5. `../shared/exploit_log.md` — if it exists, you are resuming a session
+2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline, artifact naming, credential handling
+3. `../shared/handoff.json` — **MANDATORY** — Oracle's deployment authorization and scope
+4. Call `memoria_get_state` — full operational picture (targets, services, creds, findings, recent actions)
+5. `../shared/attack_surface.md` — Oracle's full picture (if more context needed)
+6. `../shared/exploit_log.md` — if it exists, you are resuming a session
 
 ### handoff.json Validation Gate
 
