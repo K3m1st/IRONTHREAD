@@ -138,6 +138,26 @@ def _ok(data: dict) -> list[TextContent]:
     return [TextContent(type="text", text=json.dumps(data, default=str))]
 
 
+def _mask_secret(secret: str | None) -> str:
+    """Mask a secret value, showing only first 4 chars."""
+    if not secret:
+        return "***"
+    return secret[:4] + "***" if len(secret) > 4 else "***"
+
+
+def _mask_credentials(creds: list[dict], include_secrets: bool = False) -> list[dict]:
+    """Mask secret values in credential dicts unless explicitly requested."""
+    if include_secrets:
+        return creds
+    masked = []
+    for c in creds:
+        row = dict(c)
+        if "secret" in row:
+            row["secret"] = _mask_secret(row["secret"])
+        masked.append(row)
+    return masked
+
+
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
@@ -260,6 +280,11 @@ async def list_tools() -> list[Tool]:
                     "username": {"type": "string"},
                     "cred_type": {"type": "string"},
                     "verified_only": {"type": "boolean", "default": False},
+                    "include_secrets": {
+                        "type": "boolean",
+                        "description": "Return full unmasked secrets (default: false)",
+                        "default": False,
+                    },
                 },
                 "required": [],
             },
@@ -348,6 +373,11 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "target_ip": {"type": "string", "description": "Target IP to query"},
+                    "include_secrets": {
+                        "type": "boolean",
+                        "description": "Return full unmasked secrets (default: false)",
+                        "default": False,
+                    },
                 },
                 "required": ["target_ip"],
             },
@@ -596,10 +626,11 @@ def _handle_get_credentials(conn: sqlite3.Connection, args: dict) -> list[TextCo
 
     query += " ORDER BY c.created_at DESC"
     rows = conn.execute(query, params).fetchall()
+    include_secrets = args.get("include_secrets", False)
     return _ok({
         "tool": "memoria_get_credentials",
         "count": len(rows),
-        "credentials": [dict(r) for r in rows],
+        "credentials": _mask_credentials([dict(r) for r in rows], include_secrets),
     })
 
 
@@ -712,11 +743,13 @@ def _handle_query_target(conn: sqlite3.Connection, args: dict) -> list[TextConte
         ).fetchall()
     ]
 
-    credentials = [
-        dict(c) for c in conn.execute(
+    include_secrets = args.get("include_secrets", False)
+    credentials = _mask_credentials(
+        [dict(c) for c in conn.execute(
             "SELECT * FROM credentials WHERE target_id = ? ORDER BY created_at DESC", (tid,)
-        ).fetchall()
-    ]
+        ).fetchall()],
+        include_secrets,
+    )
 
     findings = [
         dict(f) for f in conn.execute(

@@ -12,6 +12,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+import subprocess
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from common import ts as _ts, save_output as _save, run_cmd as _run
@@ -92,6 +93,19 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "target_ip": {"type": "string", "description": "Target IP address"},
                     "output_dir": {"type": "string", "description": "Directory to save raw output"},
+                },
+                "required": ["target_ip", "output_dir"],
+            },
+        ),
+        Tool(
+            name="sova_udp_scan",
+            description="Top UDP port scan with version detection. Wraps: nmap -sU --top-ports N -sV -T4. Requires sudo.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "target_ip": {"type": "string", "description": "Target IP address"},
+                    "output_dir": {"type": "string", "description": "Directory to save raw output"},
+                    "top_ports": {"type": "integer", "description": "Number of top UDP ports to scan", "default": 100},
                 },
                 "required": ["target_ip", "output_dir"],
             },
@@ -235,6 +249,25 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             }),
         )]
 
+    elif name == "sova_udp_scan":
+        target_ip = arguments["target_ip"]
+        top_ports = arguments.get("top_ports", 100)
+        cmd = ["sudo", "nmap", "-sU", "--top-ports", str(top_ports), "-sV", "-T4", target_ip]
+        rc, stdout, stderr = _run(cmd, timeout=600)
+        raw_file = _save(output_dir, f"sova_udp_scan_{ts}.txt", stdout + "\n" + stderr)
+        return [TextContent(
+            type="text",
+            text=json.dumps({
+                "tool": "sova_udp_scan",
+                "target": target_ip,
+                "command": " ".join(cmd),
+                "return_code": rc,
+                "raw_output_file": raw_file,
+                "output": stdout,
+                "errors": stderr if stderr else None,
+            }),
+        )]
+
     elif name == "sova_add_hosts":
         import re
         ip = arguments["ip"]
@@ -279,10 +312,21 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 }),
             )]
 
-        # Build the line and append via sudo tee
+        # Build the line and append via sudo tee (stdin, no shell interpolation)
         hosts_line = f"{ip}\t{' '.join(added)}"
-        cmd = ["sudo", "bash", "-c", f"echo '{hosts_line}' >> /etc/hosts"]
-        rc, stdout, stderr = _run(cmd, timeout=10)
+        try:
+            result = subprocess.run(
+                ["sudo", "tee", "-a", "/etc/hosts"],
+                input=hosts_line + "\n",
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            rc, stderr = result.returncode, result.stderr
+        except subprocess.TimeoutExpired:
+            rc, stderr = -1, "tee timed out after 10s"
+        except FileNotFoundError:
+            rc, stderr = -1, "sudo or tee not found"
 
         return [TextContent(
             type="text",

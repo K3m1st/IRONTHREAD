@@ -2,7 +2,7 @@
 """Remote — Persistent SSH session pool for IRONTHREAD operations.
 
 Maintains long-lived Paramiko connections keyed by (host, user).
-Agents call remote_exec instead of spawning individual SSH processes.
+Agents call remote_connect once, then remote_exec with just a command.
 Connections auto-reconnect on failure. All commands are logged to
 memoria if available.
 """
@@ -10,6 +10,7 @@ memoria if available.
 import asyncio
 import json
 import os
+import re
 import sqlite3
 import threading
 import time
@@ -23,11 +24,15 @@ from mcp.types import TextContent, Tool
 server = Server("remote-mcp")
 
 # ---------------------------------------------------------------------------
-# Connection pool
+# Connection pool + active session
 # ---------------------------------------------------------------------------
 
 _pool: dict[str, paramiko.SSHClient] = {}  # key: "user@host"
 _pool_lock = threading.Lock()
+
+# Single active session — stores connection params so agents don't repeat them.
+# Set by remote_connect, cleared by remote_disconnect.
+_active_session: dict = {}
 
 
 def _pool_key(host: str, user: str) -> str:
@@ -106,6 +111,24 @@ def _close_connection(host: str, user: str) -> bool:
                 pass
             return True
     return False
+
+
+def _resolve_session(args: dict) -> dict:
+    """Resolve connection params: explicit args > active session > error.
+
+    Returns dict with host, user, key_path, password, port or raises ValueError.
+    """
+    host = args.get("host") or _active_session.get("host")
+    if not host:
+        raise ValueError("No host specified and no active session. Call remote_connect first.")
+
+    return {
+        "host": host,
+        "user": args.get("user") or _active_session.get("user", "root"),
+        "key_path": args.get("key_path") or _active_session.get("key_path"),
+        "password": args.get("password") or _active_session.get("password"),
+        "port": args.get("port") or _active_session.get("port", 22),
+    }
 
 
 def _exec_command(
@@ -188,20 +211,40 @@ def _log_to_memoria(host: str, agent: str, command: str, result: str, exit_code:
 async def list_tools() -> list[Tool]:
     return [
         Tool(
-            name="remote_exec",
+            name="remote_connect",
             description=(
-                "Execute a command on a remote target over a persistent SSH "
-                "connection. Reuses existing connections — no per-command "
-                "handshake overhead. Auto-reconnects on failure."
+                "Establish an SSH session to a target. Call once per target — "
+                "after connecting, remote_exec only needs 'command'. "
+                "Credentials are remembered for the session."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "host": {"type": "string", "description": "Target IP or hostname"},
-                    "command": {"type": "string", "description": "Command to execute"},
                     "user": {"type": "string", "description": "SSH username", "default": "root"},
+                    "key_path": {"type": "string", "description": "Path to SSH private key"},
+                    "password": {"type": "string", "description": "SSH password"},
+                    "port": {"type": "integer", "description": "SSH port", "default": 22},
+                },
+                "required": ["host"],
+            },
+        ),
+        Tool(
+            name="remote_exec",
+            description=(
+                "Execute a command on the active target. Call remote_connect "
+                "first, then only 'command' is needed. Working directory "
+                "persists across calls (use 'cd /path' to change it). "
+                "Host/user/credentials can override the active session."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "command": {"type": "string", "description": "Command to execute"},
+                    "host": {"type": "string", "description": "Target IP (optional if remote_connect was called)"},
+                    "user": {"type": "string", "description": "SSH username (optional if remote_connect was called)"},
                     "key_path": {"type": "string", "description": "Path to SSH private key (optional)"},
-                    "password": {"type": "string", "description": "SSH password (optional, prefer key)"},
+                    "password": {"type": "string", "description": "SSH password (optional)"},
                     "port": {"type": "integer", "description": "SSH port", "default": 22},
                     "timeout": {"type": "integer", "description": "Command timeout in seconds", "default": 30},
                     "agent": {
@@ -210,55 +253,54 @@ async def list_tools() -> list[Tool]:
                         "enum": ["ORACLE", "ELLIOT", "NOIRE"],
                     },
                 },
-                "required": ["host", "command"],
+                "required": ["command"],
             },
         ),
         Tool(
             name="remote_upload",
             description=(
-                "Upload a file to a remote target over persistent SSH (SFTP). "
-                "Use for deploying scripts, payloads, or keys."
+                "Upload a file to the active target over SFTP. "
+                "Uses active session if remote_connect was called."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "host": {"type": "string", "description": "Target IP or hostname"},
                     "local_path": {"type": "string", "description": "Local file path to upload"},
                     "remote_path": {"type": "string", "description": "Destination path on target"},
+                    "host": {"type": "string", "description": "Target IP (optional if remote_connect was called)"},
                     "user": {"type": "string", "default": "root"},
                     "key_path": {"type": "string"},
                     "password": {"type": "string"},
                     "port": {"type": "integer", "default": 22},
                     "mode": {"type": "integer", "description": "File permissions (octal as int, e.g. 755)", "default": 644},
                 },
-                "required": ["host", "local_path", "remote_path"],
+                "required": ["local_path", "remote_path"],
             },
         ),
         Tool(
             name="remote_download",
             description=(
-                "Download a file from a remote target over persistent SSH (SFTP). "
-                "Use for extracting configs, databases, or artifacts."
+                "Download a file from the active target over SFTP. "
+                "Uses active session if remote_connect was called."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "host": {"type": "string", "description": "Target IP or hostname"},
                     "remote_path": {"type": "string", "description": "File path on target to download"},
                     "local_path": {"type": "string", "description": "Local destination path"},
+                    "host": {"type": "string", "description": "Target IP (optional if remote_connect was called)"},
                     "user": {"type": "string", "default": "root"},
                     "key_path": {"type": "string"},
                     "password": {"type": "string"},
                     "port": {"type": "integer", "default": 22},
                 },
-                "required": ["host", "remote_path", "local_path"],
+                "required": ["remote_path", "local_path"],
             },
         ),
         Tool(
             name="remote_status",
             description=(
-                "Show active SSH connections in the pool. Use to verify "
-                "connectivity or debug connection issues."
+                "Show active SSH connections and current session info."
             ),
             inputSchema={"type": "object", "properties": {}, "required": []},
         ),
@@ -266,7 +308,7 @@ async def list_tools() -> list[Tool]:
             name="remote_disconnect",
             description=(
                 "Close a specific SSH connection or all connections. "
-                "Use when switching targets or cleaning up."
+                "Clears the active session."
             ),
             inputSchema={
                 "type": "object",
@@ -282,7 +324,9 @@ async def list_tools() -> list[Tool]:
 
 @server.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
-    if name == "remote_exec":
+    if name == "remote_connect":
+        return _handle_connect(arguments)
+    elif name == "remote_exec":
         return _handle_exec(arguments)
     elif name == "remote_upload":
         return _handle_upload(arguments)
@@ -296,52 +340,111 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return _ok({"error": f"Unknown tool: {name}"})
 
 
-# -- remote_exec -------------------------------------------------------------
+# -- remote_connect ----------------------------------------------------------
 
-def _handle_exec(args: dict) -> list[TextContent]:
+def _handle_connect(args: dict) -> list[TextContent]:
+    global _active_session
     host = args["host"]
-    command = args["command"]
     user = args.get("user", "root")
     key_path = args.get("key_path")
     password = args.get("password")
     port = args.get("port", 22)
+
+    try:
+        _get_connection(host, user, key_path, password, port)
+    except Exception as e:
+        return _ok({"tool": "remote_connect", "error": str(e), "host": host})
+
+    _active_session = {
+        "host": host,
+        "user": user,
+        "key_path": key_path,
+        "password": password,
+        "port": port,
+        "cwd": None,
+    }
+
+    return _ok({
+        "tool": "remote_connect",
+        "status": "connected",
+        "connection": _pool_key(host, user),
+        "message": "Session active. remote_exec now only needs 'command'.",
+    })
+
+
+# -- remote_exec -------------------------------------------------------------
+
+def _handle_exec(args: dict) -> list[TextContent]:
+    command = args["command"]
+
+    # Resolve connection params from args or active session
+    try:
+        session = _resolve_session(args)
+    except ValueError as e:
+        return _ok({"tool": "remote_exec", "error": str(e)})
+
+    host = session["host"]
+    user = session["user"]
     timeout = args.get("timeout", 30)
     agent = args.get("agent", "UNKNOWN")
 
+    # Prepend cwd if tracked
+    cwd = _active_session.get("cwd")
+    actual_command = f"cd {cwd} && {command}" if cwd else command
+
     exit_code, stdout, stderr = _exec_command(
-        host, user, command, key_path, password, port, timeout
+        host, user, actual_command,
+        session["key_path"], session["password"], session["port"],
+        timeout,
     )
+
+    # Track bare 'cd <path>' commands
+    cd_match = re.match(r"^cd\s+(\S+)\s*$", command)
+    if cd_match and exit_code == 0:
+        new_dir = cd_match.group(1)
+        # Resolve the actual path on the remote host
+        resolve_cmd = f"cd {cwd + '/' if cwd and not new_dir.startswith('/') else ''}{new_dir} && pwd"
+        _, pwd_out, _ = _exec_command(
+            host, user, resolve_cmd,
+            session["key_path"], session["password"], session["port"], 5,
+        )
+        resolved = pwd_out.strip()
+        if resolved:
+            _active_session["cwd"] = resolved
 
     # Auto-log to memoria
     output = stdout if stdout else stderr
     _log_to_memoria(host, agent, command, output, exit_code)
 
-    return _ok({
+    result = {
         "tool": "remote_exec",
-        "host": host,
-        "user": user,
         "command": command,
         "exit_code": exit_code,
         "stdout": stdout,
         "stderr": stderr if stderr else None,
-        "connection": _pool_key(host, user),
-    })
+    }
+    if cwd:
+        result["cwd"] = cwd
+    return _ok(result)
 
 
 # -- remote_upload ------------------------------------------------------------
 
 def _handle_upload(args: dict) -> list[TextContent]:
-    host = args["host"]
     local_path = args["local_path"]
     remote_path = args["remote_path"]
-    user = args.get("user", "root")
-    key_path = args.get("key_path")
-    password = args.get("password")
-    port = args.get("port", 22)
     mode = args.get("mode", 0o644)
 
     try:
-        client = _get_connection(host, user, key_path, password, port)
+        session = _resolve_session(args)
+    except ValueError as e:
+        return _ok({"tool": "remote_upload", "error": str(e)})
+
+    try:
+        client = _get_connection(
+            session["host"], session["user"],
+            session["key_path"], session["password"], session["port"],
+        )
         sftp = client.open_sftp()
         sftp.put(local_path, remote_path)
         sftp.chmod(remote_path, mode)
@@ -349,7 +452,6 @@ def _handle_upload(args: dict) -> list[TextContent]:
 
         return _ok({
             "tool": "remote_upload",
-            "host": host,
             "local_path": local_path,
             "remote_path": remote_path,
             "mode": oct(mode),
@@ -359,7 +461,6 @@ def _handle_upload(args: dict) -> list[TextContent]:
         return _ok({
             "tool": "remote_upload",
             "error": str(e),
-            "host": host,
             "local_path": local_path,
             "remote_path": remote_path,
         })
@@ -368,16 +469,19 @@ def _handle_upload(args: dict) -> list[TextContent]:
 # -- remote_download ----------------------------------------------------------
 
 def _handle_download(args: dict) -> list[TextContent]:
-    host = args["host"]
     remote_path = args["remote_path"]
     local_path = args["local_path"]
-    user = args.get("user", "root")
-    key_path = args.get("key_path")
-    password = args.get("password")
-    port = args.get("port", 22)
 
     try:
-        client = _get_connection(host, user, key_path, password, port)
+        session = _resolve_session(args)
+    except ValueError as e:
+        return _ok({"tool": "remote_download", "error": str(e)})
+
+    try:
+        client = _get_connection(
+            session["host"], session["user"],
+            session["key_path"], session["password"], session["port"],
+        )
         sftp = client.open_sftp()
         os.makedirs(os.path.dirname(local_path) or ".", exist_ok=True)
         sftp.get(remote_path, local_path)
@@ -386,7 +490,6 @@ def _handle_download(args: dict) -> list[TextContent]:
 
         return _ok({
             "tool": "remote_download",
-            "host": host,
             "remote_path": remote_path,
             "local_path": local_path,
             "size_bytes": size,
@@ -396,7 +499,6 @@ def _handle_download(args: dict) -> list[TextContent]:
         return _ok({
             "tool": "remote_download",
             "error": str(e),
-            "host": host,
             "remote_path": remote_path,
             "local_path": local_path,
         })
@@ -416,22 +518,35 @@ def _handle_status() -> list[TextContent]:
                 "remote_version": transport.remote_version if transport else None,
             })
 
+    session_info = None
+    if _active_session:
+        session_info = {
+            "connection": _pool_key(_active_session["host"], _active_session["user"]),
+            "cwd": _active_session.get("cwd"),
+        }
+
     return _ok({
         "tool": "remote_status",
         "active_connections": len([c for c in connections if c["active"]]),
         "total_connections": len(connections),
         "connections": connections,
+        "active_session": session_info,
     })
 
 
 # -- remote_disconnect --------------------------------------------------------
 
 def _handle_disconnect(args: dict) -> list[TextContent]:
+    global _active_session
     host = args.get("host")
     user = args.get("user", "root")
 
     if host:
         closed = _close_connection(host, user)
+        # Clear active session if it matches
+        if (_active_session.get("host") == host
+                and _active_session.get("user") == user):
+            _active_session = {}
         return _ok({
             "tool": "remote_disconnect",
             "connection": _pool_key(host, user),
@@ -448,6 +563,7 @@ def _handle_disconnect(args: dict) -> list[TextContent]:
                     pass
                 count += 1
             _pool.clear()
+        _active_session = {}
         return _ok({
             "tool": "remote_disconnect",
             "closed_all": True,
