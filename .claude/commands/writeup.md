@@ -27,7 +27,7 @@ Ask the operator:
 
 ## Step 2 — Write Public Writeup
 
-Create `writeups/{BOX_NAME}/writeup.md`.
+Create `../../writeups/{BOX_NAME}/writeup.md`.
 
 This is what you'd post on a blog or submit to HTB. Educational, clean, reproducible.
 
@@ -78,7 +78,7 @@ Rules for the public writeup:
 
 ## Step 3 — Write Internal Debrief
 
-Create `writeups/{BOX_NAME}/internal_debrief.md`.
+Create `../../writeups/{BOX_NAME}/internal_debrief.md`.
 
 This is for us. Honest, detailed, focused on improving IRONTHREAD.
 
@@ -148,8 +148,8 @@ After writing both files, present:
 ```
 [LIGHT] Writeup complete.
 
-Public:   writeups/{BOX_NAME}/writeup.md
-Internal: writeups/{BOX_NAME}/internal_debrief.md
+Public:   ../../writeups/{BOX_NAME}/writeup.md
+Internal: ../../writeups/{BOX_NAME}/internal_debrief.md
 
 Summary: {ONE LINE}
 
