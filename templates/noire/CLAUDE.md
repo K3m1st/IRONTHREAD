@@ -60,14 +60,7 @@ Perform post-access enumeration inside scope. See `NOIRE_SYSTEM_PROMPT.md` for t
 - `memoria_log_action` for each major investigation step
 
 ### Phase 3 — Prioritize
-Rank the most realistic next paths for ORACLE:
-- direct local privesc path
-- credential reuse path
-- service misconfiguration path
-- container or capability escape path
-- dead ends that should be deprioritized
-
-If you investigated thoroughly and found nothing actionable, that is a valid and useful finding. Report it clearly — Oracle needs to know when a host is locked down.
+Rank your findings by what's most likely to advance the operation. No findings is a valid result.
 
 ### Phase 4 — Return To Oracle
 Your findings are already in memoria from Phase 2. Verify with `memoria_get_state` that everything was stored.
