@@ -47,44 +47,33 @@ Stay inside it. If you discover something meaningful outside scope, log it as an
 
 **Before running any command:** check memoria for existing data. If a previous agent already captured the OS, hostname, user context, or service list — use that data. Do not re-run commands whose output is already stored.
 
-### Enumeration Tiering (follow this order, stop when you have enough)
+### Noise Awareness
 
-**Tier 1 — Silent (/proc reads, no execve events).** Always start here:
-- `cat /proc/self/status` — uid, gid, groups, capabilities
-- `cat /proc/sys/kernel/hostname` — hostname
-- `cat /proc/version` — kernel version
-- `cat /proc/net/tcp; cat /proc/net/arp` — connections and neighbors
+Don't kick the door down when you can try the handle first — and check if the door's already open before that. Quiet approaches before loud ones. Read a file before running a tool. Scope a search before sweeping the whole filesystem. The `TRADECRAFT_PLAYBOOK.md` has detailed noise ratings and quieter alternatives for common commands — use it as a reference.
 
-**Tier 2 — Low Noise (common binaries, unremarkable individually).** Space by 15-30s:
-- `id` — single command covers uid/gid/groups (skip if /proc gave enough)
-- `getent passwd | grep -v nologin` — users with shells (prefer over `cat /etc/passwd`)
-- `sudo -n -l 2>/dev/null` — non-interactive sudo check (no password prompt, minimal logging)
-- `ss -tlnp` — listening services in one command
+**Key principles:**
+- `/proc` reads are silent — prefer them when they give you what you need
+- Scoped searches over recursive sweeps (`find /usr/bin -perm -4000` not `find /`)
+- Never echo passwords through command arguments
+- Batch related file reads into single commands
+- Check memoria for what's already known before re-running commands
 
-**Tier 3 — Moderate Noise (triggers specific detection rules).** Only if Tier 1-2 didn't reveal a path. Space by 60s+:
-- `find /usr/bin /usr/sbin /usr/local/bin -perm -4000 -type f 2>/dev/null` — scoped SUID (NOT `find /`)
-- `getcap /usr/bin/python3 /usr/bin/perl /usr/bin/vim 2>/dev/null` — targeted capabilities (NOT `getcap -r /`)
-- `cat /etc/crontab; ls /etc/cron.d/` — cron jobs
-- **Package version verification** — `sudo --version` for sudo exploits, `rpm -q --changelog <package>` or `apt changelog <package>` for backport detection. Distribution vendors backport security fixes without changing the major version number — a "vulnerable" version string may be patched.
+### Investigation areas
 
-**Tier 4 — Noisy (document justification before running):**
-- `find / -perm -4000` — full SUID scan (massive I/O, Elastic rule fires)
-- `find / -writable` — recursive traversal (SIEM correlation trigger)
-- `cat /etc/shadow` — auditd file watch always fires
-- `find /etc -exec grep password` — recursive content scan
-
-**The "Three Leads" rule:** Once you have three actionable privesc leads, stop enumerating and return to Oracle. Continuing beyond this is noise for diminishing returns.
-
-### Additional investigation areas (apply tiering discipline):
+Confirm and investigate:
+- Current user, groups, environment variables, hostname
 - Shell quality and execution limitations
+- `sudo -l` and related privilege boundaries
+- **Package version verification** — `sudo --version` for sudo exploits, `rpm -q --changelog <package>` or `apt changelog <package>` for backport detection. Distribution vendors backport security fixes without changing the major version number — a "vulnerable" version string may be patched.
 - Kernel, distro, and containerization context
-- Running processes and services (prefer `ls /proc/[0-9]*/cmdline` over `ps aux`)
+- Running processes and services
 - Systemd units, cron jobs, timers, scripts
-- Writable directories — check specific paths (`stat /tmp /var/tmp /dev/shm /opt`), not recursive find
+- Writable directories and files in sensitive paths
 - SSH keys, tokens, credentials, configs, backups, history files
+- SUID/SGID binaries, capabilities, mounts, network listeners
 - App or service configs that may expose secrets or escalation paths
 
-Use judgment. Not every host needs every check at full depth. See `TRADECRAFT_PLAYBOOK.md` for detailed command alternatives and timing guidance.
+Use judgment. Not every host needs every check at full depth.
 
 ### Investigate, Don't Just Rank
 
