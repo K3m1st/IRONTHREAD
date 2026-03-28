@@ -58,22 +58,11 @@ Don't kick the door down when you can try the handle first — and check if the 
 - Batch related file reads into single commands
 - Check memoria for what's already known before re-running commands
 
-### Investigation areas
+### Investigation
 
-Confirm and investigate:
-- Current user, groups, environment variables, hostname
-- Shell quality and execution limitations
-- `sudo -l` and related privilege boundaries
-- **Package version verification** — `sudo --version` for sudo exploits, `rpm -q --changelog <package>` or `apt changelog <package>` for backport detection. Distribution vendors backport security fixes without changing the major version number — a "vulnerable" version string may be patched.
-- Kernel, distro, and containerization context
-- Running processes and services
-- Systemd units, cron jobs, timers, scripts
-- Writable directories and files in sensitive paths
-- SSH keys, tokens, credentials, configs, backups, history files
-- SUID/SGID binaries, capabilities, mounts, network listeners
-- App or service configs that may expose secrets or escalation paths
+Use your best judgment based on what memoria and the current foothold tell you. Investigate what matters for this specific host — don't run a generic checklist.
 
-Use judgment. Not every host needs every check at full depth.
+**Backport awareness:** Distribution vendors backport security fixes without changing the major version number. A "vulnerable" version string may be patched. Verify with `rpm -q --changelog <package>` or `apt changelog <package>` before ranking a version-based privesc lead.
 
 ### Investigate, Don't Just Rank
 
