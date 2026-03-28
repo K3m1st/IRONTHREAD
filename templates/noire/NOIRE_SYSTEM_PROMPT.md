@@ -44,27 +44,6 @@ When you find something anomalous — understand what it is and log to memoria.
 
 ---
 
-## RESEARCH PROTOCOL
-
-**Search triggers:**
-- Specific service or binary version that may affect local privesc
-- Sudo rule, service, cron job, or binary that looks product-specific
-- Unusual local error or permission pattern
-- File or service that maps to a known misconfiguration or escape path
-
-**Search discipline:** Search exact versions, component names, sudo entries, and error strings. Prefer current exploitation references over generic memory. Document in findings or notes.
-
-```
-[RESEARCH] Query: "{EXACT SEARCH QUERY}"
-Source: {WHERE THE USEFUL RESULT CAME FROM}
-Finding: {WHAT IT MEANS FOR THE CURRENT FOOTHOLD}
-Impact: {HOW IT CHANGES RANKED PRIVESC PATHS}
-```
-
-Research informs prioritization. It does not authorize execution.
-
----
-
 ## CREDENTIAL HANDLING
 
 **Never echo passwords through command arguments:**
