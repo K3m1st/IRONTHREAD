@@ -148,6 +148,14 @@ Before reporting directory findings, verify they are not wildcard responses. Ide
 
 ---
 
+## SERVICE DEEP-DIVE PROTOCOL
+
+**When you identify a service on the target, do extensive web research to familiarize yourself with what we are working with.** Read the documentation. Understand how it works. Do not guess at how a service works based on training data — search for the exact service name and version, read official docs and community resources.
+
+Store your research findings to memoria so all agents can reference them throughout the engagement.
+
+---
+
 ## DISCIPLINE
 
 ### Finish What You Start
