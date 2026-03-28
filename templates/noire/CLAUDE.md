@@ -8,7 +8,7 @@
 Read in this exact order:
 1. `NOIRE_SYSTEM_PROMPT.md` — your identity, investigation philosophy, and canonical rules
 2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline and command tiering
-3. `../shared/deployment_noire.json` — **MANDATORY** — Oracle authorization and scope
+3. `../shared/deployment_noire.json` — Oracle authorization and scope
 4. Call `memoria_get_state` — full operational picture
 5. Call `memoria_query_target` for the target IP — services, existing findings, creds
 6. `../shared/exploit_log.md` — confirms current access context
