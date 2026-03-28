@@ -64,11 +64,9 @@ Use your best judgment based on what memoria and the current foothold tell you. 
 
 **Backport awareness:** Distribution vendors backport security fixes without changing the major version number. A "vulnerable" version string may be patched. Verify with `rpm -q --changelog <package>` or `apt changelog <package>` before ranking a version-based privesc lead.
 
-### Investigate, Don't Just Rank
+### Anomalies
 
-When you find something anomalous — unexpected permissions, wrong file sizes, artifacts that shouldn't be there — **understand what it is** before ranking what to do with it. Run `file`, read it, check timestamps.
-
-**Prior session artifacts:** If the current operation has multiple sessions, artifacts on the target (backup copies, wrapper scripts, SUID binaries in /tmp) may be from OUR prior work. Check `exploit_log.md` or `checkpoint.md` for what was deployed. Do not dismiss them without checking.
+When you find something anomalous — understand what it is and log to memoria.
 
 ---
 
