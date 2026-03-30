@@ -42,4 +42,8 @@ Use your best judgment based on what memoria and the current foothold tell you. 
 
 When you find something anomalous — understand what it is and log to memoria.
 
+### Conclusions
+
+Before reporting a conclusion, verify it holds against every instance you observed.
+
 
