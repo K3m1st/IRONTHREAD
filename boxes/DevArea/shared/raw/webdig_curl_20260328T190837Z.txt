@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 600
+Content-Type: text/html; charset=utf-8
+Last-Modified: Thu, 13 Mar 2025 22:45:45 GMT
+Date: Sat, 28 Mar 2026 19:08:38 GMT
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hoverfly Dashboard</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles.6f6b999bedb20ff0d327.css"></head>
+<body>
+  <app-root></app-root>
+<script type="text/javascript" src="runtime.06daa30a2963fa413676.js"></script><script type="text/javascript" src="polyfills.09835b67f4e254a9e063.js"></script><script type="text/javascript" src="main.8c9b7348638cc8a40f85.js"></script></body>
+</html>
+

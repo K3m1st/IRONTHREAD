@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Allow: GET, HEAD, OPTIONS
+Content-Length: 404
+Content-Type: application/json; charset=utf-8
+Date: Fri, 27 Mar 2026 02:10:21 GMT
+Referrer-Policy: same-origin
+Vary: Accept-Encoding
+Vary: Cookie
+X-Authentik-Id: ce2b80053be34dbe9fdb01bf546ef88d
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Powered-By: authentik
+
+{"error_reporting":{"enabled":true,"sentry_dsn":"https://151ba72610234c4c97c5bcff4e1cffd8@authentik.error-reporting.a7k.io/4504163677503489","environment":"customer","send_pii":false,"traces_sample_rate":0.1},"capabilities":["can_save_media","can_asn","can_geo_ip","can_impersonate","is_enterprise"],"cache_timeout":300,"cache_timeout_flows":300,"cache_timeout_policies":300,"cache_timeout_reputation":0}

@@ -1,0 +1,7 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sat, 28 Mar 2026 19:07:27 GMT
+Content-Length: 34
+
+{"message":"Hoverfly is healthy"}
+

@@ -1,0 +1,485 @@
+HTTP/1.1 200 OK
+Date: Sat, 28 Mar 2026 19:07:09 GMT
+Server: Apache/2.4.58 (Ubuntu)
+Last-Modified: Sun, 21 Sep 2025 20:52:00 GMT
+ETag: "56c3-63f55dfd03c00"
+Accept-Ranges: bytes
+Content-Length: 22211
+Vary: Accept-Encoding
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevArea - Connect with Top Development Talent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">Dev<span>Area</span></a>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Jobs</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Developers</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Companies</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-secondary">Login</a>
+                <a href="#" class="btn btn-primary">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Find the Perfect Developer for Your Project</h1>
+                <p>DevArea connects businesses with skilled developers across all technologies and experience levels</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary">Browse Jobs</a>
+                    <a href="#" class="btn btn-secondary">Find Talent</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="assets/images/hero-image.svg" alt="DevArea - Developer Hiring Platform">
+            </div>
+        </section>
+
+        <!-- Featured Jobs Section -->
+        <section class="featured-jobs">
+            <div class="section-header">
+                <h2>Featured Job Opportunities</h2>
+                <a href="#" class="view-all">View All Jobs</a>
+            </div>
+            <div class="job-cards">
+                <!-- Static Job Card 1 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="company-logo">
+                            <img src="assets/images/company-logo1.svg" alt="TechCorp logo">
+                        </div>
+                        <div class="job-info">
+                            <h3 class="job-title">
+                                <a href="#">Senior Frontend Developer</a>
+                            </h3>
+                            <div class="company-name">TechCorp</div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-body">
+                        <div class="job-meta">
+                            <div class="job-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                San Francisco, CA
+                            </div>
+                            <div class="job-type">
+                                <i class="fas fa-briefcase"></i>
+                                Full-time
+                            </div>
+                            <div class="job-salary">
+                                <i class="fas fa-money-bill-wave"></i>
+                                $120,000 - $150,000
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <div class="job-date">
+                            <i class="far fa-clock"></i>
+                            2 days ago
+                        </div>
+                        <a href="#" class="btn btn-outline">View Details</a>
+                    </div>
+                </div>
+
+                <!-- Static Job Card 2 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="company-logo">
+                            <img src="assets/images/company-logo2.svg" alt="WebSolutions logo">
+                        </div>
+                        <div class="job-info">
+                            <h3 class="job-title">
+                                <a href="#">Backend Developer (Node.js)</a>
+                            </h3>
+                            <div class="company-name">WebSolutions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-body">
+                        <div class="job-meta">
+                            <div class="job-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Remote
+                            </div>
+                            <div class="job-type">
+                                <i class="fas fa-briefcase"></i>
+                                Full-time
+                            </div>
+                            <div class="job-salary">
+                                <i class="fas fa-money-bill-wave"></i>
+                                $90,000 - $120,000
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <div class="job-date">
+                            <i class="far fa-clock"></i>
+                            3 days ago
+                        </div>
+                        <a href="#" class="btn btn-outline">View Details</a>
+                    </div>
+                </div>
+
+                <!-- Static Job Card 3 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="company-logo">
+                            <img src="assets/images/company-logo3.svg" alt="DataInnovate logo">
+                        </div>
+                        <div class="job-info">
+                            <h3 class="job-title">
+                                <a href="#">Data Scientist</a>
+                            </h3>
+                            <div class="company-name">DataInnovate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-body">
+                        <div class="job-meta">
+                            <div class="job-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                New York, NY
+                            </div>
+                            <div class="job-type">
+                                <i class="fas fa-briefcase"></i>
+                                Full-time
+                            </div>
+                            <div class="job-salary">
+                                <i class="fas fa-money-bill-wave"></i>
+                                $130,000 - $160,000
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <div class="job-date">
+                            <i class="far fa-clock"></i>
+                            1 week ago
+                        </div>
+                        <a href="#" class="btn btn-outline">View Details</a>
+                    </div>
+                </div>
+
+                <!-- Static Job Card 4 -->
+                <div class="job-card">
+                    <div class="job-card-header">
+                        <div class="company-logo">
+                            <img src="assets/images/company-logo4.svg" alt="MobileApps logo">
+                        </div>
+                        <div class="job-info">
+                            <h3 class="job-title">
+                                <a href="#">Mobile Developer (React Native)</a>
+                            </h3>
+                            <div class="company-name">MobileApps</div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-body">
+                        <div class="job-meta">
+                            <div class="job-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Austin, TX
+                            </div>
+                            <div class="job-type">
+                                <i class="fas fa-briefcase"></i>
+                                Contract
+                            </div>
+                            <div class="job-salary">
+                                <i class="fas fa-money-bill-wave"></i>
+                                $80 - $100 per hour
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <div class="job-date">
+                            <i class="far fa-clock"></i>
+                            5 days ago
+                        </div>
+                        <a href="#" class="btn btn-outline">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top Developers Section -->
+        <section class="top-developers">
+            <div class="section-header">
+                <h2>Top Developers</h2>
+                <a href="#" class="view-all">View All Developers</a>
+            </div>
+            <div class="developer-cards">
+                <!-- Static Developer Card 1 -->
+                <div class="developer-card">
+                    <div class="developer-header">
+                        <div class="developer-avatar">
+                            <img src="assets/images/john-dev.jpg" alt="John Carter">
+                        </div>
+                        <div class="developer-rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.9</span>
+                        </div>
+                    </div>
+                    <div class="developer-info">
+                        <h3 class="developer-name">John Carter</h3>
+                        <p class="developer-title">Senior Full Stack Developer</p>
+                        <div class="developer-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            San Francisco, CA
+                        </div>
+                    </div>
+                    <div class="developer-skills">
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">MongoDB</span>
+                    </div>
+                    <div class="developer-footer">
+                        <a href="#" class="btn btn-outline">View Profile</a>
+                    </div>
+                </div>
+
+                <!-- Static Developer Card 2 -->
+                <div class="developer-card">
+                    <div class="developer-header">
+                        <div class="developer-avatar">
+                            <img src="assets/images/ryan-dev.jpg" alt="Ryan Bennett">
+                        </div>
+                        <div class="developer-rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.8</span>
+                        </div>
+                    </div>
+                    <div class="developer-info">
+                        <h3 class="developer-name">Ryan Bennett</h3>
+                        <p class="developer-title">UX/UI Designer & Frontend Developer</p>
+                        <div class="developer-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Remote
+                        </div>
+                    </div>
+                    <div class="developer-skills">
+                        <span class="skill-tag">UI/UX</span>
+                        <span class="skill-tag">Figma</span>
+                        <span class="skill-tag">HTML/CSS</span>
+                        <span class="skill-tag">React</span>
+                    </div>
+                    <div class="developer-footer">
+                        <a href="#" class="btn btn-outline">View Profile</a>
+                    </div>
+                </div>
+
+                <!-- Static Developer Card 3 -->
+                <div class="developer-card">
+                    <div class="developer-header">
+                        <div class="developer-avatar">
+                            <img src="assets/images/david-dev.jpg" alt="David Kim">
+                        </div>
+                        <div class="developer-rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.7</span>
+                        </div>
+                    </div>
+                    <div class="developer-info">
+                        <h3 class="developer-name">David Kim</h3>
+                        <p class="developer-title">Backend Developer</p>
+                        <div class="developer-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Seattle, WA
+                        </div>
+                    </div>
+                    <div class="developer-skills">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">Django</span>
+                        <span class="skill-tag">PostgreSQL</span>
+                        <span class="skill-tag">AWS</span>
+                    </div>
+                    <div class="developer-footer">
+                        <a href="#" class="btn btn-outline">View Profile</a>
+                    </div>
+                </div>
+
+                <!-- Static Developer Card 4 -->
+                <div class="developer-card">
+                    <div class="developer-header">
+                        <div class="developer-avatar">
+                            <img src="assets/images/sarah-dev.jpg" alt="Sarah Williams">
+                        </div>
+                        <div class="developer-rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.9</span>
+                        </div>
+                    </div>
+                    <div class="developer-info">
+                        <h3 class="developer-name">Sarah Williams</h3>
+                        <p class="developer-title">Mobile App Developer</p>
+                        <div class="developer-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Chicago, IL
+                        </div>
+                    </div>
+                    <div class="developer-skills">
+                        <span class="skill-tag">Swift</span>
+                        <span class="skill-tag">Kotlin</span>
+                        <span class="skill-tag">Flutter</span>
+                        <span class="skill-tag">Firebase</span>
+                    </div>
+                    <div class="developer-footer">
+                        <a href="#" class="btn btn-outline">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <h2>How DevArea Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">
+                        <img src="assets/images/post-icon.svg" alt="Post Job">
+                    </div>
+                    <h3>Post a Job</h3>
+                    <p>Create a detailed job listing with your requirements and expectations</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <img src="assets/images/match-icon.svg" alt="Match Developers">
+                    </div>
+                    <h3>Match with Developers</h3>
+                    <p>Our system matches your job with qualified developers</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <img src="assets/images/hire-icon.svg" alt="Hire">
+                    </div>
+                    <h3>Hire the Best</h3>
+                    <p>Review profiles, conduct interviews, and hire the perfect match</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials">
+            <h2>What Our Users Say</h2>
+            <div class="testimonial-slider">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"DevArea helped us find an exceptional developer in just 3 days. The quality of candidates was outstanding."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="assets/images/testimonial-1.svg" alt="John Smith">
+                        <div>
+                            <h4>John Smith</h4>
+                            <p>CTO, TechStart Inc.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"As a freelance developer, DevArea has been my go-to platform for finding quality projects with fair compensation."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="assets/images/testimonial-2.svg" alt="Sarah Johnson">
+                        <div>
+                            <h4>Sarah Johnson</h4>
+                            <p>Full Stack Developer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta">
+            <div class="cta-content">
+                <h2>Ready to Find Your Perfect Match?</h2>
+                <p>Join thousands of companies and developers on DevArea today</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary">Hire Developers</a>
+                    <a href="#" class="btn btn-secondary">Find Jobs</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <div class="footer-logo">Dev<span>Area</span></div>
+                <p class="footer-about">DevArea connects businesses with skilled developers across all technologies and experience levels.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3 class="footer-heading">For Employers</h3>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Post a Job</a></li>
+                    <li class="footer-link"><a href="#">Search Developers</a></li>
+                    <li class="footer-link"><a href="#">Pricing Plans</a></li>
+                    <li class="footer-link"><a href="#">Resources</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3 class="footer-heading">For Developers</h3>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">Find Jobs</a></li>
+                    <li class="footer-link"><a href="#">Create Profile</a></li>
+                    <li class="footer-link"><a href="#">Resources</a></li>
+                    <li class="footer-link"><a href="#">Skill Tests</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3 class="footer-heading">Company</h3>
+                <ul class="footer-links">
+                    <li class="footer-link"><a href="#">About Us</a></li>
+                    <li class="footer-link"><a href="#">Contact Us</a></li>
+                    <li class="footer-link"><a href="#">Privacy Policy</a></li>
+                    <li class="footer-link"><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2025 DevArea. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

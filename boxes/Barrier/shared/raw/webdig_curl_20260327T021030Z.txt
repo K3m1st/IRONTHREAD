@@ -1,0 +1,79 @@
+HTTP/1.1 200 OK
+Content-Length: 2968
+Content-Type: text/html; charset=utf-8
+Date: Fri, 27 Mar 2026 02:10:21 GMT
+Referrer-Policy: same-origin
+Vary: Accept-Encoding
+Vary: Cookie
+X-Authentik-Id: 5abff3e484a44d8a9b6ae32ab451146e
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Powered-By: authentik
+
+
+
+
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>authentik</title>
+        <link rel="icon" href="/static/dist/assets/icons/icon.png">
+        <link rel="shortcut icon" href="/static/dist/assets/icons/icon.png">
+        
+
+        
+<link rel="prefetch" href="/static/dist/assets/images/flow_background.jpg" />
+
+
+
+
+<script>
+    window.authentik = {
+        locale: "None",
+        config: JSON.parse('{\u0022error_reporting\u0022: {\u0022enabled\u0022: true, \u0022sentry_dsn\u0022: \u0022https://151ba72610234c4c97c5bcff4e1cffd8@authentik.error\u002Dreporting.a7k.io/4504163677503489\u0022, \u0022environment\u0022: \u0022customer\u0022, \u0022send_pii\u0022: false, \u0022traces_sample_rate\u0022: 0.1}, \u0022capabilities\u0022: [\u0022can_save_media\u0022, \u0022can_asn\u0022, \u0022can_geo_ip\u0022, \u0022can_impersonate\u0022, \u0022is_enterprise\u0022], \u0022cache_timeout\u0022: 300, \u0022cache_timeout_flows\u0022: 300, \u0022cache_timeout_policies\u0022: 300, \u0022cache_timeout_reputation\u0022: 0}'),
+        brand: JSON.parse('{\u0022matched_domain\u0022: \u0022authentik\u002Ddefault\u0022, \u0022branding_title\u0022: \u0022authentik\u0022, \u0022branding_logo\u0022: \u0022/static/dist/assets/icons/icon_left_brand.svg\u0022, \u0022branding_favicon\u0022: \u0022/static/dist/assets/icons/icon.png\u0022, \u0022ui_footer_links\u0022: [], \u0022ui_theme\u0022: \u0022automatic\u0022, \u0022flow_authentication\u0022: \u0022default\u002Dauthentication\u002Dflow\u0022, \u0022flow_invalidation\u0022: \u0022default\u002Dinvalidation\u002Dflow\u0022, \u0022flow_user_settings\u0022: \u0022default\u002Duser\u002Dsettings\u002Dflow\u0022, \u0022default_locale\u0022: \u0022\u0022}'),
+        versionFamily: "2024.10",
+        versionSubdomain: "version-2024-10",
+        build: "",
+    };
+    window.addEventListener("DOMContentLoaded", function () {
+        
+    });
+</script>
+
+<script>
+window.authentik.flow = {
+    "layout": "stacked",
+};
+</script>
+
+        <link rel="stylesheet" type="text/css" href="/static/dist/authentik.css">
+        <link rel="stylesheet" type="text/css" href="/static/dist/custom.css" data-inject>
+        <script src="/static/dist/poly-2024.10.5.js" type="module"></script>
+        <script src="/static/dist/standalone/loading/index-2024.10.5.js" type="module"></script>
+        
+<script src="/static/dist/flow/FlowInterface-2024.10.5.js" type="module"></script>
+<style>
+:root {
+    --ak-flow-background: url("/static/dist/assets/images/flow_background.jpg");
+}
+</style>
+
+        <meta name="sentry-trace" content="daf11001e02e41be85cd83fcc7a05d6f-a88384e257a05d75-1" />
+    </head>
+    <body>
+        
+<ak-message-container></ak-message-container>
+<ak-flow-executor flowSlug="default-authentication-flow">
+    <ak-loading></ak-loading>
+</ak-flow-executor>
+
+        
+        
+    </body>
+</html>
+

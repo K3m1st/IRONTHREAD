@@ -1,0 +1,2 @@
+drwxr-xr-x    2 ftp      ftp          4096 Sep 22  2025 pub
+
