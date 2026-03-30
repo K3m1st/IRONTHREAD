@@ -46,7 +46,7 @@
 
 This deserves its own section above the rest because it was the defining failure of the operation.
 
-`/usr/bin/bash` was **mode 0777.** This is a free, obvious path to root. We found it. We even exploited it — **in session 1, WE replaced bash with a SUID-dropping wrapper and WE backed up the real binary to /tmp/bash_orig.** Then I created a new session. we re-established the foothold, and we completely forgot about our own work. When we came back and NOIRE found the 0777 bash again, nobody recognized that this was OUR setup from the prior session. Nobody checked if the wrapper was already deployed. Nobody checked if root had already triggered it.
+`/usr/bin/bash` was **mode 0777.** This is a free, obvious path to root. We found it. We even exploited it — **in session 1, WE replaced bash with a SUID-dropping wrapper and WE backed up the real binary to /tmp/bash_orig.** Then the box reset, we re-established the foothold, and we completely forgot about our own work. When we came back and NOIRE found the 0777 bash again, nobody recognized that this was OUR setup from the prior session. Nobody checked if the wrapper was already deployed. Nobody checked if root had already triggered it.
 
 Three agents saw the 0777 bash. None treated it as the free root it was:
 
