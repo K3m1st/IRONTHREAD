@@ -171,22 +171,6 @@ def _check_consistency(conn: sqlite3.Connection) -> list[str]:
     return warnings
 
 
-def _sync_access_state(conn: sqlite3.Connection, access_level: str) -> None:
-    """Auto-set access state keys when target access_level changes."""
-    now = _now()
-    if access_level in ("user", "root", "system"):
-        conn.execute(
-            "INSERT INTO state (key, value, updated_at) VALUES (?, ?, ?) "
-            "ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at",
-            ("has_user_access", "true", now),
-        )
-    if access_level in ("root", "system"):
-        conn.execute(
-            "INSERT INTO state (key, value, updated_at) VALUES (?, ?, ?) "
-            "ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at",
-            ("has_root_access", "true", now),
-        )
-
 
 def _mask_secret(secret: str | None) -> str:
     """Mask a secret value, showing only first 4 chars."""
@@ -531,19 +515,17 @@ def _handle_set_state(conn: sqlite3.Connection, args: dict) -> list[TextContent]
         (key, value, now),
     )
 
-    # Auto-sync: flag stored → update target access_level if lagging
+    # Auto-sync: flag stored → promote target access_level if lagging
     if key == "user_flag":
-        targets = conn.execute("SELECT ip, access_level FROM targets").fetchall()
-        for t in targets:
-            if t["access_level"] == "none":
-                conn.execute("UPDATE targets SET access_level = 'user', updated_at = ? WHERE ip = ?", (now, t["ip"]))
-                _sync_access_state(conn, "user")
+        conn.execute(
+            "UPDATE targets SET access_level = 'user', updated_at = ? "
+            "WHERE access_level = 'none'", (now,),
+        )
     elif key == "root_flag":
-        targets = conn.execute("SELECT ip, access_level FROM targets").fetchall()
-        for t in targets:
-            if t["access_level"] not in ("root", "system"):
-                conn.execute("UPDATE targets SET access_level = 'root', updated_at = ? WHERE ip = ?", (now, t["ip"]))
-                _sync_access_state(conn, "root")
+        conn.execute(
+            "UPDATE targets SET access_level = 'root', updated_at = ? "
+            "WHERE access_level NOT IN ('root', 'system')", (now,),
+        )
 
     conn.commit()
 
@@ -582,9 +564,6 @@ def _handle_upsert_target(conn: sqlite3.Connection, args: dict) -> list[TextCont
                 f"UPDATE targets SET {set_clause} WHERE ip = ?",
                 (*updates.values(), ip),
             )
-            # Cross-update access state keys
-            if "access_level" in updates:
-                _sync_access_state(conn, updates["access_level"])
             conn.commit()
         row = conn.execute("SELECT * FROM targets WHERE ip = ?", (ip,)).fetchone()
     else:
@@ -605,9 +584,6 @@ def _handle_upsert_target(conn: sqlite3.Connection, args: dict) -> list[TextCont
                 now,
             ),
         )
-        # Cross-update access state keys
-        if access_level != "none":
-            _sync_access_state(conn, access_level)
         conn.commit()
         row = conn.execute("SELECT * FROM targets WHERE ip = ?", (ip,)).fetchone()
 
