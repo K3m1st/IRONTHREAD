@@ -39,20 +39,25 @@ class Service:
 
 @dataclass
 class Finding:
+    id: int = 0
     category: str = ""
     title: str = ""
     severity: str | None = None
     status: str = "open"
     found_by: str = ""
+    detail: str = ""
+    evidence: str | None = None
 
 
 @dataclass
 class Credential:
+    id: int = 0
     cred_type: str = ""
     username: str | None = None
     source: str = ""
     verified: bool = False
     found_by: str = ""
+    context: str | None = None
 
 
 @dataclass
@@ -142,31 +147,36 @@ def load_box_state(db_path: Path) -> BoxState:
 
         # --- findings (sorted by severity) ---
         for row in conn.execute(
-            "SELECT category, title, severity, status, found_by "
-            "FROM findings "
+            "SELECT id, category, title, severity, status, found_by, "
+            "detail, evidence FROM findings "
             "ORDER BY CASE severity "
             "  WHEN 'critical' THEN 0 WHEN 'high' THEN 1 "
             "  WHEN 'medium' THEN 2 WHEN 'low' THEN 3 ELSE 4 END, id"
         ):
             state.findings.append(Finding(
+                id=row["id"],
                 category=row["category"],
                 title=row["title"],
                 severity=row["severity"],
                 status=row["status"],
                 found_by=row["found_by"],
+                detail=row["detail"],
+                evidence=row["evidence"],
             ))
 
         # --- credentials (no secrets — dashboard is read-only display) ---
         for row in conn.execute(
-            "SELECT cred_type, username, source, verified, found_by "
-            "FROM credentials ORDER BY id"
+            "SELECT id, cred_type, username, source, verified, found_by, "
+            "context FROM credentials ORDER BY id"
         ):
             state.credentials.append(Credential(
+                id=row["id"],
                 cred_type=row["cred_type"],
                 username=row["username"],
                 source=row["source"],
                 verified=bool(row["verified"]),
                 found_by=row["found_by"],
+                context=row["context"],
             ))
 
         # --- actions (most recent 50) ---

@@ -13,11 +13,12 @@ from pathlib import Path
 from rich.text import Text
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.screen import ModalScreen
 from textual.widgets import DataTable, Footer, Header, Static
 from textual import work
 
-from data import BoxState, resolve_db_path, load_box_state
+from data import BoxState, Credential, Finding, resolve_db_path, load_box_state
 
 
 # ---------------------------------------------------------------------------
@@ -95,6 +96,172 @@ class TargetPanel(Static):
 class ServicesPanel(Static):
     """Displays services as styled text."""
     pass
+
+
+# ---------------------------------------------------------------------------
+# Detail modals
+# ---------------------------------------------------------------------------
+
+class DetailModal(ModalScreen):
+    """Base modal for displaying record details."""
+
+    CSS = """
+    DetailModal {
+        align: center middle;
+    }
+
+    #detail-dialog {
+        width: 80%;
+        max-width: 100;
+        height: auto;
+        max-height: 80%;
+        border: tall $accent;
+        background: $surface;
+        padding: 2 3;
+    }
+
+    #detail-title {
+        text-style: bold;
+        margin-bottom: 1;
+    }
+
+    #detail-meta {
+        margin-bottom: 1;
+    }
+
+    #detail-body {
+        margin-top: 1;
+        margin-bottom: 1;
+    }
+
+    #detail-evidence-label {
+        text-style: bold;
+        color: $text-muted;
+        margin-top: 1;
+    }
+
+    #detail-evidence {
+        margin-bottom: 1;
+        color: $text-muted;
+    }
+
+    #detail-hint {
+        text-style: dim;
+        margin-top: 1;
+    }
+    """
+
+    BINDINGS = [
+        Binding("escape", "dismiss", "Close"),
+        Binding("q", "dismiss", "Close"),
+    ]
+
+
+class FindingDetailModal(DetailModal):
+    """Modal showing full finding details."""
+
+    def __init__(self, finding: Finding) -> None:
+        super().__init__()
+        self.finding = finding
+
+    def compose(self) -> ComposeResult:
+        f = self.finding
+        with VerticalScroll(id="detail-dialog"):
+            # Title
+            title_text = Text()
+            title_text.append("FINDING", style="bold")
+            yield Static(title_text, id="detail-title")
+
+            # Metadata row
+            meta = Text()
+            meta.append("  Severity: ", style="white")
+            meta.append(
+                (f.severity or "—").upper(),
+                style=SEVERITY_STYLES.get((f.severity or "").lower(), "white"),
+            )
+            meta.append("     Status: ", style="white")
+            meta.append(
+                f.status,
+                style=STATUS_STYLES.get(f.status, "white"),
+            )
+            meta.append("\n")
+            meta.append("  Category: ", style="white")
+            meta.append(f.category, style="white")
+            meta.append("     Agent:  ", style="white")
+            meta.append(f.found_by, style=AGENT_STYLES.get(f.found_by, "white"))
+            yield Static(meta, id="detail-meta")
+
+            # Title line
+            yield Static(Text(f"  {f.title}", style="bold white"))
+
+            # Detail body
+            if f.detail:
+                detail_label = Text()
+                detail_label.append("\n  DETAIL", style="bold dim")
+                yield Static(detail_label)
+
+                detail_body = Text()
+                for line in f.detail.split("\n"):
+                    detail_body.append(f"  {line}\n", style="white")
+                yield Static(detail_body, id="detail-body")
+
+            # Evidence
+            if f.evidence:
+                ev_label = Text()
+                ev_label.append("  EVIDENCE", style="bold dim")
+                yield Static(ev_label, id="detail-evidence-label")
+
+                ev_body = Text()
+                for line in f.evidence.split("\n"):
+                    ev_body.append(f"  {line}\n", style="dim cyan")
+                yield Static(ev_body, id="detail-evidence")
+
+            yield Static(Text("  [Esc] Close", style="dim"), id="detail-hint")
+
+
+class CredentialDetailModal(DetailModal):
+    """Modal showing full credential details."""
+
+    def __init__(self, cred: Credential) -> None:
+        super().__init__()
+        self.cred = cred
+
+    def compose(self) -> ComposeResult:
+        c = self.cred
+        with VerticalScroll(id="detail-dialog"):
+            title_text = Text()
+            title_text.append("CREDENTIAL", style="bold")
+            yield Static(title_text, id="detail-title")
+
+            meta = Text()
+            meta.append("  Type: ", style="white")
+            meta.append(c.cred_type, style="bold white")
+            meta.append("       Username: ", style="white")
+            meta.append(c.username or "—", style="bold white")
+            meta.append("\n")
+            meta.append("  Verified: ", style="white")
+            if c.verified:
+                meta.append("Yes", style="bold green")
+            else:
+                meta.append("No", style="dim")
+            meta.append("     Agent: ", style="white")
+            meta.append(c.found_by, style=AGENT_STYLES.get(c.found_by, "white"))
+            yield Static(meta, id="detail-meta")
+
+            # Source
+            src = Text()
+            src.append("\n  SOURCE\n", style="bold dim")
+            src.append(f"  {c.source}\n", style="white")
+            yield Static(src)
+
+            # Context
+            if c.context:
+                ctx = Text()
+                ctx.append("\n  CONTEXT\n", style="bold dim")
+                ctx.append(f"  {c.context}\n", style="white")
+                yield Static(ctx)
+
+            yield Static(Text("  [Esc] Close", style="dim"), id="detail-hint")
 
 
 # ---------------------------------------------------------------------------
@@ -180,6 +347,8 @@ class OperatorDashboard(App):
         self.db_path = db_path
         self._paused = False
         self._state: BoxState | None = None
+        self._findings_index: list[Finding] = []
+        self._creds_index: list[Credential] = []
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -287,16 +456,25 @@ class OperatorDashboard(App):
 
         content.append("\n")
 
-        # Flags
+        # Flags — check state table first, fall back to access_level
+        has_user = bool(t.user_flag) or t.access_level in ("user", "root", "system")
+        has_root = bool(t.root_flag) or t.access_level in ("root", "system")
+
         content.append("  Flags:  ", style="white")
-        if t.user_flag:
+        if has_user:
             content.append("U", style="bold yellow")
-            content.append(" user  ", style="dim")
+            if t.user_flag:
+                content.append(f" {t.user_flag[:8]}..  ", style="dim")
+            else:
+                content.append(" user  ", style="dim")
         else:
             content.append(".        ", style="dim")
-        if t.root_flag:
+        if has_root:
             content.append("R", style="bold green")
-            content.append(" root", style="dim")
+            if t.root_flag:
+                content.append(f" {t.root_flag[:8]}..", style="dim")
+            else:
+                content.append(" root", style="dim")
         else:
             content.append(".", style="dim")
 
@@ -331,9 +509,10 @@ class OperatorDashboard(App):
     def _update_findings(self, state: BoxState) -> None:
         table = self.query_one("#findings-table", DataTable)
         table.clear()
+        self._findings_index = list(state.findings)
 
         title = self.query_one("#findings-container .section-title", Static)
-        title.update(f"FINDINGS ({len(state.findings)})")
+        title.update(f"FINDINGS ({len(state.findings)})  [Enter] detail")
 
         for f in state.findings:
             table.add_row(
@@ -347,9 +526,10 @@ class OperatorDashboard(App):
     def _update_credentials(self, state: BoxState) -> None:
         table = self.query_one("#creds-table", DataTable)
         table.clear()
+        self._creds_index = list(state.credentials)
 
         title = self.query_one("#creds-container .section-title", Static)
-        title.update(f"CREDENTIALS ({len(state.credentials)})")
+        title.update(f"CREDENTIALS ({len(state.credentials)})  [Enter] detail")
 
         for c in state.credentials:
             verified = Text("Yes", style="green") if c.verified else Text("No", style="dim")
@@ -360,6 +540,16 @@ class OperatorDashboard(App):
                 verified,
                 agent_text(c.found_by),
             )
+
+    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+        """Open detail modal when Enter is pressed on a findings or creds row."""
+        table_id = event.data_table.id
+        row_idx = event.cursor_row
+
+        if table_id == "findings-table" and row_idx < len(self._findings_index):
+            self.push_screen(FindingDetailModal(self._findings_index[row_idx]))
+        elif table_id == "creds-table" and row_idx < len(self._creds_index):
+            self.push_screen(CredentialDetailModal(self._creds_index[row_idx]))
 
     def _update_actions(self, state: BoxState) -> None:
         table = self.query_one("#actions-table", DataTable)
