@@ -1,2 +1,6 @@
 mcp[cli]
 paramiko
+pywinrm
+impacket
+bloodhound
+bloodhound-import

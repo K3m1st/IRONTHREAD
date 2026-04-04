@@ -24,6 +24,13 @@ def save_output(output_dir: str, filename: str, content: str) -> str:
     return path
 
 
+def truncate_output(text: str, limit: int = 3000) -> str:
+    """Truncate text for token-efficient responses, with indicator."""
+    if len(text) <= limit:
+        return text
+    return text[:limit] + f"\n\n[... truncated, {len(text)} total chars — see raw_output_file]"
+
+
 def run_cmd(cmd: list[str], timeout: int = 120) -> tuple[int, str, str]:
     """Run a subprocess, return (returncode, stdout, stderr)."""
     try:

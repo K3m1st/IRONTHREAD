@@ -1,18 +1,28 @@
 #!/bin/bash
 # ============================================================
 # new_box.sh — Spin up a new HTB operation in one command
-# Usage: new_box BOXNAME TARGET_IP
+# Usage: new_box BOXNAME TARGET_IP [--windows]
 # Example: new_box Monitored 10.10.11.248
+# Example: new_box Timelapse 10.10.10.10 --windows
 # ============================================================
 
 set -e
 
 BOX_NAME=$1
 TARGET_IP=$2
+OS_TYPE="linux"
+
+# Check for --windows flag in any position
+for arg in "$@"; do
+    if [ "$arg" = "--windows" ]; then
+        OS_TYPE="windows"
+    fi
+done
 
 if [ -z "$BOX_NAME" ] || [ -z "$TARGET_IP" ]; then
-    echo "Usage: new_box BOXNAME TARGET_IP"
+    echo "Usage: new_box BOXNAME TARGET_IP [--windows]"
     echo "Example: new_box Monitored 10.10.11.248"
+    echo "Example: new_box Timelapse 10.10.10.10 --windows"
     exit 1
 fi
 
@@ -76,8 +86,44 @@ echo "[+] MCP servers configured (.mcp.json in repo)"
 cat > "$BOX_DIR/shared/target.txt" << EOF
 BOX_NAME=$BOX_NAME
 TARGET_IP=$TARGET_IP
+OS_TYPE=$OS_TYPE
 EOF
 
+if [ "$OS_TYPE" = "windows" ]; then
+    echo "AD_DOMAIN=" >> "$BOX_DIR/shared/target.txt"
+fi
+
+if [ "$OS_TYPE" = "windows" ]; then
+cat > "$BOX_DIR/shared/operation.md" << EOF
+# Operation: $BOX_NAME (Windows)
+> Created: $(date)
+> Target IP: $TARGET_IP
+> OS: Windows
+> Status: RECON
+
+## Phase Tracking
+| Phase | Status | Started | Completed |
+|-------|--------|---------|-----------|
+| 1. Reconnaissance | PENDING | — | — |
+| 2. Analysis & CVE Research | PENDING | — | — |
+| 3. AD Enumeration | PENDING | — | — |
+| 4. Kerberos Attacks | PENDING | — | — |
+| 5. Exploitation (initial) | PENDING | — | — |
+| 6. Post-Access Investigation | PENDING | — | — |
+| 7. Privilege Escalation | PENDING | — | — |
+| 8. Lateral Movement | PENDING | — | — |
+
+## Agent Status
+| Agent | Status | Last Deployment | Turns Used |
+|-------|--------|-----------------|------------|
+| ORACLE | PENDING | — | — |
+| ELLIOT | PENDING | — | — |
+| NOIRE | PENDING | — | — |
+
+## Notes
+
+EOF
+else
 cat > "$BOX_DIR/shared/operation.md" << EOF
 # Operation: $BOX_NAME
 > Created: $(date)
@@ -104,6 +150,7 @@ cat > "$BOX_DIR/shared/operation.md" << EOF
 ## Notes
 
 EOF
+fi
 
 cat > "$BOX_DIR/shared/notes/important_notes.md" << EOF
 # Important Notes — $BOX_NAME
@@ -123,6 +170,9 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Operation ready: $BOX_NAME"
 echo "  Target: $TARGET_IP"
+if [ "$OS_TYPE" = "windows" ]; then
+echo "  OS: Windows"
+fi
 echo "  Location: $BOX_DIR"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
@@ -136,5 +186,11 @@ echo "  Step 3 — After foothold, Oracle deploys NOIRE:"
 echo "    cd $BOX_DIR/noire && claude"
 echo ""
 echo "  Flow: Oracle → Elliot → NOIRE → Oracle → Elliot (as needed)"
+if [ "$OS_TYPE" = "windows" ]; then
+echo ""
+echo "  Windows tools available: wintools-mcp (nxc, impacket, bloodhound,"
+echo "  kerbrute, rpcclient, ldapsearch) + winrm-mcp (WinRM session pool)"
+echo "  BloodHound collection is standard practice — run early."
+fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""

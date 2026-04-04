@@ -15,6 +15,14 @@
     "remote-mcp": {
       "command": "bash",
       "args": ["-c", "exec python3 \"$(git rev-parse --show-toplevel)/mcp/remote/server.py\""]
+    },
+    "wintools-mcp": {
+      "command": "bash",
+      "args": ["-c", "exec python3 \"$(git rev-parse --show-toplevel)/mcp/wintools/server.py\""]
+    },
+    "winrm-mcp": {
+      "command": "bash",
+      "args": ["-c", "exec python3 \"$(git rev-parse --show-toplevel)/mcp/winrm/server.py\""]
     }
   }
 }
