@@ -1,2 +1,0 @@
-BOX_NAME=Snapped
-TARGET_IP=10.129.9.2

@@ -1,9 +1,0 @@
-HTTP/1.1 500 Internal Server Error
-Server: nginx/1.24.0 (Ubuntu)
-Date: Wed, 25 Mar 2026 17:45:07 GMT
-Content-Type: application/json; charset=utf-8
-Content-Length: 37
-Connection: keep-alive
-Request-Id: 2a5627de-9cfc-491f-8214-c68ba5a46a68
-
-{"code":500,"message":"Server Error"}

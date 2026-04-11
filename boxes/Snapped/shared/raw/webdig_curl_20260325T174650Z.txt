@@ -1,9 +1,0 @@
-HTTP/1.1 500 Internal Server Error
-Server: nginx/1.24.0 (Ubuntu)
-Date: Wed, 25 Mar 2026 17:46:51 GMT
-Content-Type: application/json; charset=utf-8
-Content-Length: 148
-Connection: keep-alive
-Request-Id: 188d3325-d695-4911-8edb-b592947ed886
-
-{"scope":"config","code":50006,"message":"path: {0} is not under the nginx conf dir: {1}","params":["/usr/local/etc/nginx-ui/app.ini","/etc/nginx"]}

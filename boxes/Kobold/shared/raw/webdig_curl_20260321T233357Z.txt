@@ -1,8 +1,0 @@
-HTTP/1.1 401 Unauthorized
-Content-Type: application/problem+json
-Link: </api/schemas/ErrorModel.json>; rel="describedBy"
-Date: Sat, 21 Mar 2026 23:33:49 GMT
-Content-Length: 144
-
-{"$schema":"https://10.129.7.164:3552/api/schemas/ErrorModel.json","title":"Unauthorized","status":401,"detail":"Invalid username or password"}
-

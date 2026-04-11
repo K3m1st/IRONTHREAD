@@ -1,2 +1,0 @@
-BOX_NAME=Pterodactyl
-TARGET_IP=10.129.6.130

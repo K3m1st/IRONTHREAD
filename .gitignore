@@ -1,9 +1,36 @@
+# macOS
 .DS_Store
-.DS_Store
+
+# Editor swap files
 *.swp
 *.swo
 *~
+
+# Claude Code internals
 .claude/
 !.claude/commands/
+
+# Python
 __pycache__/
-boxes/Kobold/oracle/hydra.restore
+*.pyc
+*.pyo
+
+# Operational data (lives in IRONTHREAD-DEV)
+boxes/
+
+# Memoria databases
+*.db
+*.db-shm
+*.db-wal
+
+# SSH keys (operational artifacts)
+*_key
+*id_rsa
+*id_ed25519
+*.pem
+
+# Hydra
+hydra.restore
+
+# Presentation brief (not part of the tool)
+PRESENTATION_BRIEF.md

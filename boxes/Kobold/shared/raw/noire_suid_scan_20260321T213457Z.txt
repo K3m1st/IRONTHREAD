@@ -1,3 +1,0 @@
-
-Warning: Identity file /tmp/ben_key not accessible: No such file or directory.
-ssh: connect to host 10.129.7.164 port 22: Connection timed out

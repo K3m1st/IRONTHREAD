@@ -1,1 +1,0 @@
-[1m[34mhttp://pterodactyl.htb[0m [200 OK] [1mCountry[0m[[0m[22mRESERVED[0m][[1m[31mZZ[0m], [1mHTML5[0m, [1mHTTPServer[0m[[1m[36mnginx/1.21.5[0m], [1mIP[0m[[0m[22m10.129.6.130[0m], [1mPHP[0m[[1m[32m8.4.8[0m], [1mScript[0m, [1mTitle[0m[[1m[33mMy Minecraft Server[0m], [1mX-Powered-By[0m[[0m[22mPHP/8.4.8[0m], [1mnginx[0m[[1m[32m1.21.5[0m]

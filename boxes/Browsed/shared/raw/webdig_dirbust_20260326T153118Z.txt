@@ -1,2 +1,0 @@
-
-2026/03/26 10:31:18 wordlist file "/usr/share/seclists/Discovery/Web-Content/raft-small-words.txt" does not exist: stat /usr/share/seclists/Discovery/Web-Content/raft-small-words.txt: no such file or directory

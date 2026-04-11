@@ -1,9 +1,0 @@
-HTTP/1.1 200 OK
-Server: nginx/1.24.0 (Ubuntu)
-Date: Wed, 25 Mar 2026 17:47:42 GMT
-Content-Type: application/json; charset=utf-8
-Content-Length: 1551
-Connection: keep-alive
-Request-Id: b9a58dd4-76b3-43eb-804a-530746c58975
-
-{"app":{"page_size":20,"jwt_secret":"6c4af436-035a-4942-9ca6-172b36696ce9"},"auth":{"ip_white_list":null,"ban_threshold_minutes":10,"max_attempts":10},"casdoor":{"endpoint":"","external_url":"","client_id":"","client_secret":"","certificate_path":"","organization":"","application":"","redirect_uri":""},"cert":{"email":"admin@test.htb","ca_dir":"","renewal_interval":7,"recursive_nameservers":[],"http_challenge_port":"9180"},"database":{"name":"database"},"http":{"github_proxy":"","insecure_skip_verify":false},"logrotate":{"enabled":false,"cmd":"logrotate /etc/logrotate.d/nginx","interval":1440},"nginx":{"access_log_path":"/var/log/nginx/access.log","error_log_path":"/var/log/nginx/error.log","log_dir_white_list":null,"config_dir":"/etc/nginx","config_path":"","pid_path":"/run/nginx.pid","sbin_path":"","test_config_cmd":"","reload_cmd":"nginx -s reload","restart_cmd":"start-stop-daemon --start --quiet --pidfile /run/nginx.pid --exec /usr/sbin/nginx","stub_status_port":51820,"container_name":""},"node":{"name":"","secret":"c64d7ca1-19cb-4ebe-96d4-49037e7df78e","skip_installation":false,"demo":false,"icp_number":"","public_security_number":""},"openai":{"base_url":"","token":"","proxy":"","model":"","api_type":"OPEN_AI","enable_code_completion":false,"code_completion_model":""},"server":{"host":"127.0.0.1","port":9000,"run_mode":"release","base_url":"","enable_https":false,"ssl_cert":"","ssl_key":"","enable_h2":false,"enable_h3":false},"terminal":{"start_cmd":"login"},"webauthn":{"rp_display_name":"","rpid":"","rp_origins":null}}

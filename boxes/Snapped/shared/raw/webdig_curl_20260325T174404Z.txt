@@ -1,9 +1,0 @@
-HTTP/1.1 404 Not Found
-Server: nginx/1.24.0 (Ubuntu)
-Date: Wed, 25 Mar 2026 17:44:04 GMT
-Content-Type: application/json; charset=utf-8
-Content-Length: 23
-Connection: keep-alive
-Request-Id: 8352f79d-45d5-4546-8380-9ed587b2a531
-
-{"message":"not found"}

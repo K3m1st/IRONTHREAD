@@ -1,6 +1,0 @@
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Sat, 28 Mar 2026 19:15:09 GMT
-Content-Length: 220
-
-{"token":"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjIwODU3NjUzMDksImlhdCI6MTc3NDcyNTMwOSwic3ViIjoiIiwidXNlcm5hbWUiOiJhZG1pbiJ9.RXNJ4_YOLVPh4rRTsa8DF9DuyhPhKEqG5q2641wPOX_zboOzRLTEXzJ9n6Km5QOcQL8ELrYoaJg77o8FtsJpLQ"}
