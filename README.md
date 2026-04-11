@@ -1,7 +1,5 @@
 # IRONTHREAD
 
-> Multi-agent offensive security framework built on Claude Code and Model Context Protocol (MCP).
-
 **Status:** Active Development | **License:** MIT | **Platform:** Kali Linux / macOS
 
 IRONTHREAD automates penetration testing operations using three specialized AI agents that share persistent state through a SQLite database (Memoria). Each agent has a defined role, strict authorization gates, and access to purpose-built MCP tool servers. Built and validated against 10+ Hack The Box machines.
