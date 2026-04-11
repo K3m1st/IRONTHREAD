@@ -29,6 +29,16 @@ boxes/
 *id_ed25519
 *.pem
 
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+
+# Working notes
+tasks/
+
 # Hydra
 hydra.restore
 
