@@ -28,7 +28,7 @@ Agents communicate through JSON authorization contracts (`handoff.json`, `deploy
 
 Before setup, ensure you have:
 
-- **Claude Code**: `npm install -g @anthropic-ai/claude-code`
+- **Claude Code**: `curl -fsSL https://claude.ai/install.sh | bash`
 - **Anthropic API key** or Claude subscription with OAuth: `export ANTHROPIC_API_KEY=your_key`
 - **Python 3.10+**: `python3 --version`
 - **Pentest tools**: nmap, whatweb, gobuster, ffuf, smbclient, dig, curl
