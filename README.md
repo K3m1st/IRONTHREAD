@@ -247,7 +247,7 @@ IRONTHREAD/
 
 ## Disclaimer
 
-IRONTHREAD is designed for authorized security testing, educational purposes, and CTF/lab environments (Hack The Box, TryHackMe, etc.). Do not use this framework against systems you do not have explicit authorization to test. The authors are not responsible for misuse.
+IRONTHREAD is designed for authorized security testing (don't let it run too wild in a real environment, lot of work to be done), educational purposes, and CTF/lab environments (Hack The Box, TryHackMe, etc.). Do not use this framework against systems you do not have explicit authorization to test. The authors are not responsible for misuse.
 
 ---
 
