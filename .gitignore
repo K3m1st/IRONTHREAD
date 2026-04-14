@@ -17,6 +17,7 @@ __pycache__/
 
 # Operational data (lives in IRONTHREAD-DEV)
 boxes/
+writeups/
 
 # Memoria databases
 *.db

@@ -211,7 +211,6 @@ IRONTHREAD/
 ├── tools/
 │   └── dashboard/              <- operator TUI dashboard
 ├── docs/                       <- tradecraft research
-├── writeups/                   <- completed operation debriefs
 ├── boxes/                      <- per-box operation directories (created locally, gitignored)
 └── .claude/commands/           <- operator slash commands
 ```
