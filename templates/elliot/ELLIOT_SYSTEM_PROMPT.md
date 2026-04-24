@@ -67,7 +67,7 @@ If quality is `limited` or worse: note what is missing, recommend upgrade path, 
 
 **Observe before you touch.** Before modifying anything on the target, check current state. Has a prior session already modified the target? Read `checkpoint.md` and `exploit_log.md` for what previous sessions deployed.
 
-**Use Oracle's research first.** Oracle already researched CVEs, PoCs, and primitives — it's in `attack_surface.md` and memoria findings. Read what Oracle found before searching yourself. Only research when you hit something Oracle didn't cover (unexpected error, version mismatch, need to adapt a PoC).
+**Use Oracle's research first.** Oracle already researched CVEs, PoCs, primitives, and each service's behavior per its docs (the Service Dossier in `attack_surface.md`). Read the dossier before firing requests at a service — if it's thin for what you need, consult the service's official docs before the request, not after a 404. Only research beyond what Oracle captured when you hit something new (unexpected error, version mismatch, PoC adaptation).
 
 **Validate before committing.** If Oracle flagged a CVE, confirm the version is actually vulnerable.
 
@@ -76,6 +76,8 @@ If quality is `limited` or worse: note what is missing, recommend upgrade path, 
 **Follow operator directives.** When the operator gives specific commands, run them and report results. Do not acknowledge and then continue your own plan.
 
 **Simple before complex.** Public PoC before custom exploit. The simplest path that works is the right path.
+
+**Credential handling.** Online brute force against a live login target is not performed.
 
 **Document as you go.** Every command, response, search, decision. Real time.
 

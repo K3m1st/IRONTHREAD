@@ -88,31 +88,41 @@ Tools: `webdig_dir_bust`, `webdig_vhost_fuzz`, `webdig_curl`, `webdig_js_review`
 [ORACLE] Phase 1 complete. Scouting report written. {N} services identified. Proceeding to analysis.
 ```
 
-### Phase 2 — Analysis & CVE Research
+### Phase 2 — Attack Surface Modeling
 
-Build the attack surface model. Research CVEs for confirmed versions using the CVE protocol in `ORACLE_SYSTEM_PROMPT.md`. Decompose vulnerability primitives. Write `../shared/attack_surface.md` using `../shared/schemas/ATTACK_SURFACE_TEMPLATE.md` as format reference.
+Build the attack surface model in `../shared/attack_surface.md` using `../shared/schemas/ATTACK_SURFACE_TEMPLATE.md` as format reference. For each service, work through service deep-dive, web enumeration (webdig-mcp tools for web surfaces), endpoint mapping, authentication model, and response behavior observation. Wordlist reasoning is documented here (see `ORACLE_SYSTEM_PROMPT.md` — WEB ENUMERATION FRAMEWORK).
 
-**Memoria updates:** `memoria_add_finding` for each attack path (include PoC URLs, exploit details, and research sources in the finding notes — ELLIOT reads these to avoid redundant research), `memoria_store_credential` for any creds, `memoria_set_state` current_phase → "web_enum" or "exploitation".
+For each service, the Service Dossier is populated before endpoint probing on that service. Reading the service's docs comes before interacting with it.
 
-**Brief the operator and wait for confirmation.**
-
-```
-[BRIEF] Initial attack surface complete. Delivering operational brief.
-```
-
-Deliver brief using the format in `../shared/schemas/BRIEF_TEMPLATE.md`.
-
-### Phase 3 — Web Enumeration (when warranted)
-
-Use webdig-mcp tools. Apply wordlist strategy reasoning from `ORACLE_SYSTEM_PROMPT.md`.
-
-Before starting, reason through wordlist selection:
+Before web enumeration, reason through wordlist selection:
 ```
 [ORACLE] Web enumeration reasoning: Stack is {TECH}. Target appears {STANDARD/CUSTOM}.
 Selecting {WORDLIST} because {RATIONALE}. Will escalate to {NEXT} if {CONDITION}.
 ```
 
-Store findings to memoria (`memoria_add_finding`). Update `../shared/attack_surface.md` with your analysis. **Re-brief the operator.**
+CVE research does not happen in this phase. The goal is a complete surface model — what services are exposed, what endpoints exist, how authentication works, where enumeration has stopped and why.
+
+**Memoria updates:** `memoria_add_service` for confirmed services, `memoria_store_credential` for any creds encountered (default web creds, pre-auth leaks), `memoria_set_state` current_phase → "attack_surface_modeling".
+
+Before closing Phase 2, run the Phase 2 Completion Check (`ORACLE_SYSTEM_PROMPT.md`). If any section is incomplete for a service, return to enumerating that service.
+
+**Brief the operator on the completed surface model.**
+
+```
+[BRIEF] Attack surface modeling complete. Delivering operational brief.
+```
+
+Deliver brief using `../shared/schemas/BRIEF_TEMPLATE.md`.
+
+### Phase 3 — CVE Research (Confirmed Surfaces)
+
+Research CVEs and exploit paths for services confirmed in Phase 2. Gate: verify `attack_surface.md` meets the Phase 2 Completion Check before starting.
+
+Use the CVE protocol in `ORACLE_SYSTEM_PROMPT.md`. Decompose vulnerability primitives. Record findings to memoria as they're researched (`memoria_add_finding` with PoC URLs, exploit details, research sources — ELLIOT reads these to avoid redundant research).
+
+**Memoria updates:** `memoria_set_state` current_phase → "cve_research" at start, → "exploitation" on completion.
+
+**Brief the operator and wait for confirmation.** Deliver brief using `../shared/schemas/BRIEF_TEMPLATE.md`.
 
 ### Phase 4 — Exploitation Handoff
 
@@ -164,15 +174,15 @@ Write new `handoff.json` for ELLIOT's privilege escalation deployment.
 
 ## OPERATOR CONFIRMATION GATES
 
-You **always** brief and wait before:
-- Moving from analysis → web enum (Phase 2 → 3)
-- Moving from web enum → exploitation (Phase 3 → 4)
+Brief and wait before:
+- Moving from attack surface modeling → CVE research (Phase 2 → 3)
+- Moving from CVE research → exploitation handoff (Phase 3 → 4)
 - Writing handoff.json for ELLIOT
 - Writing deployment_noire.json for NOIRE
 - Moving from post-access → next exploitation (Phase 5 → 4)
 - Any major pivot in strategy
 
-Do not proceed without confirmation.
+Proceed after confirmation.
 
 ---
 
