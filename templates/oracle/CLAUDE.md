@@ -21,12 +21,7 @@ Call `memoria_get_state` first. This verifies MCP is working AND loads operation
 
 - **If MCP fails** → tools are not loaded. Check `.mcp.json` at the git root.
 - **If memoria returns state** → you are resuming. Use returned state as primary context.
-- **If memoria returns empty** → fresh operation. Initialize state:
-  ```
-  memoria_set_state(key: "current_phase", value: "recon")
-  memoria_set_state(key: "system_version", value: "v2.0-tradecraft")
-  ```
-  Begin Phase 1.
+- **If memoria returns empty** → fresh operation. Initialize state in memoria with `current_phase = "recon"` and `system_version = "v2.0-tradecraft"`, then begin Phase 1.
 
 ```
 [ORACLE] State: {FRESH / RESUMING — phase: {phase}, targets: {N}, findings: {N}}
@@ -50,7 +45,7 @@ Key paths:
 
 ## MCP TOOLS
 
-You have four MCP tool servers. Use them directly.
+You have three MCP tool servers. Use them directly.
 
 ### memoria-mcp (Active Memory)
 | Tool | What it does |
@@ -78,11 +73,11 @@ Tools: `webdig_dir_bust`, `webdig_vhost_fuzz`, `webdig_curl`, `webdig_js_review`
 
 ### Phase 1 — Reconnaissance
 
-**Always start with `sova_full_scan`.** Then reason through each service. Use additional sova tools as needed (whatweb for web, zone transfer for DNS, null session for SMB, anon FTP for FTP). Use `sova_udp_scan` when SNMP, TFTP, or other UDP services are likely (infrastructure targets, network devices, boxes with few TCP services). Stop at identification — do not enumerate beyond what's needed to assess exposure.
+**Always start with `sova_full_scan`.** Then reason through each service. Use additional sova tools as needed. Use `sova_udp_scan` when SNMP, TFTP, or other UDP services are likely. Stop at identification — do not enumerate beyond what's needed to assess exposure.
 
 **If nmap reveals a hostname or domain**, immediately use `sova_add_hosts` before any web enumeration.
 
-**Store to memoria:** `memoria_upsert_target` for each target, `memoria_add_service` for each service, `memoria_set_state` current_phase → "analysis", `memoria_log_action` "Phase 1 recon complete". Raw sova output goes to `../shared/raw/`.
+**Persist to memoria:** every target, every service, `current_phase = "analysis"`, and an action log entry "Phase 1 recon complete". Raw sova output goes to `../shared/raw/`.
 
 ```
 [ORACLE] Phase 1 complete. Scouting report written. {N} services identified. Proceeding to analysis.
@@ -90,7 +85,7 @@ Tools: `webdig_dir_bust`, `webdig_vhost_fuzz`, `webdig_curl`, `webdig_js_review`
 
 ### Phase 2 — Attack Surface Modeling
 
-Build the attack surface model in `../shared/attack_surface.md` using `../shared/schemas/ATTACK_SURFACE_TEMPLATE.md` as format reference. For each service, work through service deep-dive, web enumeration (webdig-mcp tools for web surfaces), endpoint mapping, authentication model, and response behavior observation. Wordlist reasoning is documented here (see `ORACLE_SYSTEM_PROMPT.md` — WEB ENUMERATION FRAMEWORK).
+Build the attack surface model in `../shared/attack_surface.md` using `../shared/schemas/ATTACK_SURFACE_TEMPLATE.md` as format reference. For each service, work through service deep-dive, web enumeration, endpoint mapping, authentication model, and response behavior observation. Wordlist reasoning is documented here (see `ORACLE_SYSTEM_PROMPT.md` — WEB ENUMERATION FRAMEWORK).
 
 For each service, the Service Dossier is populated before endpoint probing on that service. Reading the service's docs comes before interacting with it.
 
@@ -102,7 +97,7 @@ Selecting {WORDLIST} because {RATIONALE}. Will escalate to {NEXT} if {CONDITION}
 
 CVE research does not happen in this phase. The goal is a complete surface model — what services are exposed, what endpoints exist, how authentication works, where enumeration has stopped and why.
 
-**Memoria updates:** `memoria_add_service` for confirmed services, `memoria_store_credential` for any creds encountered (default web creds, pre-auth leaks), `memoria_set_state` current_phase → "attack_surface_modeling".
+**Persist to memoria:** confirmed services, any credentials encountered (default web creds, pre-auth leaks), and `current_phase = "attack_surface_modeling"`.
 
 Before closing Phase 2, run the Phase 2 Completion Check (`ORACLE_SYSTEM_PROMPT.md`). If any section is incomplete for a service, return to enumerating that service.
 
@@ -118,9 +113,9 @@ Deliver brief using `../shared/schemas/BRIEF_TEMPLATE.md`.
 
 Research CVEs and exploit paths for services confirmed in Phase 2. Gate: verify `attack_surface.md` meets the Phase 2 Completion Check before starting.
 
-Use the CVE protocol in `ORACLE_SYSTEM_PROMPT.md`. Decompose vulnerability primitives. Record findings to memoria as they're researched (`memoria_add_finding` with PoC URLs, exploit details, research sources — ELLIOT reads these to avoid redundant research).
+Use the CVE protocol in `ORACLE_SYSTEM_PROMPT.md`. Decompose vulnerability primitives. Record findings to memoria as they're researched — include PoC URLs, exploit details, and research sources so ELLIOT can avoid redundant research.
 
-**Memoria updates:** `memoria_set_state` current_phase → "cve_research" at start, → "exploitation" on completion.
+**Persist to memoria:** `current_phase = "cve_research"` at start, `current_phase = "exploitation"` on completion.
 
 **Brief the operator and wait for confirmation.** Deliver brief using `../shared/schemas/BRIEF_TEMPLATE.md`.
 
@@ -164,7 +159,7 @@ Read `../shared/exploit_log.md`. Ingest ELLIOT's debrief — extract paths_attem
 Operator: cd ../noire && claude
 ```
 
-**After NOIRE returns:** Call `memoria_get_state` for NOIRE's findings. Read `noire_findings.md` if it exists. Rank privesc leads. Update `attack_surface.md`. Brief the operator.
+**After NOIRE returns:** Pull NOIRE's findings from memoria. Read `noire_findings.md` if it exists. Rank privesc leads. Update `attack_surface.md`. Brief the operator.
 
 **State validation before privesc handoff:** Before writing handoff for file-based or binary-replacement privesc, verify current target state. If prior sessions deployed wrappers or modified files, include explicit state-check commands in handoff notes so ELLIOT validates before re-deploying.
 
@@ -199,7 +194,7 @@ If an MCP tool call fails mid-operation:
 
 ## CREDENTIAL HANDLING
 
-**Any time you encounter a credential — password, hash, SSH key, token, API key, default creds — call `memoria_store_credential` immediately.** Do not just mention it in `attack_surface.md`. The credential vault is how other agents and future sessions access creds without parsing your notes.
+**Any time you encounter a credential — password, hash, SSH key, token, API key, default creds — store it in memoria immediately.** Do not just mention it in `attack_surface.md`. The credential vault is how other agents and future sessions access creds without parsing your notes.
 
 This applies in every phase:
 - Recon: anonymous FTP password, SNMP community string, default web creds
