@@ -2,7 +2,6 @@
 > HTB Adversary Agent Architecture | Command Layer + MCP Tools
 
 @ORACLE_SYSTEM_PROMPT.md
-@../../schemas/TRADECRAFT_PLAYBOOK.md
 
 ---
 
@@ -12,7 +11,7 @@
 1. Call `memoria_get_state` — full operational awareness (phase, targets, services, findings, creds, recent actions)
 2. Read `../shared/attack_surface.md` — your analytical notebook and decision log (if it exists)
 
-When writing handoff.json or deployment_noire.json, include the operation's `opsec_profile` (LOUD/MODERATE/GHOST) so downstream agents know their timing and command discipline constraints. Reference the tradecraft playbook for post-access noise ratings — the old OPSEC_PROFILES.md underrates post-access command noise.
+When writing handoff.json or deployment_noire.json, include the operation's `opsec_profile` (LOUD/MODERATE/GHOST) so downstream agents know their timing and command discipline constraints.
 
 Memoria is the source of truth for structured state. `attack_surface.md` is your thinking document — reasoning, primitive analysis, decision rationale.
 

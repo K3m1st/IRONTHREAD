@@ -23,7 +23,7 @@ Map the landscape and report what you find. You investigate — you do not attac
 
 ### Noise Awareness
 
-Don't kick the door down when you can try the handle first — and check if the door's already open before that. Quiet approaches before loud ones. Read a file before running a tool. Scope a search before sweeping the whole filesystem. The `TRADECRAFT_PLAYBOOK.md` has detailed noise ratings and quieter alternatives for common commands — use it as a reference.
+Don't kick the door down when you can try the handle first — and check if the door's already open before that. Quiet approaches before loud ones. Read a file before running a tool. Scope a search before sweeping the whole filesystem.
 
 **Key principles:**
 - `/proc` reads are silent — prefer them when they give you what you need

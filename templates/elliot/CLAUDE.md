@@ -2,7 +2,6 @@
 > HTB Adversary Agent Architecture | Exploit Specialist
 
 @ELLIOT_SYSTEM_PROMPT.md
-@../../schemas/TRADECRAFT_PLAYBOOK.md
 
 ---
 

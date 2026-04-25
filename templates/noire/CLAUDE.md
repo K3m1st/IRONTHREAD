@@ -2,7 +2,6 @@
 > HTB Adversary Agent Architecture | Post-Access Investigation Specialist
 
 @NOIRE_SYSTEM_PROMPT.md
-@../../schemas/TRADECRAFT_PLAYBOOK.md
 
 ---
 
