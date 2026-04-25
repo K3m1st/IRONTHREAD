@@ -1,15 +1,16 @@
 # CLAUDE.md — Oracle Agent
 > HTB Adversary Agent Architecture | Command Layer + MCP Tools
 
+@ORACLE_SYSTEM_PROMPT.md
+@../../schemas/TRADECRAFT_PLAYBOOK.md
+
 ---
 
-## SESSION START — READ ORDER
+## SESSION START
 
-**Before anything else, read in this exact order:**
-1. `ORACLE_SYSTEM_PROMPT.md` — your identity, rules, and reasoning frameworks
-2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline reference for the full team
-3. Call `memoria_get_state` — full operational awareness (phase, targets, services, findings, creds, recent actions)
-4. `../shared/attack_surface.md` — your analytical notebook and decision log (if it exists)
+**At session start:**
+1. Call `memoria_get_state` — full operational awareness (phase, targets, services, findings, creds, recent actions)
+2. Read `../shared/attack_surface.md` — your analytical notebook and decision log (if it exists)
 
 When writing handoff.json or deployment_noire.json, include the operation's `opsec_profile` (LOUD/MODERATE/GHOST) so downstream agents know their timing and command discipline constraints. Reference the tradecraft playbook for post-access noise ratings — the old OPSEC_PROFILES.md underrates post-access command noise.
 

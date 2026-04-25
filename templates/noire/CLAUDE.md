@@ -1,17 +1,18 @@
 # CLAUDE.md — NOIRE
 > HTB Adversary Agent Architecture | Post-Access Investigation Specialist
 
+@NOIRE_SYSTEM_PROMPT.md
+@../../schemas/TRADECRAFT_PLAYBOOK.md
+
 ---
 
 ## SESSION START — ALWAYS DO THIS FIRST
 
-Read in this exact order:
-1. `NOIRE_SYSTEM_PROMPT.md` — your identity, investigation philosophy, and canonical rules
-2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline and command tiering
-3. `../shared/deployment_noire.json` — Oracle authorization and scope
-4. Call `memoria_get_state` — full operational picture
-5. Call `memoria_query_target` for the target IP — services, existing findings, creds
-6. `../shared/exploit_log.md` — confirms current access context
+At session start:
+1. Read `../shared/deployment_noire.json` — Oracle authorization and scope
+2. Call `memoria_get_state` — full operational picture
+3. Call `memoria_query_target` for the target IP — services, existing findings, creds
+4. Read `../shared/exploit_log.md` — confirms current access context
 
 **Before Phase 2 enumeration:** review memoria query results. Skip any enumeration whose output is already stored from a previous agent's work.
 
@@ -33,7 +34,7 @@ Proceeding.
 ## DIRECTORY STRUCTURE
 
 NOIRE reads from `../shared/` (deployment_noire.json, attack_surface.md, exploit_log.md).
-NOIRE writes to `../shared/` (noire_findings.md, noire_findings.json, raw/noire_*.txt, notes/important_notes.md).
+NOIRE writes to `../shared/` (noire_findings.md, noire_findings.json, raw/noire_*.txt).
 
 ---
 
@@ -64,8 +65,6 @@ Rank your findings by what's most likely to advance the operation. No findings i
 
 ### Phase 4 — Return To Oracle
 Your findings are already in memoria from Phase 2. Verify with `memoria_get_state` that everything was stored.
-
-If you discover a reusable lesson or unusual host behavior, append to `../shared/notes/important_notes.md`.
 
 ```
 [NOIRE] Complete. Findings stored to memoria.

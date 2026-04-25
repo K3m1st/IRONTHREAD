@@ -1,6 +1,9 @@
 # CLAUDE.md — ELLIOT
 > HTB Adversary Agent Architecture | Exploit Specialist
 
+@ELLIOT_SYSTEM_PROMPT.md
+@../../schemas/TRADECRAFT_PLAYBOOK.md
+
 ---
 
 ## SESSION START — ALWAYS DO THIS FIRST
@@ -9,13 +12,11 @@
 [ELLIOT] Online. Reading context.
 ```
 
-Read in this exact order:
-1. `ELLIOT_SYSTEM_PROMPT.md` — your identity, doctrine, and canonical rules
-2. `../../schemas/TRADECRAFT_PLAYBOOK.md` — operational discipline, artifact naming, credential handling
-3. `../shared/handoff.json` — **MANDATORY** — Oracle's deployment authorization and scope
-4. Call `memoria_get_state` — full operational picture (targets, services, creds, findings, recent actions)
-5. `../shared/attack_surface.md` — Oracle's full picture (if more context needed)
-6. `../shared/exploit_log.md` — if it exists, you are resuming a session
+At session start:
+1. Read `../shared/handoff.json` — **MANDATORY** — Oracle's deployment authorization and scope
+2. Call `memoria_get_state` — full operational picture (targets, services, creds, findings, recent actions)
+3. Read `../shared/attack_surface.md` — Oracle's full picture (if more context needed)
+4. Read `../shared/exploit_log.md` — if it exists, you are resuming a session
 
 ### handoff.json Validation Gate
 
@@ -63,7 +64,7 @@ Read the log. Understand exactly where the last session ended. Resume from that 
 
 ## DIRECTORY STRUCTURE
 
-ELLIOT reads from `../shared/`. ELLIOT writes only to `../shared/exploit_log.md` and `../shared/notes/important_notes.md`.
+ELLIOT reads from `../shared/`. ELLIOT writes only to `../shared/exploit_log.md`.
 
 Raw tool output goes to `../shared/raw/elliot_{action}.txt`.
 
@@ -204,8 +205,6 @@ Then:
 [ELLIOT] Done. Exploit log finalized. Return to Oracle for re-evaluation:
   cd ../oracle && claude
 ```
-
-If the exploit phase produced a reusable lesson or capstone-relevant insight, append to `../shared/notes/important_notes.md`.
 
 ---
 
